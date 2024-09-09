@@ -14,8 +14,8 @@ let package = Package(
             targets: ["NativeblocksCompiler"]
         ),
         .plugin(
-            name: "NativeblocksPlugin",
-            targets: ["NativeblocksPlugin"]
+            name: "GenerateProvider",
+            targets: ["GenerateProvider"]
         ),
         .executable(
             name: "NativeblocksCompilerClient",
@@ -39,10 +39,10 @@ let package = Package(
         ),
 
         .plugin(
-            name: "NativeblocksPlugin",
+            name: "GenerateProvider",
             capability: .command(
                 intent: .custom(
-                    verb: "NativeblocksPlugin",
+                    verb: "GenerateProvider",
                     description: "prints hello world"
                 ),
                 permissions: [

@@ -2,7 +2,7 @@ import Foundation
 import PackagePlugin
 
 @main
-struct NativeblocksPlugin: CommandPlugin {
+struct GenerateProvider: CommandPlugin {
     func performCommand(context: PluginContext, arguments: [String]) async throws {
         print("NativeblocksPlugin:CommandPlugin performCommand \(context.pluginWorkDirectory.string)")
 //        let fileManager = FileManager.default
@@ -102,7 +102,7 @@ struct NativeblocksPlugin: CommandPlugin {
 #if canImport(XcodeProjectPlugin)
 import XcodeProjectPlugin
 
-extension NativeblocksPlugin: XcodeCommandPlugin {
+extension GenerateProvider: XcodeCommandPlugin {
 
   /// 👇 This entry point is called when operating on an Xcode project.
   func performCommand(context: XcodePluginContext, arguments: [String]) throws {
