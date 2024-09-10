@@ -4,7 +4,7 @@ import SwiftSyntaxBuilder
 enum NativeProviderGenerator {
     public static func generateProvider(prefix: String, blocks: [NativeBlock], actions: [NativeAction]) throws -> SourceFileSyntax {
         return try SourceFileSyntax {
-            try ClassDeclSyntax("public class \(raw: prefix)BlockProvider") {
+            try ClassDeclSyntax("public class \(raw: prefix)") {
                 try FunctionDeclSyntax("public static func provideBlocks()") {
                     for block in blocks {
                         """

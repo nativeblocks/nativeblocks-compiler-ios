@@ -1,7 +1,7 @@
-import NativeblocksCompilerClient
+import NativeblocksTool
 import XCTest
 
-final class NativeblocksCompilerClientTest: XCTestCase {
+final class NativeblocksToolTest: XCTestCase {
     func testProcessSwiftFile() throws {
         let provider = NativeBlocksProvider()
         let providerCode = try provider.processFiles(files: [
@@ -58,7 +58,7 @@ final class NativeblocksCompilerClientTest: XCTestCase {
             }
             """
             
-        ])
+        ],name : "Default")
 
         let providerCodeString = providerCode.formatted().description
         print("+++++++++++++++++++++++++")
