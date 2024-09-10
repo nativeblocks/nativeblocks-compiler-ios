@@ -10,7 +10,7 @@ let package = Package(
     products: [
         .library(name: "NativeblocksCompiler", targets: ["NativeblocksCompiler"]),
         .plugin(name: "GenerateProvider", targets: ["GenerateProvider"]),
-        .executable(name: "NativeblocksCompilerClient", targets: ["NativeblocksCompilerClient"]),
+        .executable(name: "NativeblocksTool", targets: ["NativeblocksTool"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
@@ -36,12 +36,12 @@ let package = Package(
                 ]
             ),
             dependencies: [
-                .target(name: "NativeblocksCompilerClient")
+                .target(name: "NativeblocksTool")
             ]
         ),
 
         .executableTarget(
-            name: "NativeblocksCompilerClient",
+            name: "NativeblocksTool",
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
@@ -62,9 +62,9 @@ let package = Package(
         ),
 
         .testTarget(
-            name: "NativeblocksCompilerClientTests",
+            name: "NativeblocksToolTests",
             dependencies: [
-                "NativeblocksCompilerClient",
+                "NativeblocksTool",
             ]
         ),
     ]

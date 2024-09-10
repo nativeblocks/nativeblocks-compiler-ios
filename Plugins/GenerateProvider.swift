@@ -7,7 +7,7 @@ struct GenerateProvider: CommandPlugin {
         context: PluginContext,
         arguments: [String]
     ) throws {
-        let tool = try context.tool(named: "NativeblocksCompilerClient")
+        let tool = try context.tool(named: "NativeblocksTool")
         let toolURL = URL(fileURLWithPath: tool.path.string)
         
         
@@ -26,7 +26,7 @@ import XcodeProjectPlugin
 
 extension GenerateProvider: XcodeCommandPlugin {
     func performCommand(context: XcodePluginContext, arguments: [String]) throws {
-        let tool = try context.tool(named: "NativeblocksCompilerClient")
+        let tool = try context.tool(named: "NativeblocksTool")
         let toolURL = URL(fileURLWithPath: tool.path.string)
 
         print("directory:\(context.xcodeProject.directory)")
