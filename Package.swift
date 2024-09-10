@@ -34,19 +34,37 @@ let package = Package(
                 permissions: [
                     .writeToPackageDirectory(reason: "This command write the new Provider to the source root."),
                 ]
-            )
+            ),
+            dependencies: [
+                .target(name: "NativeblocksCompilerClient")
+            ]
+        ),
+
+        .executableTarget(
+            name: "NativeblocksCompilerClient",
+            dependencies: [
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax")
+            ]
         ),
         .target(
             name: "NativeblocksCompiler",
             dependencies: ["NativeblocksCompilerMacros"]
         ),
 
-        .executableTarget(name: "NativeblocksCompilerClient", dependencies: ["NativeblocksCompiler"]),
         .testTarget(
             name: "NativeblocksCompilerTests",
             dependencies: [
                 "NativeblocksCompilerMacros",
                 .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
+            ]
+        ),
+
+        .testTarget(
+            name: "NativeblocksCompilerClientTests",
+            dependencies: [
+                "NativeblocksCompilerClient",
             ]
         ),
     ]
