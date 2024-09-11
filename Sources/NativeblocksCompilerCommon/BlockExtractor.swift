@@ -1,17 +1,15 @@
-import SwiftCompilerPlugin
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxBuilder
-import SwiftSyntaxMacros
 
-class BlockExtractor {
+public struct BlockExtractor {
     static let NativeBlockDataType = "NativeBlockData"
     static let NativeBlockPropType = "NativeBlockProp"
     static let NativeBlockEventType = "NativeBlockEvent"
     static let NativeBlockSlotType = "NativeBlockSlot"
 
-    static func extractVariable(from structDecl: StructDeclSyntax) -> ([BlockVariable], [Diagnostic]) {
-        var meta: [BlockVariable] = []
+    public static func extractVariable(from structDecl: StructDeclSyntax) -> ([NativeMeta], [Diagnostic]) {
+        var meta: [NativeMeta] = []
         var errors: [Diagnostic] = []
         var position = 0
         for member in structDecl.memberBlock.members {
@@ -72,8 +70,8 @@ class BlockExtractor {
             }
         }
 
-        let dataBlocks = meta.compactMap { $0 as? Data }
-        let eventBlocks = meta.compactMap { $0 as? Event }
+        let dataBlocks = meta.compactMap { $0 as? DataNativeMeta }
+        let eventBlocks = meta.compactMap { $0 as? EventNativeMeta }
 
         for event in eventBlocks {
             for binding in event.dataBinding {
@@ -91,7 +89,7 @@ class BlockExtractor {
     }
 
     private static func extractDataBlock(from varDecl: VariableDeclSyntax, startPosition: Int)
-        -> ([Data], [Diagnostic])?
+        -> ([DataNativeMeta], [Diagnostic])?
     {
         var position = startPosition
         let attributes = varDecl.attributes
@@ -120,7 +118,7 @@ class BlockExtractor {
                 }
 
                 return !key.isEmpty && !type.isEmpty
-                    ? Data(
+                    ? DataNativeMeta(
                         position: position,
                         key: key,
                         type: type,
@@ -133,7 +131,7 @@ class BlockExtractor {
     }
 
     private static func extractPropBlock(from varDecl: VariableDeclSyntax, startPosition: Int)
-        -> ([Property], [Diagnostic])?
+        -> ([PropertyNativeMeta], [Diagnostic])?
     {
         var position = startPosition
         let attributes = varDecl.attributes
@@ -171,7 +169,7 @@ class BlockExtractor {
                 }
 
                 return !key.isEmpty && !type.isEmpty
-                    ? Property(
+                    ? PropertyNativeMeta(
                         position: position,
                         key: key,
                         value: value,
@@ -188,7 +186,7 @@ class BlockExtractor {
     }
 
     private static func extractEventBlock(from varDecl: VariableDeclSyntax, startPosition: Int)
-        -> ([Event], [Diagnostic])?
+        -> ([EventNativeMeta], [Diagnostic])?
     {
         var position = startPosition
         let attributes = varDecl.attributes
@@ -245,7 +243,7 @@ class BlockExtractor {
                 }
 
                 return !event.isEmpty && function != nil
-                    ? Event(
+                    ? EventNativeMeta(
                         position: position,
                         event: event,
                         description: description,
@@ -259,7 +257,7 @@ class BlockExtractor {
     }
 
     private static func extractSlotBlock(from varDecl: VariableDeclSyntax, startPosition: Int)
-        -> ([Slot], [Diagnostic])?
+        -> ([SlotNativeMeta], [Diagnostic])?
     {
         var position = startPosition
         let attributes = varDecl.attributes
@@ -323,7 +321,7 @@ class BlockExtractor {
                 }
 
                 return !slot.isEmpty
-                    ? Slot(
+                    ? SlotNativeMeta(
                         position: position,
                         slot: slot,
                         description: description,

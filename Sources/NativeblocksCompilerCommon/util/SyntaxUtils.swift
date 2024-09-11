@@ -1,6 +1,6 @@
 import SwiftSyntax
 
-enum SyntaxUtils {
+public struct SyntaxUtils {
     static func extractAttribute(for type: String, from attributes: AttributeListSyntax) -> AttributeSyntax? {
         for attribute in attributes {
             if let attr = attribute.as(AttributeSyntax.self),

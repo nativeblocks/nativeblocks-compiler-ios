@@ -1,8 +1,9 @@
+import NativeblocksCompilerCommon
 import SwiftSyntax
 import SwiftSyntaxBuilder
 
-enum NativeProviderGenerator {
-    public static func generateBlockProvider(prefix: String, blocks: [NativeBlock]) throws -> SourceFileSyntax {
+public struct ProviderCreator {
+    public  static func createBlockProvider(prefix: String, blocks: [NativeBlock]) throws -> SourceFileSyntax {
         return try SourceFileSyntax {
             """
             import Nativeblocks
@@ -19,7 +20,7 @@ enum NativeProviderGenerator {
         }
     }
     
-    public static func generateActionProvider(prefix: String, actions: [NativeAction]) throws -> SourceFileSyntax {
+    public static func createActionProvider(prefix: String, actions: [NativeAction]) throws -> SourceFileSyntax {
         return try SourceFileSyntax {
             """
             import Nativeblocks

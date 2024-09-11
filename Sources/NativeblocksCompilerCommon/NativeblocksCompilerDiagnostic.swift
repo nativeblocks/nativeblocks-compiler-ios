@@ -1,9 +1,6 @@
 import SwiftDiagnostics
-import SwiftSyntax
-import SwiftSyntaxBuilder
-import SwiftSyntaxMacros
 
-enum NativeblocksCompilerDiagnostic: String, DiagnosticMessage {
+public enum NativeblocksCompilerDiagnostic: String, DiagnosticMessage {
     case notAStruct
     case notAClass
     case singleVariableLimit
@@ -15,9 +12,9 @@ enum NativeblocksCompilerDiagnostic: String, DiagnosticMessage {
     case requiredNativeActionFunction
     case requiredNativeActionFunctionParameter
 
-    var severity: DiagnosticSeverity { return .error }
+    public var severity: DiagnosticSeverity { return .error }
 
-    var message: String {
+    public var message: String {
         switch self {
         case .notAStruct:
             return "Can only be used with structs."
@@ -43,7 +40,7 @@ enum NativeblocksCompilerDiagnostic: String, DiagnosticMessage {
 
     }
 
-    var diagnosticID: MessageID {
+    public var diagnosticID: MessageID {
         MessageID(domain: "NativeblocksCompilerMacros", id: rawValue)
     }
 }

@@ -1,13 +1,14 @@
 import SwiftSyntax
 import SwiftSyntaxBuilder
+import NativeblocksCompilerCommon
 
 struct BlockCreator {
     static func create(
         structName: String,
-        metaData: [Data],
-        metaProp: [Property],
-        metaEvent: [Event],
-        metaSlot: [Slot]
+        metaData: [DataNativeMeta],
+        metaProp: [PropertyNativeMeta],
+        metaEvent: [EventNativeMeta],
+        metaSlot: [SlotNativeMeta]
     ) throws -> StructDeclSyntax {
         return try StructDeclSyntax("public struct \(raw: structName)Block: INativeBlock") {
             try FunctionDeclSyntax("public func blockView(blockProps: BlockProps) -> any View") {
@@ -150,7 +151,7 @@ struct BlockCreator {
         }
     }
 
-    private static func dataTypeMapper(dataItem: Data) -> String? {
+    private static func dataTypeMapper(dataItem: DataNativeMeta) -> String? {
         switch dataItem.type.uppercased() {
         case "STRING":
             return
@@ -178,7 +179,7 @@ struct BlockCreator {
         }
     }
 
-    private static func propTypeMapper(item: Property) -> String? {
+    private static func propTypeMapper(item: PropertyNativeMeta) -> String? {
         switch item.type.uppercased() {
         case "STRING":
             return

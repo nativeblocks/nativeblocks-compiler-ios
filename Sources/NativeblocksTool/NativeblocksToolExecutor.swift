@@ -20,10 +20,9 @@ public class NativeblocksToolExecutor {
         }
 
         if commands.contains(where: { command in command == GenerateProviderCommand }) {
-            let provider = NativeBlocksProvider()
-            try provider.addDirectory(at: URL(fileURLWithPath: parsedArgs[DirectoryArgumentKey]!))
-            provider.addTarget(at: parsedArgs[TargetArgumentKey]!)
-            try provider.processAll()
+            let generator = try ProviderGenerator(prefix: parsedArgs[TargetArgumentKey]!, from: URL(fileURLWithPath: parsedArgs[DirectoryArgumentKey]!))
+
+            try generator.generate()
         }
 
         if commands.contains(where: { command in command == GenerateJsonCommand }) {}
@@ -54,7 +53,7 @@ public class NativeblocksToolExecutor {
         guard let target = parsedArgs[TargetArgumentKey] else {
             throw ArgumentError.missingTarget
         }
-        
+
         if target.isEmpty {
             throw ArgumentError.missingTarget
         }

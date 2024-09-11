@@ -1,12 +1,14 @@
 import SwiftSyntax
 
-struct Data: BlockVariable {
-    var position: Int
-    var key: String
-    var type: String
-    var description: String
-    var block: AttributeSyntax?
-    var valriable: PatternBindingSyntax?
+public protocol NativeMeta {}
+
+public struct DataNativeMeta: NativeMeta {
+    public var position: Int
+    public var key: String
+    public var type: String
+    public var description: String
+    public var block: AttributeSyntax?
+    public var valriable: PatternBindingSyntax?
 
     init(
         position: Int, key: String, type: String, description: String, block: AttributeSyntax? = nil, valriable: PatternBindingSyntax? = nil
@@ -20,17 +22,17 @@ struct Data: BlockVariable {
     }
 }
 
-struct Property: BlockVariable {
-    var position: Int
-    var key: String
-    var value: String
-    var type: String
-    var description: String
-    var valuePicker: String
-    var valuePickerOptions: String
-    var valuePickerGroup: String
-    var block: AttributeSyntax?
-    var valriable: PatternBindingSyntax?
+public struct PropertyNativeMeta: NativeMeta {
+    public var position: Int
+    public var key: String
+    public var value: String
+    public var type: String
+    public var description: String
+    public var valuePicker: String
+    public var valuePickerOptions: String
+    public var valuePickerGroup: String
+    public var block: AttributeSyntax?
+    public var valriable: PatternBindingSyntax?
 
     init(
         position: Int, key: String, value: String, type: String, description: String, valuePicker: String, valuePickerOptions: String,
@@ -49,15 +51,15 @@ struct Property: BlockVariable {
     }
 }
 
-struct Event: BlockVariable {
-    var position: Int
-    var event: String
-    var description: String
-    var dataBinding: [String] = []
-    var isOptinalFunction: Bool
-    var then: String?
-    var block: AttributeSyntax?
-    var valriable: PatternBindingSyntax?
+public struct EventNativeMeta: NativeMeta {
+    public var position: Int
+    public var event: String
+    public var description: String
+    public var dataBinding: [String] = []
+    public var isOptinalFunction: Bool
+    public var then: String?
+    public var block: AttributeSyntax?
+    public var valriable: PatternBindingSyntax?
 
     init(
         position: Int, event: String, description: String, dataBinding: [String], isOptinalFunction: Bool, then: String? = nil,
@@ -75,14 +77,14 @@ struct Event: BlockVariable {
     }
 }
 
-struct Slot: BlockVariable {
-    var position: Int
-    var slot: String
-    var description: String
-    var hasBlockIndex: Bool
-    var isOptinalFunction: Bool
-    var block: AttributeSyntax?
-    var valriable: PatternBindingSyntax?
+public struct SlotNativeMeta: NativeMeta {
+    public var position: Int
+    public var slot: String
+    public var description: String
+    public var hasBlockIndex: Bool
+    public var isOptinalFunction: Bool
+    public var block: AttributeSyntax?
+    public var valriable: PatternBindingSyntax?
 
     init(
         position: Int, slot: String, description: String, hasBlockIndex: Bool, isOptinalFunction: Bool, block: AttributeSyntax? = nil,
@@ -98,17 +100,14 @@ struct Slot: BlockVariable {
     }
 }
 
-struct ActionInfo: BlockVariable {
-    var parameterClass: String
-    var functionName: String
-    var functionParamName: String
+public struct ActionNativeMeta: NativeMeta {
+    public var parameterClass: String
+    public var functionName: String
+    public var functionParamName: String
 
     init(parameterClass: String, functionName: String, functionParamName: String) {
         self.parameterClass = parameterClass
         self.functionName = functionName
         self.functionParamName = functionParamName
     }
-
 }
-
-protocol BlockVariable {}

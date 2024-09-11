@@ -1,18 +1,16 @@
-import SwiftCompilerPlugin
 import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxBuilder
-import SwiftSyntaxMacros
 
-class ActionExtractor {
+public struct ActionExtractor {
     static let NativeActionDataType = "NativeActionData"
     static let NativeActionPropType = "NativeActionProp"
     static let NativeActionEventType = "NativeActionEvent"
     static let NativeActionFunctionType = "NativeActionFunction"
     static let NativeActionParameterType = "NativeActionParameter"
 
-    static func extractVariable(from structDecl: ClassDeclSyntax) -> ([BlockVariable], [Diagnostic]) {
-        var meta: [BlockVariable] = []
+    public static func extractVariable(from structDecl: ClassDeclSyntax) -> ([NativeMeta], [Diagnostic]) {
+        var meta: [NativeMeta] = []
         var errors: [Diagnostic] = []
         var position = 0
 
@@ -67,8 +65,8 @@ class ActionExtractor {
             }
         }
 
-        let dataActions = meta.compactMap { $0 as? Data }
-        let eventActions = meta.compactMap { $0 as? Event }
+        let dataActions = meta.compactMap { $0 as? DataNativeMeta }
+        let eventActions = meta.compactMap { $0 as? EventNativeMeta }
 
         for event in eventActions {
             for binding in event.dataBinding {
@@ -86,7 +84,7 @@ class ActionExtractor {
     }
 
     private static func extractActionInfo(from classDecl: ClassDeclSyntax) -> (
-        ActionInfo?, [VariableDeclSyntax], [Diagnostic]
+        ActionNativeMeta?, [VariableDeclSyntax], [Diagnostic]
     ) {
         var parameterClass = ""
         var functionName = ""
@@ -134,7 +132,7 @@ class ActionExtractor {
 
         return !functionName.isEmpty
             ? (
-                ActionInfo(
+                ActionNativeMeta(
                     parameterClass: parameterClass,
                     functionName: functionName,
                     functionParamName: functionParamName
@@ -146,7 +144,7 @@ class ActionExtractor {
     }
 
     private static func extractDataAction(from varDecl: VariableDeclSyntax, startPosition: Int)
-        -> ([Data], [Diagnostic])?
+        -> ([DataNativeMeta], [Diagnostic])?
     {
         var position = startPosition
         let attributes = varDecl.attributes
@@ -175,7 +173,7 @@ class ActionExtractor {
                 }
 
                 return !key.isEmpty && !type.isEmpty
-                    ? Data(
+                    ? DataNativeMeta(
                         position: position,
                         key: key,
                         type: type,
@@ -188,7 +186,7 @@ class ActionExtractor {
     }
 
     private static func extractPropAction(from varDecl: VariableDeclSyntax, startPosition: Int)
-        -> ([Property], [Diagnostic])?
+        -> ([PropertyNativeMeta], [Diagnostic])?
     {
         var position = startPosition
         let attributes = varDecl.attributes
@@ -224,7 +222,7 @@ class ActionExtractor {
                 }
 
                 return !key.isEmpty && !type.isEmpty
-                    ? Property(
+                    ? PropertyNativeMeta(
                         position: position,
                         key: key,
                         value: value,
@@ -243,7 +241,7 @@ class ActionExtractor {
     private static func extractEventAction(
         from varDecl: VariableDeclSyntax, startPosition: Int
     )
-        -> ([Event], [Diagnostic])?
+        -> ([EventNativeMeta], [Diagnostic])?
     {
         var position = startPosition
         let attributes = varDecl.attributes
@@ -299,7 +297,7 @@ class ActionExtractor {
                 }
 
                 return !event.isEmpty && function != nil
-                    ? Event(
+                    ? EventNativeMeta(
                         position: position,
                         event: event,
                         description: description,

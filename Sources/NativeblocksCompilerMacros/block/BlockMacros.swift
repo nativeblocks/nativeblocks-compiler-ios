@@ -3,6 +3,7 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
+import NativeblocksCompilerCommon
 
 public struct NativeBlockMacro: PeerMacro {
     public static func expansion(
@@ -25,10 +26,10 @@ public struct NativeBlockMacro: PeerMacro {
             context.diagnose(error)
         }
 
-        let metaData = variables.compactMap { $0 as? Data }
-        let metaProp = variables.compactMap { $0 as? Property }
-        let metaEvent = variables.compactMap { $0 as? Event }
-        let metaSlot = variables.compactMap { $0 as? Slot }
+        let metaData = variables.compactMap { $0 as? DataNativeMeta }
+        let metaProp = variables.compactMap { $0 as? PropertyNativeMeta }
+        let metaEvent = variables.compactMap { $0 as? EventNativeMeta }
+        let metaSlot = variables.compactMap { $0 as? SlotNativeMeta }
 
         let newStructDecl = try BlockCreator.create(
             structName: structDecl.name.text,

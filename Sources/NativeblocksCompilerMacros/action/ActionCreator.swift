@@ -1,13 +1,14 @@
 import SwiftSyntax
 import SwiftSyntaxBuilder
+import NativeblocksCompilerCommon
 
 enum ActionCreator {
     static func create(
         structName: String,
-        actionInfo: ActionInfo?,
-        metaData: [Data],
-        metaProp: [Property],
-        metaEvent: [Event]
+        actionInfo: ActionNativeMeta?,
+        metaData: [DataNativeMeta],
+        metaProp: [PropertyNativeMeta],
+        metaEvent: [EventNativeMeta]
     ) throws -> ClassDeclSyntax {
         return try ClassDeclSyntax("public class \(raw: structName)Action: INativeAction") {
             """
@@ -128,7 +129,7 @@ enum ActionCreator {
         }
     }
 
-    private static func dataTypeMapper(dataItem: Data) -> String? {
+    private static func dataTypeMapper(dataItem: DataNativeMeta) -> String? {
         switch dataItem.type.uppercased() {
         case "STRING":
             return
@@ -156,7 +157,7 @@ enum ActionCreator {
         }
     }
 
-    private static func propTypeMapper(item: Property) -> String? {
+    private static func propTypeMapper(item: PropertyNativeMeta) -> String? {
         switch item.type.uppercased() {
         case "STRING":
             return

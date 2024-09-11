@@ -3,6 +3,7 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
+import NativeblocksCompilerCommon
 
 public struct NativeActionMacro: PeerMacro {
     public static func expansion(
@@ -24,10 +25,10 @@ public struct NativeActionMacro: PeerMacro {
             context.diagnose(error)
         }
 
-        let metaData = variables.compactMap { $0 as? Data }
-        let metaProp = variables.compactMap { $0 as? Property }
-        let metaEvent = variables.compactMap { $0 as? Event }
-        let actionInfo = variables.compactMap { $0 as? ActionInfo }.first
+        let metaData = variables.compactMap { $0 as? DataNativeMeta }
+        let metaProp = variables.compactMap { $0 as? PropertyNativeMeta }
+        let metaEvent = variables.compactMap { $0 as? EventNativeMeta }
+        let actionInfo = variables.compactMap { $0 as? ActionNativeMeta }.first
 
         let newStructDecl = try ActionCreator.create(
             structName: structDecl.name.text,

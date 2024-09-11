@@ -2,10 +2,25 @@ import Foundation
 import SwiftParser
 import SwiftSyntax
 
-class NativeBlockVisitor: SyntaxVisitor {
-    var nativeBlocks: [NativeItem] = []
+public class NativeBlockVisitor: SyntaxVisitor {
+    public var nativeBlocks: [NativeItem] = []
+    
+    public static func extractNatives(from sources: [String]) -> ([NativeBlock], [NativeAction]) {
+        let nativeBlockVisitor = NativeBlockVisitor(viewMode: SyntaxTreeViewMode.sourceAccurate)
+        
+        for source in sources {
+            let sourceFile = Parser.parse(source: source)
+            nativeBlockVisitor.walk(sourceFile)
+        }
+        
+        let natives = nativeBlockVisitor.nativeBlocks
+        
+        let blocks = natives.compactMap { $0 as? NativeBlock }
+        let actions = natives.compactMap { $0 as? NativeAction }
+        return (blocks, actions)
+    }
 
-    override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
+    public override func visit(_ node: StructDeclSyntax) -> SyntaxVisitorContinueKind {
         let attributes = node.attributes
         if let attribute = findAttribute(name: "NativeBlock", from: attributes) {
             let structName = node.name.text
@@ -17,7 +32,7 @@ class NativeBlockVisitor: SyntaxVisitor {
         return .skipChildren
     }
 
-    override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
+    public override func visit(_ node: ClassDeclSyntax) -> SyntaxVisitorContinueKind {
         let attributes = node.attributes
         if let attribute = findAttribute(name: "NativeAction", from: attributes) {
             let structName = node.name.text
