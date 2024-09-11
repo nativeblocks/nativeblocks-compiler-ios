@@ -2,8 +2,8 @@ import _NativeblocksCompilerCommon
 import SwiftSyntax
 import SwiftSyntaxBuilder
 
-public struct ProviderCreator {
-    public  static func createBlockProvider(prefix: String, blocks: [NativeBlock]) throws -> SourceFileSyntax {
+struct ProviderCreator {
+    static func createBlockProvider(prefix: String, blocks: [NativeBlock]) throws -> SourceFileSyntax {
         return try SourceFileSyntax {
             """
             import Nativeblocks
@@ -20,7 +20,7 @@ public struct ProviderCreator {
         }
     }
     
-    public static func createActionProvider(prefix: String, actions: [NativeAction]) throws -> SourceFileSyntax {
+    static func createActionProvider(prefix: String, actions: [NativeAction]) throws -> SourceFileSyntax {
         return try SourceFileSyntax {
             """
             import Nativeblocks

@@ -1,4 +1,3 @@
-import _NativeblocksCompilerCommon
 import NativeblocksTool
 import XCTest
 
@@ -40,9 +39,11 @@ final class NativeblocksToolTest: XCTestCase {
             }
             """
         ]
-
-        let (_, actions) = NativeBlockVisitor.extractNatives(from: sources)
-        let providerCode = try ProviderCreator.createActionProvider(prefix: "Default", actions: actions).formatted().description
+        
+        let provider = ProviderGenerator(prefix: "Default")
+        try provider.generate(from: sources)
+        let providerCode = provider.actionProviderCode ?? ""
+        
         print("-------------------------")
         for source in sources {
             print(source)
@@ -84,8 +85,9 @@ final class NativeblocksToolTest: XCTestCase {
             """
         ]
 
-        let (blocks, _) = NativeBlockVisitor.extractNatives(from: sources)
-        let providerCode = try ProviderCreator.createBlockProvider(prefix: "Default", blocks: blocks).formatted().description
+        let provider = ProviderGenerator(prefix: "Default")
+        try provider.generate(from: sources)
+        let providerCode = provider.blockProviderCode ?? ""
         print("-------------------------")
         for source in sources {
             print(source)
