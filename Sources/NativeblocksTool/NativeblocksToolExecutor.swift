@@ -1,23 +1,37 @@
 import Foundation
 
 public class NativeblocksToolExecutor {
-    var target: String?
-    var directory: URL?
+    let GenerateProviderCommand = "generate-provider"
+    let GenerateJsonCommand = "generate-json"
+    let TargetArgumentKey = "--target"
+    let DirectoryArgumentKey = "--directory"
+
+    var parsedArgs: [String: String] = [:]
+    var commands: [String] = []
+
     public init(_ arguments: [String]) throws {
-        (self.target, self.directory) = try parseAndValidateArguments(arguments)
+        (commands, parsedArgs) = try parseArguments(arguments)
+        try validateArguments(commands: commands, parsedArgs: parsedArgs)
     }
 
     public func execute() throws {
-        let provider = NativeBlocksProvider()
+        if commands.isEmpty {
+            throw ArgumentError.missingCommand
+        }
 
-        try provider.addDirectory(at: directory!)
-        provider.addTarget(at: target!)
-        try provider.processAll()
+        if commands.contains(where: { command in command == GenerateProviderCommand }) {
+            let provider = NativeBlocksProvider()
+            try provider.addDirectory(at: URL(fileURLWithPath: parsedArgs[DirectoryArgumentKey]!))
+            provider.addTarget(at: parsedArgs[TargetArgumentKey]!)
+            try provider.processAll()
+        }
+
+        if commands.contains(where: { command in command == GenerateJsonCommand }) {}
     }
 
-    private func parseAndValidateArguments(_ arguments: [String]) throws -> (target: String, directory: URL) {
+    private func parseArguments(_ arguments: [String]) throws -> (commands: [String], parsedArgs: [String: String]) {
         var parsedArgs: [String: String] = [:]
-
+        var commands: [String] = []
         var currentArgKey: String?
         for argument in arguments {
             if argument.starts(with: "--") {
@@ -25,14 +39,23 @@ public class NativeblocksToolExecutor {
             } else if let currentKey = currentArgKey {
                 parsedArgs[currentKey] = argument
                 currentArgKey = nil
+            } else if argument == GenerateProviderCommand {
+                commands.append(argument)
+                currentArgKey = nil
+            } else if argument == GenerateJsonCommand {
+                commands.append(argument)
+                currentArgKey = nil
             }
         }
+        return (commands, parsedArgs)
+    }
 
-        guard let target = parsedArgs["--target"] else {
+    private func validateArguments(commands: [String], parsedArgs: [String: String]) throws {
+        guard let target = parsedArgs[TargetArgumentKey] else {
             throw ArgumentError.missingTarget
         }
 
-        guard let directoryPath = parsedArgs["--directory"] else {
+        guard let directoryPath = parsedArgs[DirectoryArgumentKey] else {
             throw ArgumentError.missingDirectory
         }
 
@@ -42,12 +65,12 @@ public class NativeblocksToolExecutor {
             throw ArgumentError.invalidDirectory(directoryPath)
         }
 
-        let validArgs = Set(["--target", "--directory"])
+        let validArgs = Set([TargetArgumentKey, DirectoryArgumentKey])
+
         let extraArgs = parsedArgs.keys.filter { !validArgs.contains($0) }
+
         if !extraArgs.isEmpty {
             throw ArgumentError.extraArguments(extraArgs)
         }
-
-        return (target, directoryURL)
     }
 }

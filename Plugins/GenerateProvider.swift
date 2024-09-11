@@ -9,7 +9,7 @@ struct GenerateProvider: CommandPlugin {
     ) throws {
         let tool = try context.tool(named: "NativeblocksTool")
         let toolURL = URL(fileURLWithPath: tool.path.string)
-
+        let command = "generate-provider"
         var processArguments = arguments
 
         if processArguments.filter({ arg in
@@ -17,7 +17,7 @@ struct GenerateProvider: CommandPlugin {
         }).count == 0 {
             processArguments.append(contentsOf: ["--directory", context.package.directory.string])
         }
-        try callNativeblocksCompilerClient(toolURL: toolURL, arguments: processArguments)
+        try callNativeblocksTool(toolURL: toolURL, command: command, arguments: processArguments)
     }
 }
 
@@ -29,24 +29,26 @@ extension GenerateProvider: XcodeCommandPlugin {
         let tool = try context.tool(named: "NativeblocksTool")
         let toolURL = URL(fileURLWithPath: tool.path.string)
         var processArguments = arguments
-        
+        let command = "generate-provider"
+
         if processArguments.filter({ arg in
             arg == "--directory"
         }).count == 0 {
             processArguments.append(contentsOf: ["--directory", context.xcodeProject.directory.string])
         }
-        try callNativeblocksCompilerClient(toolURL: toolURL, arguments: processArguments)
+
+        try callNativeblocksTool(toolURL: toolURL, command: command, arguments: processArguments)
     }
 }
 
 #endif
 
-func callNativeblocksCompilerClient(toolURL: URL, arguments: [String]) throws {
+func callNativeblocksTool(toolURL: URL, command: String, arguments: [String]) throws {
     let process = Process()
     process.executableURL = toolURL
-    process.arguments = arguments
+    process.arguments = [command] + arguments
 
-    print("call NativeblocksTool: \(arguments)")
+    print("call NativeblocksTool:\(command) \(arguments)")
 
     try process.run()
     process.waitUntilExit()
