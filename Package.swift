@@ -9,7 +9,6 @@ let package = Package(
     platforms: [.macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .macCatalyst(.v13)],
     products: [
         .library(name: "NativeblocksCompiler", targets: ["NativeblocksCompiler"]),
-        .library(name: "NativeblocksCompilerCommon", targets: ["NativeblocksCompilerCommon"]),
         .plugin(name: "GenerateProvider", targets: ["GenerateProvider"]),
         .plugin(name: "GenerateJson", targets: ["GenerateJson"]),
         .executable(name: "NativeblocksTool", targets: ["NativeblocksTool"]),
@@ -23,7 +22,7 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
-                "NativeblocksCompilerCommon"
+                "_NativeblocksCompilerCommon"
             ]
         ),
 
@@ -65,7 +64,7 @@ let package = Package(
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
-                "NativeblocksCompilerCommon"
+                "_NativeblocksCompilerCommon"
             ]
         ),
         .target(
@@ -74,7 +73,7 @@ let package = Package(
         ),
         
         .target(
-            name: "NativeblocksCompilerCommon",
+            name: "_NativeblocksCompilerCommon",
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
@@ -85,7 +84,7 @@ let package = Package(
             name: "NativeblocksCompilerTests",
             dependencies: [
                 "NativeblocksCompilerMacros",
-                "NativeblocksCompilerCommon",
+                "_NativeblocksCompilerCommon",
                 .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
             ]
         ),
@@ -94,7 +93,7 @@ let package = Package(
             name: "NativeblocksToolTests",
             dependencies: [
                 "NativeblocksTool",
-                "NativeblocksCompilerCommon",
+                "_NativeblocksCompilerCommon",
             ]
         ),
     ]

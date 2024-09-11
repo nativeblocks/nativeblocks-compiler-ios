@@ -1,6 +1,6 @@
 import SwiftSyntax
 import SwiftSyntaxBuilder
-import NativeblocksCompilerCommon
+import _NativeblocksCompilerCommon
 
 struct BlockCreator {
     static func create(

@@ -3,7 +3,7 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
-import NativeblocksCompilerCommon
+import _NativeblocksCompilerCommon
 
 public struct NativeActionMacro: PeerMacro {
     public static func expansion(

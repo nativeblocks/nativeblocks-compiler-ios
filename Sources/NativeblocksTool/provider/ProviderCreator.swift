@@ -1,4 +1,4 @@
-import NativeblocksCompilerCommon
+import _NativeblocksCompilerCommon
 import SwiftSyntax
 import SwiftSyntaxBuilder
 

@@ -1,4 +1,4 @@
-import NativeblocksCompilerCommon
+import _NativeblocksCompilerCommon
 import NativeblocksTool
 import XCTest
 

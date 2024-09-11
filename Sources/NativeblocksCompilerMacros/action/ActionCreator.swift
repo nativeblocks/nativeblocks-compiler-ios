@@ -1,6 +1,6 @@
 import SwiftSyntax
 import SwiftSyntaxBuilder
-import NativeblocksCompilerCommon
+import _NativeblocksCompilerCommon
 
 enum ActionCreator {
     static func create(

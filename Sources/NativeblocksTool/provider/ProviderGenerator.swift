@@ -1,5 +1,5 @@
 import Foundation
-import NativeblocksCompilerCommon
+import _NativeblocksCompilerCommon
 import SwiftParser
 import SwiftSyntax
 
