@@ -10,6 +10,7 @@ let package = Package(
     products: [
         .library(name: "NativeblocksCompiler", targets: ["NativeblocksCompiler"]),
         .plugin(name: "GenerateProvider", targets: ["GenerateProvider"]),
+        .plugin(name: "GenerateJson", targets: ["GenerateJson"]),
         .executable(name: "NativeblocksTool", targets: ["NativeblocksTool"]),
     ],
     dependencies: [
@@ -29,14 +30,30 @@ let package = Package(
             capability: .command(
                 intent: .custom(
                     verb: "GenerateProvider",
-                    description: "prints hello world"
+                    description: "Generate Provider"
                 ),
                 permissions: [
                     .writeToPackageDirectory(reason: "This command write the new Provider to the source root."),
                 ]
             ),
             dependencies: [
-                .target(name: "NativeblocksTool")
+                .target(name: "NativeblocksTool"),
+            ]
+        ),
+
+        .plugin(
+            name: "GenerateJson",
+            capability: .command(
+                intent: .custom(
+                    verb: "GenerateJson",
+                    description: "Generate Json"
+                ),
+                permissions: [
+                    .writeToPackageDirectory(reason: "This command write the new json blocks to the source root."),
+                ]
+            ),
+            dependencies: [
+                .target(name: "NativeblocksTool"),
             ]
         ),
 
@@ -45,7 +62,7 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
-                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax")
+                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
             ]
         ),
         .target(

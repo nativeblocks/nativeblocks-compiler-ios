@@ -54,6 +54,10 @@ public class NativeblocksToolExecutor {
         guard let target = parsedArgs[TargetArgumentKey] else {
             throw ArgumentError.missingTarget
         }
+        
+        if target.isEmpty {
+            throw ArgumentError.missingTarget
+        }
 
         guard let directoryPath = parsedArgs[DirectoryArgumentKey] else {
             throw ArgumentError.missingDirectory
