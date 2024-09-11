@@ -2,27 +2,8 @@ import NativeblocksTool
 import XCTest
 
 final class NativeblocksToolTest: XCTestCase {
-    func testProcessSwiftFile() throws {
-        let provider = NativeBlocksProvider()
-        let providerCode = try provider.processFiles(files: [
-            """
-            @NativeBlock(name: "My text", keyType: "MYText", description: "text description")
-            struct MyText {
-                @NativeBlockData(description: "desc text")
-                var text: String
-                @NativeBlockProp(description: "desc number")
-                var number: Int
-            }
-
-            @NativeBlock(name: "My text", keyType: "MYText2", description: "text description")
-            struct MyText2 {
-                @NativeBlockData(description: "desc text")
-                var text: String
-                @NativeBlockProp(description: "desc number")
-                var number: Int
-            }
-            """,
-            
+    func testActionProviderGenerator() throws {
+        let sources = [
             """
             @NativeAction(
                 name: "Alert",
@@ -57,23 +38,70 @@ final class NativeblocksToolTest: XCTestCase {
                 }
             }
             """
-            
-        ],name : "Default")
+        ]
 
-        let providerCodeString = providerCode.formatted().description
+        let provider = NativeBlocksProvider()
+        let (_, actions) = provider.extractNatives(from: sources)
+        let providerCode = try provider.generateActionProvider(actions: actions, prefix: "Default")
+        print("-------------------------")
+        for source in sources {
+            print(source)
+        }
         print("+++++++++++++++++++++++++")
-        print(providerCodeString)
-        print("--------------------------")
+        print(providerCode)
+        print("=========================")
         XCTAssertEqual(
-            providerCodeString,
+            providerCode,
             """
+            import Nativeblocks
+            public class DefaultActionProvider {
+                public static func provideActions(nativeAlert : NativeAlert) {
+                    NativeblocksManager.getInstance().provideAction(actionKeyType: "ALERT", action: NativeAlertAction(action: nativeAlert))
+                }
+            }
+            """
+        )
+    }
+
+    func testBlockProviderGenerator() throws {
+        let sources = [
+            """
+            @NativeBlock(name: "My text", keyType: "MYText", description: "text description")
+            struct MyText {
+                @NativeBlockData(description: "desc text")
+                var text: String
+                @NativeBlockProp(description: "desc number")
+                var number: Int
+            }
+
+            @NativeBlock(name: "My text", keyType: "MYText2", description: "text description")
+            struct MyText2 {
+                @NativeBlockData(description: "desc text")
+                var text: String
+                @NativeBlockProp(description: "desc number")
+                var number: Int
+            }
+            """
+        ]
+
+        let provider = NativeBlocksProvider()
+        let (blocks, _) = provider.extractNatives(from: sources)
+        let providerCode = try provider.generateBlockProvider(blocks: blocks, prefix: "Default")
+        print("-------------------------")
+        for source in sources {
+            print(source)
+        }
+        print("+++++++++++++++++++++++++")
+        print(providerCode)
+        print("=========================")
+        XCTAssertEqual(
+            providerCode,
+            """
+            import Nativeblocks
             public class DefaultBlockProvider {
                 public static func provideBlocks() {
-                    NativeblocksManager.getInstance().provideBlock(blockKeyType: "MyText", block: MyTextBlock())
-                    NativeblocksManager.getInstance().provideBlock(blockKeyType: "MyText2", block: MyText2Block())
-                }
-                public static func provideActions() {
-                    NativeblocksManager.getInstance().provideAction(actionKeyType: "NativeAlert", action: NativeAlertAction(action: action))
+                    NativeblocksManager.getInstance().provideBlock(blockKeyType: "MYText", block: MyTextBlock())
+                    NativeblocksManager.getInstance().provideBlock(blockKeyType: "MYText2", block: MyText2Block())
                 }
             }
             """

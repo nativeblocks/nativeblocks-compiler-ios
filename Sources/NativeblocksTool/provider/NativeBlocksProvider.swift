@@ -5,7 +5,7 @@ import SwiftSyntax
 public class NativeBlocksProvider {
     var filePaths: [URL] = []
     
-    var target :String? = nil
+    var target: String?
     
     public init() {}
     
@@ -23,7 +23,7 @@ public class NativeBlocksProvider {
         }
     }
     
-    func addTarget(at target:String){
+    func addTarget(at target: String) {
         self.target = target
     }
     
@@ -31,46 +31,53 @@ public class NativeBlocksProvider {
         let files = filePaths.compactMap { filePath in
             try? String(contentsOf: filePath, encoding: .utf8)
         }
-        print("processAll count:\(files.count)")
-        var name = "DefaultNativeblocksProvider"
-        if target != nil {
-            name = toCamelCaseWithoutSpaces(target!) + "NativeblocksProvider"
-        }
-        let provider = try processFiles(files: files, name:name)
-        let code = provider.formatted().description
-        let filePath = FileManager.default.currentDirectoryPath + "/\(name).swift"
-        try code.write(toFile: filePath, atomically: true, encoding: .utf8)
-        print(provider.formatted().description)
+        
+        let name = generateName(target: target)
+        
+        let (blocks, actions) = extractNatives(from: files)
+
+        let actionProviderCode = try generateActionProvider(actions: actions, prefix: name)
+        let blockProviderCode = try generateBlockProvider(blocks: blocks, prefix: name)
+        
+        let actionFilePath = FileManager.default.currentDirectoryPath + "/\(name)ActionProvider.swift"
+        let blockFilePath = FileManager.default.currentDirectoryPath + "/\(name)BlockProvider.swift"
+        
+        try actionProviderCode.write(toFile: actionFilePath, atomically: true, encoding: .utf8)
+        try blockProviderCode.write(toFile: blockFilePath, atomically: true, encoding: .utf8)
+        
+        print(actionProviderCode)
+        print(blockProviderCode)
     }
     
-    public func processFiles(files: [String], name: String) throws -> SourceFileSyntax {
-        let natives = try files.flatMap { file in try nativeExtractor(at: file) }
+    public func extractNatives(from sources: [String]) -> ([NativeBlock], [NativeAction]) {
+        let nativeBlockVisitor = NativeBlockVisitor(viewMode: SyntaxTreeViewMode.sourceAccurate)
+        
+        for source in sources {
+            let sourceFile = Parser.parse(source: source)
+            nativeBlockVisitor.walk(sourceFile)
+        }
+        
+        let natives = nativeBlockVisitor.nativeBlocks
         
         let blocks = natives.compactMap { $0 as? NativeBlock }
         let actions = natives.compactMap { $0 as? NativeAction }
-        
-        let provider = try NativeProviderGenerator.generateProvider(prefix: name, blocks: blocks, actions: actions)
-        
-        return provider
+        return (blocks, actions)
     }
     
-    public func nativeExtractor(at file: String) throws -> [NativeItem] {
-        let sourceFile = Parser.parse(source: file)
-        let nativeBlockVisitor = NativeBlockVisitor(viewMode: SyntaxTreeViewMode.sourceAccurate)
-        nativeBlockVisitor.walk(sourceFile)
-        return nativeBlockVisitor.nativeBlocks
+    public func generateActionProvider(actions: [NativeAction], prefix: String) throws -> String {
+        let provider = try NativeProviderGenerator.generateActionProvider(prefix: prefix, actions: actions)
+        return provider.formatted().description
     }
     
+    public func generateBlockProvider(blocks: [NativeBlock], prefix: String) throws -> String {
+        let provider = try NativeProviderGenerator.generateBlockProvider(prefix: prefix, blocks: blocks)
+        return provider.formatted().description
+    }
     
-    
-    func toCamelCaseWithoutSpaces(_ input: String) -> String {
-        // Convert the first letter to lowercase
-        guard !input.isEmpty else { return "" }
-        
-        let firstCharacter = input.prefix(1).uppercased()
-        let remainingCharacters = input.dropFirst()
-        
-        // Combine the lowercase first character with the remaining part of the string
+    func generateName(target: String?) -> String {
+        guard ((target?.isEmpty) != nil) == true else { return "Default" }
+        let firstCharacter = target!.prefix(1).uppercased()
+        let remainingCharacters = target!.dropFirst()
         return firstCharacter + remainingCharacters
     }
 }

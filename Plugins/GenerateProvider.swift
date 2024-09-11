@@ -29,7 +29,7 @@ extension GenerateProvider: XcodeCommandPlugin {
         let tool = try context.tool(named: "NativeblocksTool")
         let toolURL = URL(fileURLWithPath: tool.path.string)
         var processArguments = arguments
-
+        
         if processArguments.filter({ arg in
             arg == "--directory"
         }).count == 0 {

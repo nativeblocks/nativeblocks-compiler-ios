@@ -5,7 +5,7 @@ enum ArgumentError: Error, CustomStringConvertible {
     case missingDirectory
     case invalidDirectory(String)
     case extraArguments([String])
-    
+
     var description: String {
         switch self {
         case .missingTarget:
