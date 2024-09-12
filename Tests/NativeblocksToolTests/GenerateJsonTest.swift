@@ -75,13 +75,13 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             eventsString,
             """
-            [{"event":"completion","description":""}]
+            [{"event":"END","description":""}]
             """
         )
         XCTAssertEqual(
             propertiesString,
             """
-            [{"value":"false","key":"animated","type":"BOOL","description":""}]
+            [{"value":"false","key":"animated","type":"BOOLEAN","description":""}]
             """
         )
     }

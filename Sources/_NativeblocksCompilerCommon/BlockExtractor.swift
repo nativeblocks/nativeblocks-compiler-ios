@@ -244,6 +244,7 @@ public struct BlockExtractor {
 
                 return !event.isEmpty && function != nil
                     ? EventNativeMeta(
+                        kind : .block,
                         position: position,
                         event: event,
                         description: description,

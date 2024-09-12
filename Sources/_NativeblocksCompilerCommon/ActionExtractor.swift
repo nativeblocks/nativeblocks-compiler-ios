@@ -298,6 +298,7 @@ public struct ActionExtractor {
 
                 return !event.isEmpty && function != nil
                     ? EventNativeMeta(
+                        kind: .action,
                         position: position,
                         event: event,
                         description: description,

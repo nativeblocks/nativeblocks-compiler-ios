@@ -2,6 +2,11 @@ import SwiftSyntax
 
 public protocol NativeMeta: Encodable {}
 
+public enum NativeKind {
+    case action
+    case block
+}
+
 public struct DataNativeMeta: NativeMeta {
     public var position: Int
     public var key: String
@@ -24,7 +29,7 @@ public struct DataNativeMeta: NativeMeta {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(self.key, forKey: .key)
-        try container.encode(self.type.uppercased(), forKey: .type)
+        try container.encode(TypeUtils.typeMapToJson(self.type)!, forKey: .type)
         try container.encode(self.description, forKey: .description)
     }
 
@@ -68,13 +73,14 @@ public struct PropertyNativeMeta: NativeMeta {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(self.key, forKey: .key)
-        try container.encode(self.type.uppercased(), forKey: .type)
+        try container.encode(TypeUtils.typeMapToJson(self.type)!, forKey: .type)
         try container.encode(self.description, forKey: .description)
         try container.encode(self.value, forKey: .value)
     }
 }
 
 public struct EventNativeMeta: NativeMeta {
+    public var kind: NativeKind
     public var position: Int
     public var event: String
     public var description: String
@@ -85,10 +91,11 @@ public struct EventNativeMeta: NativeMeta {
     public var valriable: PatternBindingSyntax?
 
     init(
-        position: Int, event: String, description: String, dataBinding: [String], isOptinalFunction: Bool, then: String? = nil,
+        kind: NativeKind, position: Int, event: String, description: String, dataBinding: [String], isOptinalFunction: Bool, then: String? = nil,
         block: AttributeSyntax? = nil,
         valriable: PatternBindingSyntax? = nil
     ) {
+        self.kind = kind
         self.position = position
         self.event = event
         self.description = description
@@ -101,6 +108,16 @@ public struct EventNativeMeta: NativeMeta {
 
     private enum CodingKeys: String, CodingKey {
         case event, description
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if self.kind == .action {
+            try container.encode(TypeUtils.thenMapToJson(self.then), forKey: .event)
+        } else {
+            try container.encode(self.event, forKey: .event)
+        }
+        try container.encode(self.description, forKey: .description)
     }
 }
 
