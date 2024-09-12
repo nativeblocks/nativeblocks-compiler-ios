@@ -21,12 +21,17 @@ public class ProviderGenerator {
         blockProviderCode = try ProviderCreator.createBlockProvider(prefix: prefix, blocks: blocks).formatted().description
     }
     
-    public func save(to directory: URL) throws {
-        let actionFilePath = directory.absoluteString + "/\(prefix)ActionProvider.swift"
-        let blockFilePath = directory.absoluteString + "/\(prefix)BlockProvider.swift"
+    public func save(to directory: String) throws {
+        let actionFilePath = directory + "/\(prefix)ActionProvider.swift"
+        let blockFilePath = directory + "/\(prefix)BlockProvider.swift"
         
         try actionProviderCode!.write(toFile: actionFilePath, atomically: true, encoding: .utf8)
         try blockProviderCode!.write(toFile: blockFilePath, atomically: true, encoding: .utf8)
+       
+        print("exportrd File: \(actionFilePath) =>")
+        print(String(actionProviderCode!))
+        print("exportrd File: \(blockFilePath) =>")
+        print(String(blockProviderCode!))
     }
     
     static func generateName(prefix: String?) -> String {
