@@ -27,7 +27,7 @@ public class NativeBlockVisitor: SyntaxVisitor {
             let keyType = getStringValue(name: "keyType", from: attribute)
             let name = getStringValue(name: "name", from: attribute)
             let description = getStringValue(name: "description", from: attribute)
-            nativeBlocks.append(NativeBlock(declName: structName, name: name!, keyType: keyType!, description: description!, syntax: node))
+            nativeBlocks.append(NativeBlock(declName: structName, name: name!, keyType: keyType!, description: description!, syntax: node,meta: []))
         }
         return .skipChildren
     }
@@ -39,7 +39,7 @@ public class NativeBlockVisitor: SyntaxVisitor {
             let keyType = getStringValue(name: "keyType", from: attribute)
             let name = getStringValue(name: "name", from: attribute)
             let description = getStringValue(name: "description", from: attribute)
-            nativeBlocks.append(NativeAction(declName: structName, name: name!, keyType: keyType!, description: description!, syntax: node))
+            nativeBlocks.append(NativeAction(declName: structName, name: name!, keyType: keyType!, description: description!, syntax: node,meta: []))
         }
         return .skipChildren
     }

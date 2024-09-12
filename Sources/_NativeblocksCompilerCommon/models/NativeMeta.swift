@@ -1,6 +1,6 @@
 import SwiftSyntax
 
-public protocol NativeMeta {}
+public protocol NativeMeta: Encodable {}
 
 public struct DataNativeMeta: NativeMeta {
     public var position: Int
@@ -19,6 +19,10 @@ public struct DataNativeMeta: NativeMeta {
         self.description = description
         self.block = block
         self.valriable = valriable
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case key, type, description
     }
 }
 
@@ -49,6 +53,10 @@ public struct PropertyNativeMeta: NativeMeta {
         self.block = block
         self.valriable = valriable
     }
+
+    private enum CodingKeys: String, CodingKey {
+        case key, type, description, value
+    }
 }
 
 public struct EventNativeMeta: NativeMeta {
@@ -75,6 +83,10 @@ public struct EventNativeMeta: NativeMeta {
         self.block = block
         self.valriable = valriable
     }
+
+    private enum CodingKeys: String, CodingKey {
+        case event, description
+    }
 }
 
 public struct SlotNativeMeta: NativeMeta {
@@ -97,6 +109,10 @@ public struct SlotNativeMeta: NativeMeta {
         self.isOptinalFunction = isOptinalFunction
         self.block = block
         self.valriable = valriable
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case slot, description
     }
 }
 
