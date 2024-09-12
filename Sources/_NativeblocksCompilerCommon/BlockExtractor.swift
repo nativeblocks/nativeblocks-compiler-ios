@@ -135,15 +135,19 @@ public struct BlockExtractor {
     {
         var position = startPosition
         let attributes = varDecl.attributes
-        var description = "" as String?
+        var description = ""
         var blockAttribute: AttributeSyntax?
         var diagnostic: [Diagnostic] = []
+        var valuePicker = ""
+        var valuePickerGroup = ""
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockPropType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
+        valuePicker = SyntaxUtils.extractValuePicker(from: blockAttribute!) ?? "TEXT_INPUT"
+        valuePickerGroup = SyntaxUtils.extractValuePickerGroup(from: blockAttribute!) ?? "General"
 
         if varDecl.bindings.count > 1 {
             diagnostic.append(
@@ -174,10 +178,10 @@ public struct BlockExtractor {
                         key: key,
                         value: value,
                         type: type,
-                        description: description ?? "",
-                        valuePicker: "",
+                        description: description,
+                        valuePicker: valuePicker,
                         valuePickerOptions: "",
-                        valuePickerGroup: "",
+                        valuePickerGroup: valuePickerGroup,
                         block: blockAttribute,
                         valriable: binding
                     ) : nil

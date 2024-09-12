@@ -61,27 +61,27 @@ final class GenerateJsonTest: XCTestCase {
         print("=========================")
         
         XCTAssertEqual(
-            integrationString,
+            String(integrationString!),
             """
             {"platFormSupport":"IOS","documentation":"","keyType":"ALERT","price":0,"description":"Nativeblocks alert action","imageIcon":"","name":"Alert","kind":"ACTION"}
             """
         )
         XCTAssertEqual(
-            datasString,
+            String(datasString!),
             """
             [{"key":"message","type":"STRING","description":""}]
             """
         )
         XCTAssertEqual(
-            eventsString,
+            String(eventsString!),
             """
             [{"event":"END","description":""}]
             """
         )
         XCTAssertEqual(
-            propertiesString,
+            String(propertiesString!),
             """
-            [{"value":"false","key":"animated","type":"BOOLEAN","description":""}]
+            [{"value":"false","key":"animated","valuePickerGroup":"General","type":"BOOLEAN","description":"","valuePicker":"text-input"}]
             """
         )
     }
@@ -205,7 +205,7 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             propertiesString!,
             """
-            [{"value":"#ffffffff","key":"background","type":"STRING","description":""},{"value":"S","key":"size","type":"STRING","description":"Button size"}]
+            [{"value":"#ffffffff","key":"background","valuePickerGroup":"General","type":"STRING","description":"","valuePicker":"color-picker"},{"value":"S","key":"size","valuePickerGroup":"General","type":"STRING","description":"Button size","valuePicker":"dropdown"}]
             """
         )
         XCTAssertEqual(

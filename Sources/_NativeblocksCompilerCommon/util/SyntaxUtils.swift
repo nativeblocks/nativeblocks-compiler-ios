@@ -1,10 +1,10 @@
 import SwiftSyntax
 
-public struct SyntaxUtils {
+public enum SyntaxUtils {
     static func extractAttribute(for type: String, from attributes: AttributeListSyntax) -> AttributeSyntax? {
         for attribute in attributes {
             if let attr = attribute.as(AttributeSyntax.self),
-                attr.attributeName.as(IdentifierTypeSyntax.self)?.name.text == type
+               attr.attributeName.as(IdentifierTypeSyntax.self)?.name.text == type
             {
                 return attr
             }
@@ -18,6 +18,22 @@ public struct SyntaxUtils {
             if let segments = argument.expression.as(StringLiteralExprSyntax.self)?.segments.as(StringLiteralSegmentListSyntax.self) {
                 return segments.first?.as(StringSegmentSyntax.self)?.content.text
             }
+        }
+        return nil
+    }
+
+    static func extractValuePicker(from attribute: AttributeSyntax) -> String? {
+        guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }
+        for argument in arguments where argument.label?.text == "valuePicker" {
+            return argument.expression.as(MemberAccessExprSyntax.self)?.declName.as(DeclReferenceExprSyntax.self)?.baseName.text
+        }
+        return nil
+    }
+    
+    static func extractValuePickerGroup(from attribute: AttributeSyntax) -> String? {
+        guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }
+        for argument in arguments where argument.label?.text == "valuePicker" {
+            return argument.expression.as(FunctionCallExprSyntax.self)?.arguments.first?.as(LabeledExprSyntax.self)?.expression.as(StringLiteralExprSyntax.self)?.segments.first?.as(StringSegmentSyntax.self)?.content.text
         }
         return nil
     }

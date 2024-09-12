@@ -1,6 +1,6 @@
 import Foundation
 
-struct TypeUtils {
+enum TypeUtils {
     static func typeMapToJson(_ type: String) -> String? {
         switch type.uppercased() {
         case "STRING":
@@ -14,12 +14,12 @@ struct TypeUtils {
         case "DOUBLE", "CGFLOAT":
             return "DOUBLE"
         case "BOOL":
-            return  "BOOLEAN"
+            return "BOOLEAN"
         default:
             return nil
         }
     }
-    
+
     static func thenMapToJson(_ then: String?) -> String {
         switch then?.uppercased() {
         case "SUCCESS":
@@ -32,6 +32,25 @@ struct TypeUtils {
             return "END"
         default:
             return "END"
+        }
+    }
+
+    static func valuePickerMapJson(_ type: String) -> String? {
+        switch type.uppercased() {
+        case "TEXT_INPUT":
+            return "text-input"
+        case "TEXT_AREA_INPUT":
+            return "text-area-input"
+        case "NUMBER_INPUT":
+            return "number-input"
+        case "DROPDOWN":
+            return "dropdown"
+        case "COLOR_PICKER":
+            return "color-picker"
+        case "COMBOBOX_INPUT":
+            return "combobox-input"
+        default:
+            return nil
         }
     }
 }

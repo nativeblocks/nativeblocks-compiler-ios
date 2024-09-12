@@ -67,7 +67,7 @@ public struct PropertyNativeMeta: NativeMeta {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case key, type, description, value
+        case key, type, description, value, valuePicker, valuePickerGroup
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -76,6 +76,8 @@ public struct PropertyNativeMeta: NativeMeta {
         try container.encode(TypeUtils.typeMapToJson(self.type)!, forKey: .type)
         try container.encode(self.description, forKey: .description)
         try container.encode(self.value, forKey: .value)
+        try container.encode(TypeUtils.valuePickerMapJson(self.valuePicker), forKey: .valuePicker)
+        try container.encode(self.valuePickerGroup, forKey: .valuePickerGroup)
     }
 }
 
