@@ -1,6 +1,6 @@
 import SwiftSyntax
 
-public protocol NativeItem : Encodable {}
+public protocol NativeItem: Encodable {}
 
 public struct NativeBlock: NativeItem {
     public var declName: String

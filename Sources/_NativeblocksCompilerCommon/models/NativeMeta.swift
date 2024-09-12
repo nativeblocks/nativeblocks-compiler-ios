@@ -21,6 +21,13 @@ public struct DataNativeMeta: NativeMeta {
         self.valriable = valriable
     }
 
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.key, forKey: .key)
+        try container.encode(self.type.uppercased(), forKey: .type)
+        try container.encode(self.description, forKey: .description)
+    }
+
     private enum CodingKeys: String, CodingKey {
         case key, type, description
     }
@@ -56,6 +63,14 @@ public struct PropertyNativeMeta: NativeMeta {
 
     private enum CodingKeys: String, CodingKey {
         case key, type, description, value
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.key, forKey: .key)
+        try container.encode(self.type.uppercased(), forKey: .type)
+        try container.encode(self.description, forKey: .description)
+        try container.encode(self.value, forKey: .value)
     }
 }
 

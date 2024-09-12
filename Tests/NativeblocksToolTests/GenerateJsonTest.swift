@@ -69,7 +69,7 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             datasString,
             """
-            [{"key":"message","type":"String","description":""}]
+            [{"key":"message","type":"STRING","description":""}]
             """
         )
         XCTAssertEqual(
@@ -81,7 +81,7 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             propertiesString,
             """
-            [{"value":"false","key":"animated","type":"Bool","description":""}]
+            [{"value":"false","key":"animated","type":"BOOL","description":""}]
             """
         )
     }
@@ -130,7 +130,7 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             datasString,
             """
-            [{"key":"text","type":"String","description":"desc text"}]
+            [{"key":"text","type":"STRING","description":"desc text"}]
             """
         )
         XCTAssertEqual(
@@ -142,7 +142,7 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             propertiesString,
             """
-            [{"value":"","key":"number","type":"Int","description":"desc number"}]
+            [{"value":"","key":"number","type":"INT","description":"desc number"}]
             """
         )
         XCTAssertEqual(
