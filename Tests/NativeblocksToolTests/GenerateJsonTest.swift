@@ -81,7 +81,7 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             String(propertiesString!),
             """
-            [{"value":"false","key":"animated","valuePickerGroup":"General","type":"BOOLEAN","description":"","valuePicker":"text-input"}]
+            [{"valuePicker":"text-input","valuePickerGroup":"General","valuePickerOptions":"[]","value":"false","key":"animated","type":"BOOLEAN","description":""}]
             """
         )
     }
@@ -205,7 +205,7 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             propertiesString!,
             """
-            [{"value":"#ffffffff","key":"background","valuePickerGroup":"General","type":"STRING","description":"","valuePicker":"color-picker"},{"value":"S","key":"size","valuePickerGroup":"General","type":"STRING","description":"Button size","valuePicker":"dropdown"}]
+            [{"valuePicker":"color-picker","valuePickerGroup":"General","valuePickerOptions":"[]","value":"#ffffffff","key":"background","type":"STRING","description":""},{"valuePicker":"dropdown","valuePickerGroup":"Size","valuePickerOptions":"[{\\"id\\":\\"S\\",\\"text\\":\\"Small\\"},{\\"id\\":\\"M\\",\\"text\\":\\"Medium\\"},{\\"id\\":\\"L\\",\\"text\\":\\"Large\\"}]","value":"S","key":"size","type":"STRING","description":"Button size"}]
             """
         )
         XCTAssertEqual(

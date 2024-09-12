@@ -38,6 +38,11 @@ public struct DataNativeMeta: NativeMeta {
     }
 }
 
+public struct ValuePickerOption : Encodable {
+    public var id:String
+    public var text:String
+}
+
 public struct PropertyNativeMeta: NativeMeta {
     public var position: Int
     public var key: String
@@ -45,13 +50,13 @@ public struct PropertyNativeMeta: NativeMeta {
     public var type: String
     public var description: String
     public var valuePicker: String
-    public var valuePickerOptions: String
+    public var valuePickerOptions: [ValuePickerOption]
     public var valuePickerGroup: String
     public var block: AttributeSyntax?
     public var valriable: PatternBindingSyntax?
 
     init(
-        position: Int, key: String, value: String, type: String, description: String, valuePicker: String, valuePickerOptions: String,
+        position: Int, key: String, value: String, type: String, description: String, valuePicker: String, valuePickerOptions: [ValuePickerOption],
         valuePickerGroup: String, block: AttributeSyntax? = nil, valriable: PatternBindingSyntax? = nil
     ) {
         self.position = position
@@ -67,7 +72,7 @@ public struct PropertyNativeMeta: NativeMeta {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case key, type, description, value, valuePicker, valuePickerGroup
+        case key, type, description, value, valuePicker, valuePickerGroup , valuePickerOptions
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -78,6 +83,7 @@ public struct PropertyNativeMeta: NativeMeta {
         try container.encode(self.value, forKey: .value)
         try container.encode(TypeUtils.valuePickerMapJson(self.valuePicker), forKey: .valuePicker)
         try container.encode(self.valuePickerGroup, forKey: .valuePickerGroup)
+        try container.encode(TypeUtils.valuePickerOptionsMapToJson(self.valuePickerOptions) , forKey: .valuePickerOptions)
     }
 }
 

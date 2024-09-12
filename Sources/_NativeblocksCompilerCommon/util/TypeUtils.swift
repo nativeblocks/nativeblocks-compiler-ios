@@ -53,4 +53,8 @@ enum TypeUtils {
             return nil
         }
     }
+    
+    static func valuePickerOptionsMapToJson(_ options: [ValuePickerOption]) throws -> String {
+        return try String(data: JSONEncoder().encode(options), encoding: .utf8) ?? "[]"
+    }
 }

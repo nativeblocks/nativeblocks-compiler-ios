@@ -140,6 +140,7 @@ public struct BlockExtractor {
         var diagnostic: [Diagnostic] = []
         var valuePicker = ""
         var valuePickerGroup = ""
+        var valuePickerOptions: [ValuePickerOption] = []
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockPropType, from: attributes)
 
@@ -148,6 +149,8 @@ public struct BlockExtractor {
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         valuePicker = SyntaxUtils.extractValuePicker(from: blockAttribute!) ?? "TEXT_INPUT"
         valuePickerGroup = SyntaxUtils.extractValuePickerGroup(from: blockAttribute!) ?? "General"
+        
+        valuePickerOptions = SyntaxUtils.extractvaluePickerOptions(from: blockAttribute!) ?? []
 
         if varDecl.bindings.count > 1 {
             diagnostic.append(
@@ -180,7 +183,7 @@ public struct BlockExtractor {
                         type: type,
                         description: description,
                         valuePicker: valuePicker,
-                        valuePickerOptions: "",
+                        valuePickerOptions: valuePickerOptions,
                         valuePickerGroup: valuePickerGroup,
                         block: blockAttribute,
                         valriable: binding

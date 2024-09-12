@@ -29,13 +29,29 @@ public enum SyntaxUtils {
         }
         return nil
     }
-    
+
     static func extractValuePickerGroup(from attribute: AttributeSyntax) -> String? {
         guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }
-        for argument in arguments where argument.label?.text == "valuePicker" {
+        for argument in arguments where argument.label?.text == "valuePickerGroup" {
             return argument.expression.as(FunctionCallExprSyntax.self)?.arguments.first?.as(LabeledExprSyntax.self)?.expression.as(StringLiteralExprSyntax.self)?.segments.first?.as(StringSegmentSyntax.self)?.content.text
         }
         return nil
+    }
+
+    static func extractvaluePickerOptions(from attribute: AttributeSyntax) -> [ValuePickerOption]? {
+        guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }
+        var options: [ValuePickerOption] = []
+        for argument in arguments where argument.label?.text == "valuePickerOptions" {
+            argument.expression.as(ArrayExprSyntax.self)?.elements.as(ArrayElementListSyntax.self)?.forEach { element in
+                let key = element.expression.as(FunctionCallExprSyntax.self)?.arguments.first?.as(LabeledExprSyntax.self)?.expression.as(StringLiteralExprSyntax.self)?.segments.first?.as(StringSegmentSyntax.self)?.content.text
+                let value = element.expression.as(FunctionCallExprSyntax.self)?.arguments.last?.as(LabeledExprSyntax.self)?.expression.as(StringLiteralExprSyntax.self)?.segments.first?.as(StringSegmentSyntax.self)?.content.text
+
+                if key != nil, value != nil {
+                    options.append(ValuePickerOption(id: key!, text: value!))
+                }
+            }
+        }
+        return options
     }
 
     static func extractDataBinding(from attribute: AttributeSyntax) -> [String]? {

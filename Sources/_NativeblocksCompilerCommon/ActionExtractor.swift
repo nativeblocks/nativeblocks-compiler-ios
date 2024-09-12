@@ -195,12 +195,15 @@ public struct ActionExtractor {
         var diagnostic: [Diagnostic] = []
         var valuePicker = ""
         var valuePickerGroup = ""
+        var valuePickerOptions: [ValuePickerOption] = []
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeActionPropType, from: attributes)
         guard blockAttribute != nil else { return nil }
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         valuePicker = SyntaxUtils.extractValuePicker(from: blockAttribute!) ?? "TEXT_INPUT"
         valuePickerGroup = SyntaxUtils.extractValuePickerGroup(from: blockAttribute!) ?? "General"
+        
+        valuePickerOptions = SyntaxUtils.extractvaluePickerOptions(from: blockAttribute!) ?? []
 
         if varDecl.bindings.count > 1 {
             diagnostic.append(
@@ -233,7 +236,7 @@ public struct ActionExtractor {
                         type: type,
                         description: description,
                         valuePicker: valuePicker,
-                        valuePickerOptions: "",
+                        valuePickerOptions: valuePickerOptions,
                         valuePickerGroup: valuePickerGroup,
                         block: blockAttribute,
                         valriable: binding
