@@ -1,7 +1,7 @@
 import NativeblocksTool
 import XCTest
 
-final class NativeblocksToolTest: XCTestCase {
+final class GenerateProviderTest: XCTestCase {
     func testActionProviderGenerator() throws {
         let sources = [
             """

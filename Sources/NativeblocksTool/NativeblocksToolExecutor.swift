@@ -19,17 +19,25 @@ public class NativeblocksToolExecutor {
             throw ArgumentError.missingCommand
         }
 
+        let fileManager = FileManager.default
+
+        let directory = URL(fileURLWithPath: parsedArgs[DirectoryArgumentKey]!)
+        let output = fileManager.currentDirectoryPath
+        let files = try fileManager.getFilesContent(from: directory)
+
         if commands.contains(where: { command in command == GenerateProviderCommand }) {
-            let directory = URL(fileURLWithPath: parsedArgs[DirectoryArgumentKey]!)
-            let output = FileManager.default.currentDirectoryPath
-            let files = try FileUtils.getFilesContent(from: directory)
             let target = parsedArgs[TargetArgumentKey]!
+
             let generator = ProviderGenerator(prefix: target)
             try generator.generate(from: files)
             try generator.save(to: output)
         }
 
-        if commands.contains(where: { command in command == GenerateJsonCommand }) {}
+        if commands.contains(where: { command in command == GenerateJsonCommand }) {
+            let generator = JsonGenerator()
+            try generator.generate(from: files)
+            try generator.save(to: output, with: fileManager)
+        }
     }
 
     private func parseArguments(_ arguments: [String]) throws -> (commands: [String], parsedArgs: [String: String]) {
