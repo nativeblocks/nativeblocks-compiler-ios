@@ -52,7 +52,7 @@ public struct SyntaxUtils {
     static func extractDefaultValue(from initializer: InitializerClauseSyntax?) -> String {
         guard let initializer = initializer?.value else { return "" }
         if let stringLiteral = initializer.as(StringLiteralExprSyntax.self)?.segments.first?.as(StringSegmentSyntax.self)?.content.text {
-            return "\"\(stringLiteral)\""
+            return "\(stringLiteral)"
         } else if let intLiteral = initializer.as(IntegerLiteralExprSyntax.self)?.literal.text {
             return intLiteral
         } else if let floatLiteral = initializer.as(FloatLiteralExprSyntax.self)?.literal.text {

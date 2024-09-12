@@ -89,13 +89,76 @@ final class GenerateJsonTest: XCTestCase {
     func testBlockJsonGenerator() throws {
         let sources = [
             """
-            @NativeBlock(name: "My text", keyType: "MYText", description: "text description")
-            struct MyText {
-                @NativeBlockData(description: "desc text")
-                var text: String
-                @NativeBlockProp(description: "desc number")
-                var number: Int
+            @NativeBlock(
+                name: "X button",
+                keyType: "XBUTTON",
+                description: "This is a button"
+            )
+            struct XButton: View {
+                @NativeBlockData(description: "Button text")
+                @State var text: String
+                @NativeBlockProp(valuePicker: NativeBlockValuePicker.COLOR_PICKER)
+                @State var background: String = "#ffffffff"
+                @NativeBlockProp(
+                    description: "Button size",
+                    valuePicker: NativeBlockValuePicker.DROPDOWN,
+                    valuePickerOptions: [
+                        NativeBlockValuePickerOption("S", "Small"),
+                        NativeBlockValuePickerOption("M", "Medium"),
+                        NativeBlockValuePickerOption("L", "Large"),
+                    ],
+                    valuePickerGroup : NativeBlockValuePickerPosition("Size")
+                )
+                @State var size: String = "S"
+                @NativeBlockSlot(description: "Button leading icon")
+                var onLeadingIcon: () -> AnyView
+                @NativeBlockSlot(description: "Button trailing icon")
+                var onTrailingIcon: (() -> AnyView)? = nil
+                @NativeBlockEvent(description: "Button on click")
+                var onClick: (() -> Void)?
+
+                var body: some View {
+                    Button(action: {
+                        onClick?()
+                    }) {
+                        HStack(spacing: 8) {
+                            onLeadingIcon()
+                            Text(text)
+                                .font(.system(size: textSize))
+                                .padding(padding)
+                            if let trailingIcon = onTrailingIcon {
+                                trailingIcon()
+                            }
+                        }
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .background(Color(hex: background))
+                    .cornerRadius(24)
+                }
+
+                private var padding: EdgeInsets {
+                    switch size {
+                    case "M":
+                        return EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12)
+                    case "L":
+                        return EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
+                    default:  // "S"
+                        return EdgeInsets(top: 4, leading: 4, bottom: 4, trailing: 4)
+                    }
+                }
+
+                private var textSize: CGFloat {
+                    switch size {
+                    case "M":
+                        return 22
+                    case "L":
+                        return 32
+                    default:  // "S"
+                        return 16
+                    }
+                }
             }
+
             """
         ]
 
@@ -122,33 +185,33 @@ final class GenerateJsonTest: XCTestCase {
         print("=========================")
         
         XCTAssertEqual(
-            integrationString,
+            integrationString!,
             """
-            {"platFormSupport":"IOS","documentation":"","keyType":"MYText","price":0,"description":"text description","imageIcon":"","name":"My text","kind":"BLOCK"}
-            """
-        )
-        XCTAssertEqual(
-            datasString,
-            """
-            [{"key":"text","type":"STRING","description":"desc text"}]
+            {"platFormSupport":"IOS","documentation":"","keyType":"XBUTTON","price":0,"description":"This is a button","imageIcon":"","name":"X button","kind":"BLOCK"}
             """
         )
         XCTAssertEqual(
-            eventsString,
+            datasString!,
             """
-            []
-            """
-        )
-        XCTAssertEqual(
-            propertiesString,
-            """
-            [{"value":"","key":"number","type":"INT","description":"desc number"}]
+            [{"key":"text","type":"STRING","description":"Button text"}]
             """
         )
         XCTAssertEqual(
-            slotsString,
+            eventsString!,
             """
-            []
+            [{"event":"onClick","description":"Button on click"}]
+            """
+        )
+        XCTAssertEqual(
+            propertiesString!,
+            """
+            [{"value":"#ffffffff","key":"background","type":"STRING","description":""},{"value":"S","key":"size","type":"STRING","description":"Button size"}]
+            """
+        )
+        XCTAssertEqual(
+            slotsString!,
+            """
+            [{"description":"Button leading icon","slot":"onLeadingIcon"},{"description":"Button trailing icon","slot":"onTrailingIcon"}]
             """
         )
     }

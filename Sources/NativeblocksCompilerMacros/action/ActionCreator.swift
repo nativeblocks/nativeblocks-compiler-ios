@@ -162,7 +162,7 @@ enum ActionCreator {
         case "STRING":
             return
                 """
-                properties["\(item.key)"]?.value ?? \(item.value.isEmpty ? "\"\"" : item.value)
+                properties["\(item.key)"]?.value ?? \(item.value.isEmpty ? "\"\"" : "\"\(item.value)\"")
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8", "FLOAT", "FLOAT80", "FLOAT64",
             "FLOAT32", "FLOAT16", "DOUBLE":
