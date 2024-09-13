@@ -2,15 +2,22 @@ import Foundation
 import PackagePlugin
 
 @main
-struct GenerateJson: CommandPlugin {
+struct SyncNativeblocks: CommandPlugin {
     func performCommand(
         context: PluginContext,
         arguments: [String]
     ) throws {
         let tool = try context.tool(named: "NativeblocksTool")
         let toolURL = URL(fileURLWithPath: tool.path.string)
-        let command = "generate-json"
+        let command = "sync"
         var processArguments = arguments
+        
+        guard let config = try readNativeblocksConfig(rootPath:context.package.directory.string) else {
+            return
+        }
+        processArguments.append(contentsOf: ["--endpoint", config.endpoint])
+        processArguments.append(contentsOf: ["--authToken", config.authToken])
+        processArguments.append(contentsOf: ["--organizationId", config.organizationId])
 
         if processArguments.filter({ arg in
             arg == "--directory"
@@ -24,12 +31,12 @@ struct GenerateJson: CommandPlugin {
 #if canImport(XcodeProjectPlugin)
 import XcodeProjectPlugin
 
-extension GenerateJson: XcodeCommandPlugin {
+extension SyncNativeblocks: XcodeCommandPlugin {
     func performCommand(context: XcodePluginContext, arguments: [String]) throws {
         let tool = try context.tool(named: "NativeblocksTool")
         let toolURL = URL(fileURLWithPath: tool.path.string)
         var processArguments = arguments
-        let command = "generate-json"
+        let command = "sync"
 
         if processArguments.filter({ arg in
             arg == "--directory"
@@ -56,6 +63,34 @@ func callNativeblocksTool(toolURL: URL, command: String, arguments: [String]) th
     if process.terminationStatus == 0 {
         print("Successfully ran call NativeblocksTool with arguments.")
     } else {
-        print("Failed to run call NativeblocksTool. Exit code: \(process.terminationStatus)")
+        Diagnostics.error("Failed to run call NativeblocksTool. Exit code: \(process.terminationStatus)")
     }
+}
+
+func readNativeblocksConfig(rootPath:String) throws -> NativeblocksConfig? {
+    let configFilePath = rootPath + "/nativeblocks.json"
+
+    let fileManager = FileManager.default
+
+    guard fileManager.fileExists(atPath: configFilePath) else {
+        Diagnostics.error("nativeblocks.json file not found at the root of the project.")
+        return nil
+    }
+    let fileURL = URL(fileURLWithPath: configFilePath)
+    do {
+        let data = try Data(contentsOf: fileURL)
+
+        let decoder = JSONDecoder()
+        return try decoder.decode(NativeblocksConfig.self, from: data)
+
+    } catch {
+        Diagnostics.error("Failed to read or decode nativeblocks.json: \(error)")
+    }
+    return nil
+}
+
+struct NativeblocksConfig: Codable {
+    var endpoint: String
+    var authToken: String
+    var organizationId: String
 }

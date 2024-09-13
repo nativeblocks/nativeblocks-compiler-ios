@@ -8,3 +8,4 @@ DerivedData/
 .netrc
 .swiftpm
 .nativeblocks
+nativeblocks.json

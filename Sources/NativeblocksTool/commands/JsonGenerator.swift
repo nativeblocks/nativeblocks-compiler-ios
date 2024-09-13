@@ -70,6 +70,8 @@ public class JsonGenerator {
         }
     }
     
+    public func upload(endpoint: URL, authToken: String, organizationId: String) throws {}
+    
     public func generateBlock(from block: NativeBlock) throws -> (integration: String?, data: String?, events: String?, properties: String?, slots: String?) {
         let integrationString = try String(data: JSONEncoder().encode(block), encoding: .utf8)
         
