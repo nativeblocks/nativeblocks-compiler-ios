@@ -37,6 +37,13 @@ extension SyncNativeblocks: XcodeCommandPlugin {
         let toolURL = URL(fileURLWithPath: tool.path.string)
         var processArguments = arguments
         let command = "sync"
+        
+        guard let config = try readNativeblocksConfig(rootPath:context.xcodeProject.directory.string) else {
+            return
+        }
+        processArguments.append(contentsOf: ["--endpoint", config.endpoint])
+        processArguments.append(contentsOf: ["--authToken", config.authToken])
+        processArguments.append(contentsOf: ["--organizationId", config.organizationId])
 
         if processArguments.filter({ arg in
             arg == "--directory"
