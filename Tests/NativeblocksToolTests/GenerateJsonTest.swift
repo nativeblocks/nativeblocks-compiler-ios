@@ -43,43 +43,47 @@ final class GenerateJsonTest: XCTestCase {
         let provider = JsonGenerator()
         try provider.generate(from: sources)
         
-        let (integrationString, datasString, eventsString, propertiesString) = try provider.generateAction(from: provider.actions.first!)
-
+        let actionJsons = provider.actionsJson.first?.value
+        
         print("-------------------------")
         for source in sources {
             print(source)
         }
         print("+++++++++++++++++++++++++")
-        print("integration.json=>")
-        print(String(integrationString!))
-        print("data.json=>")
-        print(String(datasString!))
-        print("events.json=>")
-        print(String(eventsString!))
-        print("properties.json=>")
-        print(String(propertiesString!))
+        
+        print("\(JsonGenerateType.integration.fileName)=>")
+        print(String(actionJsons![JsonGenerateType.integration]!))
+        
+        print("\(JsonGenerateType.data.fileName)=>")
+        print(String(actionJsons![JsonGenerateType.data]!))
+        
+        print("\(JsonGenerateType.event.fileName)=>")
+        print(String(actionJsons![JsonGenerateType.event]!))
+        
+        print("\(JsonGenerateType.propertie.fileName)=>")
+        print(String(actionJsons![JsonGenerateType.propertie]!))
         print("=========================")
         
         XCTAssertEqual(
-            String(integrationString!),
+            String(actionJsons![JsonGenerateType.integration]!),
             """
-            {"platFormSupport":"IOS","documentation":"","keyType":"ALERT","price":0,"description":"Nativeblocks alert action","imageIcon":"","name":"Alert","kind":"ACTION"}
+            {"platFormSupport":"IOS","documentation":"","keyType":"ALERT","price":0,"organizationId":"","description":"Nativeblocks alert action","imageIcon":"","name":"Alert","kind":"ACTION"}
             """
         )
         XCTAssertEqual(
-            String(datasString!),
+            String(actionJsons![JsonGenerateType.data]!),
             """
             [{"key":"message","type":"STRING","description":""}]
             """
         )
         XCTAssertEqual(
-            String(eventsString!),
+            String(actionJsons![JsonGenerateType.event]!),
             """
             [{"event":"END","description":""}]
             """
         )
         XCTAssertEqual(
-            String(propertiesString!),
+            String(actionJsons![JsonGenerateType.propertie]!),
             """
             [{"valuePicker":"text-input","valuePickerGroup":"General","valuePickerOptions":"[]","value":"false","key":"animated","type":"BOOLEAN","description":""}]
             """
@@ -163,53 +167,61 @@ final class GenerateJsonTest: XCTestCase {
         ]
 
         
+       
         let provider = JsonGenerator()
         try provider.generate(from: sources)
         
-        let (integrationString, datasString, eventsString, propertiesString, slotsString)  = try provider.generateBlock(from: provider.blocks.first!)
+        let jsons = provider.blocksJson.first?.value
+        
+        
         print("-------------------------")
         for source in sources {
             print(source)
         }
         print("+++++++++++++++++++++++++")
-        print("integration.json=>")
-        print(String(integrationString!))
-        print("data.json=>")
-        print(String(datasString!))
-        print("events.json=>")
-        print(String(eventsString!))
-        print("properties.json=>")
-        print(String(propertiesString!))
-        print("slots.json=>")
-        print(String(slotsString!))
+        
+        print("\(JsonGenerateType.integration.fileName)=>")
+        print(String(jsons![JsonGenerateType.integration]!))
+        
+        print("\(JsonGenerateType.data.fileName)=>")
+        print(String(jsons![JsonGenerateType.data]!))
+        
+        print("\(JsonGenerateType.event.fileName)=>")
+        print(String(jsons![JsonGenerateType.event]!))
+        
+        print("\(JsonGenerateType.propertie.fileName)=>")
+        print(String(jsons![JsonGenerateType.propertie]!))
+                
+        print("\(JsonGenerateType.slot.fileName)=>")
+        print(String(jsons![JsonGenerateType.slot]!))
         print("=========================")
         
         XCTAssertEqual(
-            integrationString!,
+            jsons![JsonGenerateType.integration]!,
             """
-            {"platFormSupport":"IOS","documentation":"","keyType":"XBUTTON","price":0,"description":"This is a button","imageIcon":"","name":"X button","kind":"BLOCK"}
+            {"platFormSupport":"IOS","documentation":"","keyType":"XBUTTON","price":0,"organizationId":"","description":"This is a button","imageIcon":"","name":"X button","kind":"BLOCK"}
             """
         )
         XCTAssertEqual(
-            datasString!,
+            jsons![JsonGenerateType.data]!,
             """
             [{"key":"text","type":"STRING","description":"Button text"}]
             """
         )
         XCTAssertEqual(
-            eventsString!,
+            jsons![JsonGenerateType.event]!,
             """
             [{"event":"onClick","description":"Button on click"}]
             """
         )
         XCTAssertEqual(
-            propertiesString!,
+            jsons![JsonGenerateType.propertie]!,
             """
             [{"valuePicker":"color-picker","valuePickerGroup":"General","valuePickerOptions":"[]","value":"#ffffffff","key":"background","type":"STRING","description":""},{"valuePicker":"dropdown","valuePickerGroup":"Size","valuePickerOptions":"[{\\"id\\":\\"S\\",\\"text\\":\\"Small\\"},{\\"id\\":\\"M\\",\\"text\\":\\"Medium\\"},{\\"id\\":\\"L\\",\\"text\\":\\"Large\\"}]","value":"S","key":"size","type":"STRING","description":"Button size"}]
             """
         )
         XCTAssertEqual(
-            slotsString!,
+            jsons![JsonGenerateType.slot]!,
             """
             [{"description":"Button leading icon","slot":"onLeadingIcon"},{"description":"Button trailing icon","slot":"onTrailingIcon"}]
             """

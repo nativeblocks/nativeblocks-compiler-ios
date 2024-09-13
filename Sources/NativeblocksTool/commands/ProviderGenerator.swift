@@ -14,24 +14,51 @@ public class ProviderGenerator {
     }
 
     public func generate(from files: [String]) throws {
+        print("Generate providers...")
+        
         let (blocks, actions) = NativeBlockVisitor.extractNatives(from: files)
         
-        actionProviderCode = try createActionProvider(prefix: prefix, actions: actions).formatted().description
+        if blocks.isEmpty && actions.isEmpty {
+            print("There is no actions or blocks to generate providers")
+            return
+        }
         
-        blockProviderCode = try createBlockProvider(prefix: prefix, blocks: blocks).formatted().description
+        if !actions.isEmpty{
+            actionProviderCode = try createActionProvider(prefix: prefix, actions: actions).formatted().description
+        }
+        
+        if !blocks.isEmpty{
+            blockProviderCode = try createBlockProvider(prefix: prefix, blocks: blocks).formatted().description
+        }
     }
     
     public func save(to directory: String) throws {
+        print("Save providers...")
+        
+        
+        if actionProviderCode == nil && blockProviderCode == nil {
+            print("There is no actions or blocks to save providers")
+            return
+        }
+        
         let actionFilePath = directory + "/\(prefix)ActionProvider.swift"
         let blockFilePath = directory + "/\(prefix)BlockProvider.swift"
         
-        try actionProviderCode!.write(toFile: actionFilePath, atomically: true, encoding: .utf8)
-        try blockProviderCode!.write(toFile: blockFilePath, atomically: true, encoding: .utf8)
+        try actionProviderCode?.write(toFile: actionFilePath, atomically: true, encoding: .utf8)
+        
+        try blockProviderCode?.write(toFile: blockFilePath, atomically: true, encoding: .utf8)
        
-        print("exportrd File: \(actionFilePath) =>")
-        print(String(actionProviderCode!))
-        print("exportrd File: \(blockFilePath) =>")
-        print(String(blockProviderCode!))
+        if(actionProviderCode != nil){
+            print("exportrd File: \(actionFilePath) =>")
+            print(String(actionProviderCode!))
+        }
+        
+        if(blockProviderCode != nil){
+            print("exportrd File: \(blockFilePath) =>")
+            print(String(blockProviderCode!))
+        }
+        
+        
     }
     
     static func generateName(prefix: String?) -> String {

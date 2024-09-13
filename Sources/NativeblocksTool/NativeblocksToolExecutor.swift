@@ -49,7 +49,7 @@ public class NativeblocksToolExecutor {
             let organizationId = parsedArgs[OrganizationIdArgumentKey]!
 
             let generator = JsonGenerator()
-            try generator.generate(from: files)
+            try generator.generate(from: files,organizationId: organizationId)
             try generator.save(to: output, with: fileManager)
             try generator.upload(endpoint: endpoint, authToken: authToken, organizationId: organizationId)
         }
