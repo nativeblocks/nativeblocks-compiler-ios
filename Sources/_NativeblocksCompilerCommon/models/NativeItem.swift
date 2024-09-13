@@ -14,9 +14,10 @@ public struct NativeBlock: NativeItem {
     public let platFormSupport = "IOS"
     public let imageIcon = ""
     public let documentation = ""
+    public var organizationId = ""
 
     private enum CodingKeys: String, CodingKey {
-        case name, description, documentation, imageIcon, keyType, kind, platFormSupport, price
+        case name, description, documentation, imageIcon, keyType, kind, platFormSupport, price, organizationId
     }
 }
 
@@ -32,8 +33,9 @@ public struct NativeAction: NativeItem {
     public let platFormSupport = "IOS"
     public let imageIcon = ""
     public let documentation = ""
+    public var organizationId = ""
 
     private enum CodingKeys: String, CodingKey {
-        case name, description, documentation, imageIcon, keyType, kind, platFormSupport, price
+        case name, description, documentation, imageIcon, keyType, kind, platFormSupport, price , organizationId
     }
 }
