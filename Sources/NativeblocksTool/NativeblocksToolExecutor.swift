@@ -44,14 +44,18 @@ public class NativeblocksToolExecutor {
         }
 
         if commands.contains(where: { command in command == SyncCommand }) {
-            let endpoint = URL(fileURLWithPath: parsedArgs[EndpointArgumentKey]!)
+            let endpoint = parsedArgs[EndpointArgumentKey]!
             let authToken = parsedArgs[AuthTokenArgumentKey]!
             let organizationId = parsedArgs[OrganizationIdArgumentKey]!
 
             let generator = JsonGenerator()
-            try generator.generate(from: files,organizationId: organizationId)
+
+            try generator.generate(from: files, organizationId: organizationId)
             try generator.save(to: output, with: fileManager)
-            try generator.upload(endpoint: endpoint, authToken: authToken, organizationId: organizationId)
+
+            let uploader = JsonUploader(endpoint: endpoint, authToken: authToken, organizationId: organizationId)
+
+            try uploader.upload(blocks: generator.blocks, actions: generator.actions)
         }
     }
 
