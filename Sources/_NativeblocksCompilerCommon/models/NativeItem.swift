@@ -11,13 +11,14 @@ public struct NativeBlock: NativeItem {
     public var meta: [NativeMeta]
     public let kind = "BLOCK"
     public let price = 0
-    public let platFormSupport = "IOS"
+    public let platformSupport = "IOS"
     public let imageIcon = ""
     public let documentation = ""
     public var organizationId = ""
+    public var `public` = false
 
     private enum CodingKeys: String, CodingKey {
-        case name, description, documentation, imageIcon, keyType, kind, platFormSupport, price, organizationId
+        case name, description, documentation, imageIcon, keyType, kind, platformSupport, price, organizationId ,`public`
     }
 }
 
@@ -30,12 +31,13 @@ public struct NativeAction: NativeItem {
     public var meta: [NativeMeta]
     public let kind = "ACTION"
     public let price = 0
-    public let platFormSupport = "IOS"
+    public let platformSupport = "IOS"
     public let imageIcon = ""
     public let documentation = ""
     public var organizationId = ""
+    public var `public` = false
 
     private enum CodingKeys: String, CodingKey {
-        case name, description, documentation, imageIcon, keyType, kind, platFormSupport, price , organizationId
+        case name, description, documentation, imageIcon, keyType, kind, platformSupport, price , organizationId ,`public`
     }
 }
