@@ -39,3 +39,9 @@ extension FileManager {
         }
     }
 }
+
+extension Data {
+    public func toString()->String? {
+       return String(data:self, encoding: .utf8)
+    }
+}

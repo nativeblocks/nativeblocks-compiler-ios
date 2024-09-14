@@ -52,38 +52,38 @@ final class GenerateJsonTest: XCTestCase {
         print("+++++++++++++++++++++++++")
         
         print("\(JsonGenerateType.integration.fileName)=>")
-        print(String(actionJsons![JsonGenerateType.integration]!))
+        print(actionJsons![JsonGenerateType.integration]!.toString()!)
         
         print("\(JsonGenerateType.data.fileName)=>")
-        print(String(actionJsons![JsonGenerateType.data]!))
+        print(actionJsons![JsonGenerateType.data]!.toString()!)
         
         print("\(JsonGenerateType.event.fileName)=>")
-        print(String(actionJsons![JsonGenerateType.event]!))
+        print(actionJsons![JsonGenerateType.event]!.toString()!)
         
         print("\(JsonGenerateType.propertie.fileName)=>")
-        print(String(actionJsons![JsonGenerateType.propertie]!))
+        print(actionJsons![JsonGenerateType.propertie]!.toString()!)
         print("=========================")
         
         XCTAssertEqual(
-            String(actionJsons![JsonGenerateType.integration]!),
+            String(actionJsons![JsonGenerateType.integration]!.toString()!),
             """
-            {"platFormSupport":"IOS","documentation":"","keyType":"ALERT","price":0,"organizationId":"","description":"Nativeblocks alert action","imageIcon":"","name":"Alert","kind":"ACTION"}
+            {"platformSupport":"IOS","documentation":"","keyType":"ALERT","price":0,"organizationId":"","description":"Nativeblocks alert action","imageIcon":"","name":"Alert","kind":"ACTION"}
             """
         )
         XCTAssertEqual(
-            String(actionJsons![JsonGenerateType.data]!),
+            String(actionJsons![JsonGenerateType.data]!.toString()!),
             """
             [{"key":"message","type":"STRING","description":""}]
             """
         )
         XCTAssertEqual(
-            String(actionJsons![JsonGenerateType.event]!),
+            String(actionJsons![JsonGenerateType.event]!.toString()!),
             """
             [{"event":"END","description":""}]
             """
         )
         XCTAssertEqual(
-            String(actionJsons![JsonGenerateType.propertie]!),
+            String(actionJsons![JsonGenerateType.propertie]!.toString()!),
             """
             [{"valuePicker":"text-input","valuePickerGroup":"General","valuePickerOptions":"[]","value":"false","key":"animated","type":"BOOLEAN","description":""}]
             """
@@ -181,47 +181,47 @@ final class GenerateJsonTest: XCTestCase {
         print("+++++++++++++++++++++++++")
         
         print("\(JsonGenerateType.integration.fileName)=>")
-        print(String(jsons![JsonGenerateType.integration]!))
+        print(jsons![JsonGenerateType.integration]!.toString()!)
         
         print("\(JsonGenerateType.data.fileName)=>")
-        print(String(jsons![JsonGenerateType.data]!))
+        print(jsons![JsonGenerateType.data]!.toString()!)
         
         print("\(JsonGenerateType.event.fileName)=>")
-        print(String(jsons![JsonGenerateType.event]!))
+        print(jsons![JsonGenerateType.event]!.toString()!)
         
         print("\(JsonGenerateType.propertie.fileName)=>")
-        print(String(jsons![JsonGenerateType.propertie]!))
+        print(jsons![JsonGenerateType.propertie]!.toString()!)
                 
         print("\(JsonGenerateType.slot.fileName)=>")
-        print(String(jsons![JsonGenerateType.slot]!))
+        print(jsons![JsonGenerateType.slot]!.toString()!)
         print("=========================")
         
         XCTAssertEqual(
-            jsons![JsonGenerateType.integration]!,
+            jsons![JsonGenerateType.integration]!.toString()!,
             """
-            {"platFormSupport":"IOS","documentation":"","keyType":"XBUTTON","price":0,"organizationId":"","description":"This is a button","imageIcon":"","name":"X button","kind":"BLOCK"}
+            {"platformSupport":"IOS","documentation":"","keyType":"XBUTTON","price":0,"organizationId":"","description":"This is a button","imageIcon":"","name":"X button","kind":"BLOCK"}
             """
         )
         XCTAssertEqual(
-            jsons![JsonGenerateType.data]!,
+            jsons![JsonGenerateType.data]!.toString()!,
             """
             [{"key":"text","type":"STRING","description":"Button text"}]
             """
         )
         XCTAssertEqual(
-            jsons![JsonGenerateType.event]!,
+            jsons![JsonGenerateType.event]!.toString()!,
             """
             [{"event":"onClick","description":"Button on click"}]
             """
         )
         XCTAssertEqual(
-            jsons![JsonGenerateType.propertie]!,
+            jsons![JsonGenerateType.propertie]!.toString()!,
             """
             [{"valuePicker":"color-picker","valuePickerGroup":"General","valuePickerOptions":"[]","value":"#ffffffff","key":"background","type":"STRING","description":""},{"valuePicker":"dropdown","valuePickerGroup":"Size","valuePickerOptions":"[{\\"id\\":\\"S\\",\\"text\\":\\"Small\\"},{\\"id\\":\\"M\\",\\"text\\":\\"Medium\\"},{\\"id\\":\\"L\\",\\"text\\":\\"Large\\"}]","value":"S","key":"size","type":"STRING","description":"Button size"}]
             """
         )
         XCTAssertEqual(
-            jsons![JsonGenerateType.slot]!,
+            jsons![JsonGenerateType.slot]!.toString()!,
             """
             [{"description":"Button leading icon","slot":"onLeadingIcon"},{"description":"Button trailing icon","slot":"onTrailingIcon"}]
             """
