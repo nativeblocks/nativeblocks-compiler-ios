@@ -9,6 +9,7 @@ public enum NativeblocksCompilerDiagnostic: String, DiagnosticMessage {
     case eventTypeMisMachParamCount
     case premitiveTypeSupported
     case eventDataMissing
+    case eventDistinctThen
     case requiredNativeActionFunction
     case requiredNativeActionFunctionParameter
 
@@ -36,6 +37,8 @@ public enum NativeblocksCompilerDiagnostic: String, DiagnosticMessage {
             return "Requires one '@NativeActionFunction' anotated function."
         case .requiredNativeActionFunctionParameter:
             return "'@NativeActionFunction' Requires one parameter struct anotated with '@NativeActionParameter'"
+        case .eventDistinctThen:
+            return "the 'then' paramenter in '@NativeActionEvent' must be distinct."
         }
 
     }

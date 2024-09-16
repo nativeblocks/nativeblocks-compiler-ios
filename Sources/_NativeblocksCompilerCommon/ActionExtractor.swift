@@ -80,6 +80,18 @@ public struct ActionExtractor {
             }
         }
 
+        let eventGroupByThen = Dictionary(grouping: eventActions, by: { $0.then }).filter { $0.value.count > 1 }
+
+        for eventGroup in eventGroupByThen {
+            for event in eventGroup.value {
+                errors.append(
+                    Diagnostic(
+                        node: event.valriable!,
+                        message: NativeblocksCompilerDiagnostic.eventDistinctThen
+                    ))
+            }
+        }
+
         return (meta, errors)
     }
 
@@ -107,7 +119,7 @@ public struct ActionExtractor {
                     message: NativeblocksCompilerDiagnostic.requiredNativeActionFunction
                 ))
         }
-        
+
         isAsync = functions.first?.signature.effectSpecifiers?.asyncSpecifier?.text == "async"
 
         functionName = functions.first?.name.text ?? ""
@@ -206,7 +218,7 @@ public struct ActionExtractor {
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         valuePicker = SyntaxUtils.extractValuePicker(from: blockAttribute!) ?? "TEXT_INPUT"
         valuePickerGroup = SyntaxUtils.extractValuePickerGroup(from: blockAttribute!) ?? "General"
-        
+
         valuePickerOptions = SyntaxUtils.extractvaluePickerOptions(from: blockAttribute!) ?? []
 
         if varDecl.bindings.count > 1 {
