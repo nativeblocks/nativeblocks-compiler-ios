@@ -12,35 +12,37 @@ public enum NativeblocksCompilerDiagnostic: String, DiagnosticMessage {
     case eventDistinctThen
     case requiredNativeActionFunction
     case requiredNativeActionFunctionParameter
+    case actionNotsupportThrows
 
     public var severity: DiagnosticSeverity { return .error }
 
     public var message: String {
         switch self {
         case .notAStruct:
-            return "Can only be used with structs."
+            return "Only structs are supported."
         case .notAClass:
-            return "Can only be used with classes."
+            return "Only classes are supported."
         case .singleVariableLimit:
-            return "Property wrapper applies to a single variable."
+            return "Wrap a single variable only."
         case .blockIndexParamLimit:
-            return "Requires one 'BlockIndex' parameter."
+            return "Must have one 'BlockIndex' parameter."
         case .functionTypeError:
-            return "Must be a function."
+            return "Expected a function."
         case .eventTypeMisMachParamCount:
-            return "Requires parameters matching 'dataBinding' count."
+            return "Parameter count must match 'dataBinding'."
         case .premitiveTypeSupported:
-            return "Primitive type supported."
+            return "Only primitive types are supported."
         case .eventDataMissing:
-            return "For binding, define '@NativeBlockData' with the same type and name as the bound value."
+            return "Add '@NativeBlockData' with matching type and name."
         case .requiredNativeActionFunction:
-            return "Requires one '@NativeActionFunction' anotated function."
+            return "Add one '@NativeActionFunction'."
         case .requiredNativeActionFunctionParameter:
-            return "'@NativeActionFunction' Requires one parameter struct anotated with '@NativeActionParameter'"
+            return "'@NativeActionFunction' needs a struct with '@NativeActionParameter'."
         case .eventDistinctThen:
-            return "the 'then' paramenter in '@NativeActionEvent' must be distinct."
+            return "'then' in '@NativeActionEvent' must be unique."
+        case .actionNotsupportThrows:
+            return "'@NativeActionFunction' doesn't support throws. Use '@NativeActionEvent(then: Then.FAILURE)'."
         }
-
     }
 
     public var diagnosticID: MessageID {

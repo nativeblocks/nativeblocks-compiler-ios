@@ -121,6 +121,17 @@ public struct ActionExtractor {
         }
 
         isAsync = functions.first?.signature.effectSpecifiers?.asyncSpecifier?.text == "async"
+        
+        let declThrows =  functions.first?.signature.effectSpecifiers?.throwsSpecifier
+        let haveThrows =  declThrows?.text == "throws"
+        
+        if haveThrows {
+            diagnostic.append(
+                Diagnostic(
+                    node: classDecl,
+                    message: NativeblocksCompilerDiagnostic.requiredNativeActionFunctionParameter
+                ))
+        }
 
         functionName = functions.first?.name.text ?? ""
         functionParams = functions.first?.signature.parameterClause.parameters.compactMap { $0.as(FunctionParameterSyntax.self) } ?? []
