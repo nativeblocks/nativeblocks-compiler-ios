@@ -21,11 +21,10 @@ public class JsonUploader {
                        actions: [NativeAction]) throws
     {
         for block in blocks {
-            print("Sync Block:\(block.keyType) start..." )
+            print("Sync Block:\(block.keyType) start...")
             var input = block
             input.organizationId = organizationId
-            let (integrationId, _) = try JsonUploader.syncIntegration(input: input)
-            
+            let integrationId = try JsonUploader.syncIntegration(input: input)
             
             let datas = block.meta.compactMap { $0 as? DataNativeMeta }
             let events = block.meta.compactMap { $0 as? EventNativeMeta }
@@ -71,7 +70,7 @@ public class JsonUploader {
             print("Sync Action:\(action.keyType) start...")
             var input = action
             input.organizationId = organizationId
-            let (integrationId, _) = try JsonUploader.syncIntegration(input: input)
+            let integrationId = try JsonUploader.syncIntegration(input: input)
             
             let datas = action.meta.compactMap { $0 as? DataNativeMeta }
             let events = action.meta.compactMap { $0 as? EventNativeMeta }
@@ -107,7 +106,7 @@ public class JsonUploader {
         print("Sync done")
     }
     
-    static func syncIntegration(input: NativeItem) throws -> (id: String, name: String) {
+    static func syncIntegration(input: NativeItem) throws -> String {
         let semaphore = DispatchSemaphore(value: 0)
         var result: ResultModel<SyncIntegrationResultRawModel>?
         NetworkExecutor.getInstance().performOperation(
@@ -123,14 +122,14 @@ public class JsonUploader {
         semaphore.wait()
         switch result! {
         case .success(let raw):
-            return (raw.syncIntegration.id, raw.syncIntegration.name)
+            return raw.syncIntegration?.id ?? ""
         case .error(let errorModel):
             throw errorModel
         }
     }
     
     static func syncIntegrationData(integrationId: String, organizationId: String, meta: [DataNativeMeta]) throws {
-        if meta.isEmpty{
+        if meta.isEmpty {
             return
         }
         let input = SyncIntegrationDataInput(
@@ -161,7 +160,7 @@ public class JsonUploader {
     }
     
     static func syncIntegrationProperties(integrationId: String, organizationId: String, meta: [PropertyNativeMeta]) throws {
-        if meta.isEmpty{
+        if meta.isEmpty {
             return
         }
         let input = SyncIntegrationPropertiesInput(
@@ -192,7 +191,7 @@ public class JsonUploader {
     }
     
     static func syncIntegrationEvents(integrationId: String, organizationId: String, meta: [EventNativeMeta]) throws {
-        if meta.isEmpty{
+        if meta.isEmpty {
             return
         }
         let input = SyncIntegrationEventsInput(
@@ -223,7 +222,7 @@ public class JsonUploader {
     }
     
     static func syncIntegrationSlots(integrationId: String, organizationId: String, meta: [SlotNativeMeta]) throws {
-        if meta.isEmpty{
+        if meta.isEmpty {
             return
         }
         let input = SyncIntegrationSlotsInput(

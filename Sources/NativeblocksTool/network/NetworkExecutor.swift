@@ -17,6 +17,7 @@ class NetworkExecutor {
         }
         return instance!
     }
+
     func performOperation<Output: Codable>(_ operation: NetworkOperation, completion: @escaping (ResultModel<Output>) -> Void) {
         guard let endpoint = NetworkExecutor.endpoint, !endpoint.isEmpty else {
             completion(ResultModel.error(ErrorModel(message: "Please provide a valid endpoint", errorType: "NETWORK")))
@@ -31,24 +32,26 @@ class NetworkExecutor {
         let decoder = JSONDecoder()
         do {
             let request: URLRequest = try operation.getURLRequest(endpoint: endpoint, apiKey: apiKey)
-            
-            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+
+//             print("request=>:\(request)")
+//            try print("operation:\(  String(data: JSONEncoder().encode(operation), encoding: .utf8)!)")
+
+            let task = URLSession.shared.dataTask(with: request) { data, _, error in
                 if let error = error {
                     completion(ResultModel.error(ErrorModel(message: error.localizedDescription, errorType: "UN_KNOWN")))
                     return
                 }
-                
+
                 guard let data = data else {
                     completion(ResultModel.error(ErrorModel(message: "No data received", errorType: "NETWORK")))
                     return
                 }
-                
+
                 do {
-                    
-                   let responseString = String(data: data, encoding: .utf8)
+                    let responseString = String(data: data, encoding: .utf8)
+//                    print("response:\(responseString ?? "")")
                     let responseModel = try decoder.decode(NetworkResult<Output>.self, from: data)
-                    
-                    
+
                     if let errors = responseModel.errors {
                         completion(ResultModel.error(ErrorModel(message: errors.first?.message, errorType: errors.first?.extensions.classification)))
                     } else if let resultData = responseModel.data {
@@ -60,9 +63,9 @@ class NetworkExecutor {
                     completion(ResultModel.error(ErrorModel(message: "Failed to parse response: \(error.localizedDescription)", errorType: "PARSING")))
                 }
             }
-            
+
             task.resume()
-            
+
         } catch {
             completion(ResultModel.error(ErrorModel(message: error.localizedDescription, errorType: "REQUEST_CREATION")))
         }
