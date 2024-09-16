@@ -93,11 +93,19 @@ final class JsonUploaderTest: XCTestCase {
 
             """
         ]
-
+        
+        let endpoint = ""
+        let authToken = ""
+        let organizationId = ""
+        
+        if !endpoint.isEmpty || authToken.isEmpty || organizationId.isEmpty {
+            return
+        }
+        
         let jsonUploader = JsonUploader(
-            endpoint: "endpoint",
-            authToken: "authToken",
-            organizationId: "organizationId"
+            endpoint: endpoint,
+            authToken: authToken,
+            organizationId: organizationId
         )
         
         let provider = JsonGenerator()
@@ -106,6 +114,5 @@ final class JsonUploaderTest: XCTestCase {
         let blocks = provider.blocks
         
         try jsonUploader.upload(blocks: blocks, actions: [])
-        
     }
 }

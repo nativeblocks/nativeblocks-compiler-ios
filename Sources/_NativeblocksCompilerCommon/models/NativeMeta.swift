@@ -38,9 +38,9 @@ public struct DataNativeMeta: NativeMeta {
     }
 }
 
-public struct ValuePickerOption : Encodable {
-    public var id:String
-    public var text:String
+public struct ValuePickerOption: Encodable {
+    public var id: String
+    public var text: String
 }
 
 public struct PropertyNativeMeta: NativeMeta {
@@ -72,7 +72,7 @@ public struct PropertyNativeMeta: NativeMeta {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case key, type, description, value, valuePicker, valuePickerGroup , valuePickerOptions
+        case key, type, description, value, valuePicker, valuePickerGroup, valuePickerOptions
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -83,7 +83,7 @@ public struct PropertyNativeMeta: NativeMeta {
         try container.encode(self.value, forKey: .value)
         try container.encode(TypeUtils.valuePickerMapJson(self.valuePicker), forKey: .valuePicker)
         try container.encode(self.valuePickerGroup, forKey: .valuePickerGroup)
-        try container.encode(TypeUtils.valuePickerOptionsMapToJson(self.valuePickerOptions) , forKey: .valuePickerOptions)
+        try container.encode(TypeUtils.valuePickerOptionsMapToJson(self.valuePickerOptions), forKey: .valuePickerOptions)
     }
 }
 
@@ -160,10 +160,12 @@ public struct ActionNativeMeta: NativeMeta {
     public var parameterClass: String
     public var functionName: String
     public var functionParamName: String
+    public var isAsync: Bool
 
-    init(parameterClass: String, functionName: String, functionParamName: String) {
+    init(parameterClass: String, functionName: String, functionParamName: String, isAsync: Bool) {
         self.parameterClass = parameterClass
         self.functionName = functionName
         self.functionParamName = functionParamName
+        self.isAsync = isAsync
     }
 }

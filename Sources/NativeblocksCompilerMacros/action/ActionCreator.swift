@@ -1,6 +1,6 @@
+import _NativeblocksCompilerCommon
 import SwiftSyntax
 import SwiftSyntaxBuilder
-import _NativeblocksCompilerCommon
 
 enum ActionCreator {
     static func create(
@@ -20,6 +20,13 @@ enum ActionCreator {
             }
             """
             try FunctionDeclSyntax("public func handle(actionProps: ActionProps)") {
+                if actionInfo?.isAsync == true {
+                    """
+                    Task {
+
+                    """
+                }
+
                 if !metaData.isEmpty {
                     """
                     let data = actionProps.trigger?.data ?? [:]
@@ -118,11 +125,16 @@ enum ActionCreator {
                     let param = \(raw: structName).\(raw: actionInfo?.parameterClass ?? "Struct")(\n\(raw: arguments))
                     """
                     """
-                    action.\(raw: actionInfo?.functionName ?? "function")(param: \(raw: actionInfo?.functionParamName ?? "param"))
+                    \(raw: (actionInfo?.isAsync == true ? "await " : ""))action.\(raw: actionInfo?.functionName ?? "function")(param: \(raw: actionInfo?.functionParamName ?? "param"))
                     """
                 } else {
                     """
-                    action.\(raw: actionInfo?.functionName ?? "function")()
+                    \(raw: (actionInfo?.isAsync == true ? "await " : ""))action.\(raw: actionInfo?.functionName ?? "function")()
+                    """
+                }
+                if actionInfo?.isAsync == true {
+                    """
+                    }
                     """
                 }
             }
@@ -137,7 +149,7 @@ enum ActionCreator {
                 \(dataItem.key)Data?.value ?? ""
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8", "FLOAT", "FLOAT80", "FLOAT64",
-            "FLOAT32", "FLOAT16", "DOUBLE":
+             "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
                 \(dataItem.type)(\(dataItem.key)Data?.value ?? "") ?? 0
@@ -165,7 +177,7 @@ enum ActionCreator {
                 properties["\(item.key)"]?.value ?? \(item.value.isEmpty ? "\"\"" : "\"\(item.value)\"")
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8", "FLOAT", "FLOAT80", "FLOAT64",
-            "FLOAT32", "FLOAT16", "DOUBLE":
+             "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
                 \(item.type)(properties["\(item.key)"]?.value ?? "") ?? \(item.value.isEmpty ? "0" : item.value)
@@ -184,5 +196,4 @@ enum ActionCreator {
             return nil
         }
     }
-
 }

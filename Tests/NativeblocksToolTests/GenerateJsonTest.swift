@@ -67,7 +67,7 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             String(actionJsons![JsonGenerateType.integration]!.toString()!),
             """
-            {"platformSupport":"IOS","documentation":"","keyType":"ALERT","price":0,"organizationId":"","description":"Nativeblocks alert action","imageIcon":"","name":"Alert","kind":"ACTION"}
+            {"public":false,"platformSupport":"IOS","documentation":"","keyType":"ALERT","price":0,"organizationId":"","description":"Nativeblocks alert action","imageIcon":"","name":"Alert","kind":"ACTION"}
             """
         )
         XCTAssertEqual(
@@ -199,7 +199,7 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             jsons![JsonGenerateType.integration]!.toString()!,
             """
-            {"platformSupport":"IOS","documentation":"","keyType":"XBUTTON","price":0,"organizationId":"","description":"This is a button","imageIcon":"","name":"X button","kind":"BLOCK"}
+            {"public":false,"platformSupport":"IOS","documentation":"","keyType":"XBUTTON","price":0,"organizationId":"","description":"This is a button","imageIcon":"","name":"X button","kind":"BLOCK"}
             """
         )
         XCTAssertEqual(

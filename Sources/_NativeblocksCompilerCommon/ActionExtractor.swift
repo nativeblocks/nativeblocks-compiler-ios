@@ -92,6 +92,7 @@ public struct ActionExtractor {
         var parameters: [VariableDeclSyntax] = []
         var functionParams: [FunctionParameterSyntax] = []
         var diagnostic: [Diagnostic] = []
+        var isAsync = false
 
         let functions = classDecl.memberBlock.members.compactMap { $0.decl.as(FunctionDeclSyntax.self) }.filter { function in
             function.attributes.filter { element in
@@ -106,6 +107,8 @@ public struct ActionExtractor {
                     message: NativeblocksCompilerDiagnostic.requiredNativeActionFunction
                 ))
         }
+        
+        isAsync = functions.first?.signature.effectSpecifiers?.asyncSpecifier?.text == "async"
 
         functionName = functions.first?.name.text ?? ""
         functionParams = functions.first?.signature.parameterClause.parameters.compactMap { $0.as(FunctionParameterSyntax.self) } ?? []
@@ -135,7 +138,8 @@ public struct ActionExtractor {
                 ActionNativeMeta(
                     parameterClass: parameterClass,
                     functionName: functionName,
-                    functionParamName: functionParamName
+                    functionParamName: functionParamName,
+                    isAsync: isAsync
                 ),
                 parameters,
                 diagnostic
