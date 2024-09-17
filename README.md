@@ -20,19 +20,8 @@ Then it needed to provide compiler arguments, Properties belongs to each Studio 
 
 - #### [How block it works on Block](/docs/block.md)
 - #### [How block it works on Action](/docs/action.md)
+- #### [How to generate provider](/docs/generate-provider.md)
+- #### [How to sync natives](/docs/sync.md)
 
-### Generate Provider
 
-After providing annotations for blocks and actions, you can use `GenerateProvider` plugin to generates Swift code. These can then be initialize in App or via dependency injection
 
-Note: The prefix for the provider name comes from the target name that selected. In this case, since we
-provided "Demo," the
-compiler generates with "Demo" prefix.
-
-```swift
-DemoBlockProvider.provideBlocks()
-DemoActionProvider.provideActions(xBot)
-```
-
-For actions, all dependencies must be provided during initialization. To optimize performance, consider using dependency
-injection for scoped or lazy instances.
