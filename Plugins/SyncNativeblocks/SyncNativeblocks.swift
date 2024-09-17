@@ -38,7 +38,7 @@ extension SyncNativeblocks: XcodeCommandPlugin {
         var processArguments = arguments
         let command = "sync"
         
-        guard let config = try readNativeblocksConfig(rootPath:context.xcodeProject.directory.string) else {
+        guard let config =  try readNativeblocksConfig(rootPath:context.xcodeProject.directory.string) else {
             return
         }
         processArguments.append(contentsOf: ["--endpoint", config.endpoint])
@@ -91,7 +91,7 @@ func readNativeblocksConfig(rootPath:String) throws -> NativeblocksConfig? {
         return try decoder.decode(NativeblocksConfig.self, from: data)
 
     } catch {
-        Diagnostics.error("Failed to read or decode nativeblocks.json: \(error)")
+        Diagnostics.error("Failed to read or decode nativeblocks.json: \(error.localizedDescription)")
     }
     return nil
 }

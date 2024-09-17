@@ -9,25 +9,27 @@ enum ArgumentError: Error, CustomStringConvertible {
     case missingCommand
     case invalidDirectory(String)
     case extraArguments([String])
+    
+    var localizedDescription: String { return description }
 
     var description: String {
         switch self {
         case .missingTarget:
-            return "Error: --target argument is missing."
+            return "--target argument is missing."
         case .missingDirectory:
-            return "Error: --directory argument is missing."
+            return "--directory argument is missing."
         case .missingEndpoint:
-            return "Error: --endpoint argument is missing."
+            return "--endpoint argument is missing."
         case .missingAuthToken:
-            return "Error: --authToken argument is missing."
+            return "--authToken argument is missing."
         case .missingOrganizationId:
-            return "Error: --organizationId argument is missing."
+            return "--organizationId argument is missing."
         case .missingCommand:
-            return "Error: please use commands like: 'generate-provider', 'generate-json', 'sync'"
+            return "please use commands like: 'generate-provider', 'generate-json', 'sync'"
         case .invalidDirectory(let path):
-            return "Error: The directory \(path) does not exist."
+            return "The directory \(path) does not exist."
         case .extraArguments(let extraArgs):
-            return "Error: Extra arguments provided: \(extraArgs.joined(separator: ", "))"
+            return "Extra arguments provided: \(extraArgs.joined(separator: ", "))"
         }
     }
 }
