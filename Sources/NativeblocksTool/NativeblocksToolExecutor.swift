@@ -3,8 +3,12 @@ import Foundation
 public class NativeblocksToolExecutor {
     let GenerateProviderCommand = "generate-provider"
     let GenerateJsonCommand = "generate-json"
+    let SyncCommand = "sync"
     let TargetArgumentKey = "--target"
     let DirectoryArgumentKey = "--directory"
+    let EndpointArgumentKey = "--endpoint"
+    let AuthTokenArgumentKey = "--authToken"
+    let OrganizationIdArgumentKey = "--organizationId"
 
     var parsedArgs: [String: String] = [:]
     var commands: [String] = []
@@ -19,19 +23,49 @@ public class NativeblocksToolExecutor {
             throw ArgumentError.missingCommand
         }
 
+        let fileManager = FileManager.default
+
+        let directory = URL(fileURLWithPath: parsedArgs[DirectoryArgumentKey]!)
+        let output = fileManager.currentDirectoryPath
+        let files = try fileManager.getFilesContent(from: directory)
+
         if commands.contains(where: { command in command == GenerateProviderCommand }) {
-            let directory = URL(fileURLWithPath: parsedArgs[DirectoryArgumentKey]!)
-            let files = try FileUtils.getFilesContent(from: directory)
             let target = parsedArgs[TargetArgumentKey]!
+
             let generator = ProviderGenerator(prefix: target)
             try generator.generate(from: files)
-            try generator.save(to: directory)
+            try generator.save(to: output)
         }
 
-        if commands.contains(where: { command in command == GenerateJsonCommand }) {}
+        if commands.contains(where: { command in command == GenerateJsonCommand }) {
+            let generator = JsonGenerator()
+            try generator.generate(from: files)
+            try generator.save(to: output, with: fileManager)
+        }
+
+        if commands.contains(where: { command in command == SyncCommand }) {
+            let endpoint = parsedArgs[EndpointArgumentKey]!
+            let authToken = parsedArgs[AuthTokenArgumentKey]!
+            let organizationId = parsedArgs[OrganizationIdArgumentKey]!
+
+            let generator = JsonGenerator()
+
+            try generator.generate(from: files, organizationId: organizationId)
+            try generator.save(to: output, with: fileManager)
+
+            let uploader = JsonUploader(
+                endpoint: endpoint,
+                authToken: authToken,
+                organizationId: organizationId
+            )
+
+            try uploader.upload(blocks: generator.blocks, actions: generator.actions)
+        }
     }
 
-    private func parseArguments(_ arguments: [String]) throws -> (commands: [String], parsedArgs: [String: String]) {
+    private func parseArguments(_ arguments: [String]) throws -> (
+        commands: [String], parsedArgs: [String: String]
+    ) {
         var parsedArgs: [String: String] = [:]
         var commands: [String] = []
         var currentArgKey: String?
@@ -45,6 +79,9 @@ public class NativeblocksToolExecutor {
                 commands.append(argument)
                 currentArgKey = nil
             } else if argument == GenerateJsonCommand {
+                commands.append(argument)
+                currentArgKey = nil
+            } else if argument == SyncCommand {
                 commands.append(argument)
                 currentArgKey = nil
             }
@@ -67,11 +104,43 @@ public class NativeblocksToolExecutor {
 
         let directoryURL = URL(fileURLWithPath: directoryPath)
         var isDirectory: ObjCBool = false
-        if !FileManager.default.fileExists(atPath: directoryURL.path, isDirectory: &isDirectory) || !isDirectory.boolValue {
+        if !FileManager.default.fileExists(atPath: directoryURL.path, isDirectory: &isDirectory)
+            || !isDirectory.boolValue
+        {
             throw ArgumentError.invalidDirectory(directoryPath)
         }
 
-        let validArgs = Set([TargetArgumentKey, DirectoryArgumentKey])
+        if commands.contains(where: { command in command == SyncCommand }) {
+            guard let endpoint = parsedArgs[EndpointArgumentKey] else {
+                throw ArgumentError.missingEndpoint
+            }
+
+            guard let authToken = parsedArgs[AuthTokenArgumentKey] else {
+                throw ArgumentError.missingAuthToken
+            }
+
+            guard let organizationId = parsedArgs[OrganizationIdArgumentKey] else {
+                throw ArgumentError.missingOrganizationId
+            }
+
+            if endpoint.isEmpty {
+                throw ArgumentError.missingEndpoint
+            }
+            if authToken.isEmpty {
+                throw ArgumentError.missingAuthToken
+            }
+            if organizationId.isEmpty {
+                throw ArgumentError.missingOrganizationId
+            }
+        }
+
+        let validArgs = Set([
+            TargetArgumentKey,
+            DirectoryArgumentKey,
+            EndpointArgumentKey,
+            AuthTokenArgumentKey,
+            OrganizationIdArgumentKey,
+        ])
 
         let extraArgs = parsedArgs.keys.filter { !validArgs.contains($0) }
 

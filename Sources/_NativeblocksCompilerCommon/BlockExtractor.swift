@@ -8,7 +8,9 @@ public struct BlockExtractor {
     static let NativeBlockEventType = "NativeBlockEvent"
     static let NativeBlockSlotType = "NativeBlockSlot"
 
-    public static func extractVariable(from structDecl: StructDeclSyntax) -> ([NativeMeta], [Diagnostic]) {
+    public static func extractVariable(from structDecl: StructDeclSyntax) -> (
+        [NativeMeta], [Diagnostic]
+    ) {
         var meta: [NativeMeta] = []
         var errors: [Diagnostic] = []
         var position = 0
@@ -107,7 +109,9 @@ public struct BlockExtractor {
             varDecl.bindings.compactMap { binding in
                 position += 1
                 let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
-                let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
+                let type =
+                    binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?
+                    .name.text ?? ""
 
                 if !SyntaxUtils.isPrimitiveTypeSupported(type) {
                     diagnostic.append(
@@ -135,15 +139,22 @@ public struct BlockExtractor {
     {
         var position = startPosition
         let attributes = varDecl.attributes
-        var description = "" as String?
+        var description = ""
         var blockAttribute: AttributeSyntax?
         var diagnostic: [Diagnostic] = []
+        var valuePicker = ""
+        var valuePickerGroup = ""
+        var valuePickerOptions: [ValuePickerOption] = []
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockPropType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
+        valuePicker = SyntaxUtils.extractValuePicker(from: blockAttribute!) ?? "TEXT_INPUT"
+        valuePickerGroup = SyntaxUtils.extractValuePickerGroup(from: blockAttribute!) ?? "General"
+
+        valuePickerOptions = SyntaxUtils.extractvaluePickerOptions(from: blockAttribute!) ?? []
 
         if varDecl.bindings.count > 1 {
             diagnostic.append(
@@ -157,7 +168,9 @@ public struct BlockExtractor {
             varDecl.bindings.compactMap { binding in
                 position += 1
                 let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
-                let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
+                let type =
+                    binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?
+                    .name.text ?? ""
                 let value = SyntaxUtils.extractDefaultValue(from: binding.initializer)
 
                 if !SyntaxUtils.isPrimitiveTypeSupported(type) {
@@ -174,10 +187,10 @@ public struct BlockExtractor {
                         key: key,
                         value: value,
                         type: type,
-                        description: description ?? "",
-                        valuePicker: "",
-                        valuePickerOptions: "",
-                        valuePickerGroup: "",
+                        description: description,
+                        valuePicker: valuePicker,
+                        valuePickerOptions: valuePickerOptions,
+                        valuePickerGroup: valuePickerGroup,
                         block: blockAttribute,
                         valriable: binding
                     ) : nil
@@ -216,11 +229,14 @@ public struct BlockExtractor {
                 position += 1
                 let event = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
 
-                var function = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(FunctionTypeSyntax.self)
+                var function = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(
+                    FunctionTypeSyntax.self)
 
                 if function == nil {
-                    function = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(OptionalTypeSyntax.self)?.wrappedType.as(
-                        TupleTypeSyntax.self)?.elements.as(TupleTypeElementListSyntax.self)?.first?.type.as(FunctionTypeSyntax.self)
+                    function = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(
+                        OptionalTypeSyntax.self)?.wrappedType.as(
+                            TupleTypeSyntax.self)?.elements.as(TupleTypeElementListSyntax.self)?.first?.type.as(
+                            FunctionTypeSyntax.self)
                     isOptinalFunction = function != nil
                 }
 
@@ -244,6 +260,7 @@ public struct BlockExtractor {
 
                 return !event.isEmpty && function != nil
                     ? EventNativeMeta(
+                        kind: .block,
                         position: position,
                         event: event,
                         description: description,
@@ -285,11 +302,14 @@ public struct BlockExtractor {
                 let slot = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
 
                 var isOptinalFunction = false
-                var function = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(FunctionTypeSyntax.self)
+                var function = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(
+                    FunctionTypeSyntax.self)
 
                 if function == nil {
-                    function = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(OptionalTypeSyntax.self)?.wrappedType.as(
-                        TupleTypeSyntax.self)?.elements.as(TupleTypeElementListSyntax.self)?.first?.type.as(FunctionTypeSyntax.self)
+                    function = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(
+                        OptionalTypeSyntax.self)?.wrappedType.as(
+                            TupleTypeSyntax.self)?.elements.as(TupleTypeElementListSyntax.self)?.first?.type.as(
+                            FunctionTypeSyntax.self)
                     isOptinalFunction = function != nil
                 }
                 let parameters = function?.parameters ?? []
@@ -309,7 +329,9 @@ public struct BlockExtractor {
                             message: NativeblocksCompilerDiagnostic.blockIndexParamLimit
                         ))
                 } else if parameters.count == 1 {
-                    if let type = parameters.first?.as(TupleTypeElementSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text {
+                    if let type = parameters.first?.as(TupleTypeElementSyntax.self)?.type.as(
+                        IdentifierTypeSyntax.self)?.name.text
+                    {
                         if type != "BlockIndex" {
                             diagnostic.append(
                                 Diagnostic(

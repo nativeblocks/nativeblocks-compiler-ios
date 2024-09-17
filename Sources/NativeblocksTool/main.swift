@@ -5,6 +5,11 @@ do {
     let tool = try NativeblocksToolExecutor(CommandLine.arguments)
     try tool.execute()
 } catch {
-    print("NativeblocksTool \(error)")
+    guard let errorModel = error as? ErrorModel else {
+        print("NativeblocksTool Error: \(error)")
+        exit(1)
+    }
+
+    print("NativeblocksTool Error:\(errorModel.message ?? "")")
     exit(1)
 }

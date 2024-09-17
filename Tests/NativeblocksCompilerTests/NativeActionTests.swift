@@ -112,4 +112,104 @@ final class NativeActionTests: XCTestCase {
         #endif
     }
 
+    func testNativeAsyncAction() throws {
+        #if canImport(NativeblocksCompilerMacros)
+            assertMacroExpansion(
+                """
+                @NativeAction(
+                    name: "Alert",
+                    keyType: "ALERT",
+                    description: "Nativeblocks alert action"
+                )
+                public class NativeAlert {
+                    var alertController: UIAlertController
+                    init(alertController: UIAlertController) {
+                        self.alertController = alertController
+                    }
+
+                    @NativeActionParameter
+                    struct Parameter {
+                        @NativeActionData
+                        var message: String
+                        @NativeActionProp
+                        var animated: Bool = false
+                        @NativeActionEvent(then: Then.SUCCESS)
+                        var completion: () -> Void
+                    }
+
+                    @NativeActionFunction
+                    func callAsFunction(
+                        param: Parameter
+                    ) async {
+                        alertController.message = param.message
+                        alertController.present(
+                            animated: param.animated,
+                            completion: { param.completion() }
+                        )
+                    }
+                }
+                """,
+                expandedSource:
+                    """
+                    public class NativeAlert {
+                        var alertController: UIAlertController
+                        init(alertController: UIAlertController) {
+                            self.alertController = alertController
+                        }
+
+                        @NativeActionParameter
+                        struct Parameter {
+                            @NativeActionData
+                            var message: String
+                            @NativeActionProp
+                            var animated: Bool = false
+                            @NativeActionEvent(then: Then.SUCCESS)
+                            var completion: () -> Void
+                        }
+
+                        @NativeActionFunction
+                        func callAsFunction(
+                            param: Parameter
+                        ) async {
+                            alertController.message = param.message
+                            alertController.present(
+                                animated: param.animated,
+                                completion: { param.completion() }
+                            )
+                        }
+                    }
+
+                    public class NativeAlertAction: INativeAction {
+                        var action: NativeAlert
+                        init(action: NativeAlert) {
+                            self.action = action
+                        }
+                        public func handle(actionProps: ActionProps) {
+                            Task {
+                            let data = actionProps.trigger?.data ?? [:]
+                            let properties = actionProps.trigger?.properties ?? [:]
+                            let messageData = actionProps.variables? [data["message"]?.value ?? ""]
+                            let animatedProp = Bool(properties["animated"]?.value ?? "") ??  false
+                            let param = NativeAlert.Parameter(
+                                message: messageData?.value ?? "",
+                                animated: animatedProp,
+                                completion: {
+
+                                    if actionProps.trigger != nil {
+                                        actionProps.onHandleSuccessNextTrigger?(actionProps.trigger!)
+                                    }
+                                })
+                            await action.callAsFunction(param: param)}
+                        }
+                    }
+                    """,
+
+                macros: testActionMacros
+            )
+
+        #else
+            throw XCTSkip("macros are only supported when running tests for the host platform")
+        #endif
+    }
+
 }

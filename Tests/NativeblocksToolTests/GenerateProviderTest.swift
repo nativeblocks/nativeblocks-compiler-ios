@@ -1,7 +1,7 @@
 import NativeblocksTool
 import XCTest
 
-final class NativeblocksToolTest: XCTestCase {
+final class GenerateProviderTest: XCTestCase {
     func testActionProviderGenerator() throws {
         let sources = [
             """
@@ -39,11 +39,11 @@ final class NativeblocksToolTest: XCTestCase {
             }
             """
         ]
-        
+
         let provider = ProviderGenerator(prefix: "Default")
         try provider.generate(from: sources)
         let providerCode = provider.actionProviderCode ?? ""
-        
+
         print("-------------------------")
         for source in sources {
             print(source)

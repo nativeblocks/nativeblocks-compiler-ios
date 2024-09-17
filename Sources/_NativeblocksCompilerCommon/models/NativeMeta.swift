@@ -1,6 +1,11 @@
 import SwiftSyntax
 
-public protocol NativeMeta {}
+public protocol NativeMeta: Encodable {}
+
+public enum NativeKind {
+    case action
+    case block
+}
 
 public struct DataNativeMeta: NativeMeta {
     public var position: Int
@@ -11,7 +16,8 @@ public struct DataNativeMeta: NativeMeta {
     public var valriable: PatternBindingSyntax?
 
     init(
-        position: Int, key: String, type: String, description: String, block: AttributeSyntax? = nil, valriable: PatternBindingSyntax? = nil
+        position: Int, key: String, type: String, description: String, block: AttributeSyntax? = nil,
+        valriable: PatternBindingSyntax? = nil
     ) {
         self.position = position
         self.key = key
@@ -20,6 +26,22 @@ public struct DataNativeMeta: NativeMeta {
         self.block = block
         self.valriable = valriable
     }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.key, forKey: .key)
+        try container.encode(TypeUtils.typeMapToJson(self.type)!, forKey: .type)
+        try container.encode(self.description, forKey: .description)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case key, type, description
+    }
+}
+
+public struct ValuePickerOption: Encodable {
+    public var id: String
+    public var text: String
 }
 
 public struct PropertyNativeMeta: NativeMeta {
@@ -29,13 +51,14 @@ public struct PropertyNativeMeta: NativeMeta {
     public var type: String
     public var description: String
     public var valuePicker: String
-    public var valuePickerOptions: String
+    public var valuePickerOptions: [ValuePickerOption]
     public var valuePickerGroup: String
     public var block: AttributeSyntax?
     public var valriable: PatternBindingSyntax?
 
     init(
-        position: Int, key: String, value: String, type: String, description: String, valuePicker: String, valuePickerOptions: String,
+        position: Int, key: String, value: String, type: String, description: String,
+        valuePicker: String, valuePickerOptions: [ValuePickerOption],
         valuePickerGroup: String, block: AttributeSyntax? = nil, valriable: PatternBindingSyntax? = nil
     ) {
         self.position = position
@@ -49,9 +72,26 @@ public struct PropertyNativeMeta: NativeMeta {
         self.block = block
         self.valriable = valriable
     }
+
+    private enum CodingKeys: String, CodingKey {
+        case key, type, description, value, valuePicker, valuePickerGroup, valuePickerOptions
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.key, forKey: .key)
+        try container.encode(TypeUtils.typeMapToJson(self.type)!, forKey: .type)
+        try container.encode(self.description, forKey: .description)
+        try container.encode(self.value, forKey: .value)
+        try container.encode(TypeUtils.valuePickerMapJson(self.valuePicker), forKey: .valuePicker)
+        try container.encode(self.valuePickerGroup, forKey: .valuePickerGroup)
+        try container.encode(
+            TypeUtils.valuePickerOptionsMapToJson(self.valuePickerOptions), forKey: .valuePickerOptions)
+    }
 }
 
 public struct EventNativeMeta: NativeMeta {
+    public var kind: NativeKind
     public var position: Int
     public var event: String
     public var description: String
@@ -62,10 +102,12 @@ public struct EventNativeMeta: NativeMeta {
     public var valriable: PatternBindingSyntax?
 
     init(
-        position: Int, event: String, description: String, dataBinding: [String], isOptinalFunction: Bool, then: String? = nil,
+        kind: NativeKind, position: Int, event: String, description: String, dataBinding: [String],
+        isOptinalFunction: Bool, then: String? = nil,
         block: AttributeSyntax? = nil,
         valriable: PatternBindingSyntax? = nil
     ) {
+        self.kind = kind
         self.position = position
         self.event = event
         self.description = description
@@ -74,6 +116,20 @@ public struct EventNativeMeta: NativeMeta {
         self.isOptinalFunction = isOptinalFunction
         self.block = block
         self.valriable = valriable
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case event, description
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if self.kind == .action {
+            try container.encode(TypeUtils.thenMapToJson(self.then), forKey: .event)
+        } else {
+            try container.encode(self.event, forKey: .event)
+        }
+        try container.encode(self.description, forKey: .description)
     }
 }
 
@@ -87,7 +143,8 @@ public struct SlotNativeMeta: NativeMeta {
     public var valriable: PatternBindingSyntax?
 
     init(
-        position: Int, slot: String, description: String, hasBlockIndex: Bool, isOptinalFunction: Bool, block: AttributeSyntax? = nil,
+        position: Int, slot: String, description: String, hasBlockIndex: Bool, isOptinalFunction: Bool,
+        block: AttributeSyntax? = nil,
         valriable: PatternBindingSyntax? = nil
     ) {
         self.position = position
@@ -98,16 +155,22 @@ public struct SlotNativeMeta: NativeMeta {
         self.block = block
         self.valriable = valriable
     }
+
+    private enum CodingKeys: String, CodingKey {
+        case slot, description
+    }
 }
 
 public struct ActionNativeMeta: NativeMeta {
     public var parameterClass: String
     public var functionName: String
     public var functionParamName: String
+    public var isAsync: Bool
 
-    init(parameterClass: String, functionName: String, functionParamName: String) {
+    init(parameterClass: String, functionName: String, functionParamName: String, isAsync: Bool) {
         self.parameterClass = parameterClass
         self.functionName = functionName
         self.functionParamName = functionParamName
+        self.isAsync = isAsync
     }
 }
