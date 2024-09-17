@@ -6,7 +6,7 @@ import PackageDescription
 
 let package = Package(
     name: "NativeblocksCompiler",
-    platforms: [.macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .macCatalyst(.v13)],
+    platforms: [.macOS(.v10_15), .iOS(.v13)],
     products: [
         .library(name: "NativeblocksCompiler", targets: ["NativeblocksCompiler"]),
         .plugin(name: "GenerateProvider", targets: ["GenerateProvider"]),
