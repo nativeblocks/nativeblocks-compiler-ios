@@ -33,8 +33,17 @@ If using Swift Package Manager within an Xcode project or workspace, use the Xco
 
 1) Go to File > Add Packages...
 
+<img src="./resource/install-step-1.png" alt="step-1" height="400"/>
+
 2) In the dialog that appears, paste the URL of the Nativeblocks Compiler GitHub repo (https://github.com/nativeblocks/nativeblocks-compiler-ios.git) into the search bar, then select the 'nativeblocks-compiler-ios` package that appears:
+
+<img src="./resource/install-step-2.png" alt="step-2" height="400"/>
 
 3) Select which version you want to use, then click Add Package.
 
 4) Select which packages you want to use. please select 'NativeblocksCompiler'.
+
+<img src="./resource/install-step-4.png" alt="step-4" height="300"/>
+
+
+
