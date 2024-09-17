@@ -1,29 +1,29 @@
 ## Generate Provider
 
-After providing annotations for blocks and actions, you can use `GenerateProvider` plugin to generates Swift code. These can then be initialize in App or via dependency injection
+After providing annotations for blocks and actions, you can use the `GenerateProvider` plugin to generate Swift code. These can then be initialized in App or via dependency injection
 
-Note: The prefix for the provider name comes from the target name that selected. In this case, since we
+Note: The prefix for the provider name comes from the target name that was selected. In this case, since we
 provided "MYApp," the
-compiler generates with "MyApp" prefix.
+the compiler generates with the "MyApp" prefix.
 
 ```swift
 MyAppBlockProvider.provideBlocks()
-DemoActionProvider.provideActions(xBot)
+MyAppBlockProvider.provideActions(xBot)
 ```
 
 1) Choose `GenerateProvider`
 
-
+<img src="./resource/generate-provider-1.png" alt="generate-provider-1" height="400"/>
 
 2) Select Target
 
-
+<img src="./resource/generate-provider-2.png" alt="generate-provider-2" height="400"/>
 
 3) Add `MyAppBlockProvider.swift` to Target
 
-
+<img src="./resource/generate-provider-3.png" alt="generate-provider-3" height="400"/>
 
 4) Use `MyAppBlockProvider`
 
-
+<img src="./resource/generate-provider-4.png" alt="generate-provider-4" height="400"/>
 
