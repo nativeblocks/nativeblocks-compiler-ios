@@ -39,11 +39,11 @@ final class GenerateProviderTest: XCTestCase {
             }
             """
         ]
-        
+
         let provider = ProviderGenerator(prefix: "Default")
         try provider.generate(from: sources)
         let providerCode = provider.actionProviderCode ?? ""
-        
+
         print("-------------------------")
         for source in sources {
             print(source)

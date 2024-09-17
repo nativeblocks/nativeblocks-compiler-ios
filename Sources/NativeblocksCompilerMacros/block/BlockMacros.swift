@@ -44,7 +44,8 @@ public struct NativeBlockMacro: PeerMacro {
 
 public struct NativeBlockDataMacro: PeerMacro {
     public static func expansion(
-        of node: SwiftSyntax.AttributeSyntax, providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
+        of node: SwiftSyntax.AttributeSyntax,
+        providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
         return []
@@ -53,7 +54,8 @@ public struct NativeBlockDataMacro: PeerMacro {
 
 public struct NativeBlockPropMacro: PeerMacro {
     public static func expansion(
-        of node: SwiftSyntax.AttributeSyntax, providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
+        of node: SwiftSyntax.AttributeSyntax,
+        providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
         return []
@@ -62,7 +64,8 @@ public struct NativeBlockPropMacro: PeerMacro {
 
 public struct NativeBlockEventMacro: PeerMacro {
     public static func expansion(
-        of node: SwiftSyntax.AttributeSyntax, providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
+        of node: SwiftSyntax.AttributeSyntax,
+        providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
         return []
@@ -71,7 +74,8 @@ public struct NativeBlockEventMacro: PeerMacro {
 
 public struct NativeBlockSlotMacro: PeerMacro {
     public static func expansion(
-        of node: SwiftSyntax.AttributeSyntax, providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
+        of node: SwiftSyntax.AttributeSyntax,
+        providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
         return []

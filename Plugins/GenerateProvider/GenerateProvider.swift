@@ -22,24 +22,24 @@ struct GenerateProvider: CommandPlugin {
 }
 
 #if canImport(XcodeProjectPlugin)
-import XcodeProjectPlugin
+    import XcodeProjectPlugin
 
-extension GenerateProvider: XcodeCommandPlugin {
-    func performCommand(context: XcodePluginContext, arguments: [String]) throws {
-        let tool = try context.tool(named: "NativeblocksTool")
-        let toolURL = URL(fileURLWithPath: tool.path.string)
-        var processArguments = arguments
-        let command = "generate-provider"
+    extension GenerateProvider: XcodeCommandPlugin {
+        func performCommand(context: XcodePluginContext, arguments: [String]) throws {
+            let tool = try context.tool(named: "NativeblocksTool")
+            let toolURL = URL(fileURLWithPath: tool.path.string)
+            var processArguments = arguments
+            let command = "generate-provider"
 
-        if processArguments.filter({ arg in
-            arg == "--directory"
-        }).count == 0 {
-            processArguments.append(contentsOf: ["--directory", context.xcodeProject.directory.string])
+            if processArguments.filter({ arg in
+                arg == "--directory"
+            }).count == 0 {
+                processArguments.append(contentsOf: ["--directory", context.xcodeProject.directory.string])
+            }
+
+            try callNativeblocksTool(toolURL: toolURL, command: command, arguments: processArguments)
         }
-
-        try callNativeblocksTool(toolURL: toolURL, command: command, arguments: processArguments)
     }
-}
 
 #endif
 

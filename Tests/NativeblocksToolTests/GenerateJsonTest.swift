@@ -42,28 +42,28 @@ final class GenerateJsonTest: XCTestCase {
 
         let provider = JsonGenerator()
         try provider.generate(from: sources)
-        
+
         let actionJsons = provider.actionsJson.first?.value
-        
+
         print("-------------------------")
         for source in sources {
             print(source)
         }
         print("+++++++++++++++++++++++++")
-        
+
         print("\(JsonGenerateType.integration.fileName)=>")
         print(actionJsons![JsonGenerateType.integration]!.toString()!)
-        
+
         print("\(JsonGenerateType.data.fileName)=>")
         print(actionJsons![JsonGenerateType.data]!.toString()!)
-        
+
         print("\(JsonGenerateType.event.fileName)=>")
         print(actionJsons![JsonGenerateType.event]!.toString()!)
-        
+
         print("\(JsonGenerateType.propertie.fileName)=>")
         print(actionJsons![JsonGenerateType.propertie]!.toString()!)
         print("=========================")
-        
+
         XCTAssertEqual(
             String(actionJsons![JsonGenerateType.integration]!.toString()!),
             """
@@ -89,7 +89,7 @@ final class GenerateJsonTest: XCTestCase {
             """
         )
     }
-    
+
     func testBlockJsonGenerator() throws {
         let sources = [
             """
@@ -166,36 +166,33 @@ final class GenerateJsonTest: XCTestCase {
             """
         ]
 
-        
-       
         let provider = JsonGenerator()
         try provider.generate(from: sources)
-        
+
         let jsons = provider.blocksJson.first?.value
-        
-        
+
         print("-------------------------")
         for source in sources {
             print(source)
         }
         print("+++++++++++++++++++++++++")
-        
+
         print("\(JsonGenerateType.integration.fileName)=>")
         print(jsons![JsonGenerateType.integration]!.toString()!)
-        
+
         print("\(JsonGenerateType.data.fileName)=>")
         print(jsons![JsonGenerateType.data]!.toString()!)
-        
+
         print("\(JsonGenerateType.event.fileName)=>")
         print(jsons![JsonGenerateType.event]!.toString()!)
-        
+
         print("\(JsonGenerateType.propertie.fileName)=>")
         print(jsons![JsonGenerateType.propertie]!.toString()!)
-                
+
         print("\(JsonGenerateType.slot.fileName)=>")
         print(jsons![JsonGenerateType.slot]!.toString()!)
         print("=========================")
-        
+
         XCTAssertEqual(
             jsons![JsonGenerateType.integration]!.toString()!,
             """

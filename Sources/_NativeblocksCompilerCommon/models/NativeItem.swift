@@ -18,7 +18,8 @@ public struct NativeBlock: NativeItem {
     public var `public` = false
 
     private enum CodingKeys: String, CodingKey {
-        case name, description, documentation, imageIcon, keyType, kind, platformSupport, price, organizationId, `public`
+        case name, description, documentation, imageIcon, keyType, kind, platformSupport, price,
+            organizationId, `public`
     }
 }
 
@@ -38,6 +39,7 @@ public struct NativeAction: NativeItem {
     public var `public` = false
 
     private enum CodingKeys: String, CodingKey {
-        case name, description, documentation, imageIcon, keyType, kind, platformSupport, price, organizationId, `public`
+        case name, description, documentation, imageIcon, keyType, kind, platformSupport, price,
+            organizationId, `public`
     }
 }

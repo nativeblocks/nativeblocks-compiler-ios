@@ -9,7 +9,7 @@ enum ArgumentError: Error, CustomStringConvertible {
     case missingCommand
     case invalidDirectory(String)
     case extraArguments([String])
-    
+
     var localizedDescription: String { return description }
 
     var description: String {

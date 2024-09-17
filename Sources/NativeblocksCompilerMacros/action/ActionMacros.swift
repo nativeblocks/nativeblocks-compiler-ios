@@ -7,7 +7,8 @@ import _NativeblocksCompilerCommon
 
 public struct NativeActionMacro: PeerMacro {
     public static func expansion(
-        of node: SwiftSyntax.AttributeSyntax, providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
+        of node: SwiftSyntax.AttributeSyntax,
+        providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
         guard let structDecl = declaration.as(ClassDeclSyntax.self) else {
@@ -43,7 +44,8 @@ public struct NativeActionMacro: PeerMacro {
 
 public struct NativeActionFunctionMacro: PeerMacro {
     public static func expansion(
-        of node: SwiftSyntax.AttributeSyntax, providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
+        of node: SwiftSyntax.AttributeSyntax,
+        providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
         return []
@@ -52,7 +54,8 @@ public struct NativeActionFunctionMacro: PeerMacro {
 
 public struct NativeActionParameterMacro: PeerMacro {
     public static func expansion(
-        of node: SwiftSyntax.AttributeSyntax, providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
+        of node: SwiftSyntax.AttributeSyntax,
+        providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
         return []
@@ -61,7 +64,8 @@ public struct NativeActionParameterMacro: PeerMacro {
 
 public struct NativeActionDataMacro: PeerMacro {
     public static func expansion(
-        of node: SwiftSyntax.AttributeSyntax, providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
+        of node: SwiftSyntax.AttributeSyntax,
+        providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
         return []
@@ -70,7 +74,8 @@ public struct NativeActionDataMacro: PeerMacro {
 
 public struct NativeActionPropMacro: PeerMacro {
     public static func expansion(
-        of node: SwiftSyntax.AttributeSyntax, providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
+        of node: SwiftSyntax.AttributeSyntax,
+        providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
         return []
@@ -79,7 +84,8 @@ public struct NativeActionPropMacro: PeerMacro {
 
 public struct NativeActionEventMacro: PeerMacro {
     public static func expansion(
-        of node: SwiftSyntax.AttributeSyntax, providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
+        of node: SwiftSyntax.AttributeSyntax,
+        providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
         return []

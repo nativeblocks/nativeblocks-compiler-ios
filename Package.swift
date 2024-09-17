@@ -14,7 +14,7 @@ let package = Package(
         .executable(name: "NativeblocksTool", targets: ["NativeblocksTool"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
+        .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0")
     ],
     targets: [
         .macro(
@@ -34,11 +34,12 @@ let package = Package(
                     description: "Generate Provider"
                 ),
                 permissions: [
-                    .writeToPackageDirectory(reason: "This command write the new Provider to the source root."),
+                    .writeToPackageDirectory(
+                        reason: "This command write the new Provider to the source root.")
                 ]
             ),
             dependencies: [
-                .target(name: "NativeblocksTool"),
+                .target(name: "NativeblocksTool")
             ]
         ),
 
@@ -50,7 +51,8 @@ let package = Package(
                     description: "Sync Nativeblocks"
                 ),
                 permissions: [
-                    .writeToPackageDirectory(reason: "This command write the new json blocks to the source root."),
+                    .writeToPackageDirectory(
+                        reason: "This command write the new json blocks to the source root."),
                     .allowNetworkConnections(
                         scope: PluginNetworkPermissionScope.all(),
                         reason: "This command will sync jsons with nativeblocks server."
@@ -58,7 +60,7 @@ let package = Package(
                 ]
             ),
             dependencies: [
-                .target(name: "NativeblocksTool"),
+                .target(name: "NativeblocksTool")
             ]
         ),
 

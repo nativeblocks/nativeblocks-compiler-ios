@@ -111,7 +111,7 @@ final class NativeActionTests: XCTestCase {
             throw XCTSkip("macros are only supported when running tests for the host platform")
         #endif
     }
-    
+
     func testNativeAsyncAction() throws {
         #if canImport(NativeblocksCompilerMacros)
             assertMacroExpansion(
@@ -211,6 +211,5 @@ final class NativeActionTests: XCTestCase {
             throw XCTSkip("macros are only supported when running tests for the host platform")
         #endif
     }
-
 
 }

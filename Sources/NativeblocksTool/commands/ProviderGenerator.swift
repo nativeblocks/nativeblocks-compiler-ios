@@ -1,73 +1,73 @@
-import _NativeblocksCompilerCommon
 import Foundation
 import SwiftParser
 import SwiftSyntax
+import _NativeblocksCompilerCommon
 
 public class ProviderGenerator {
     var prefix: String
-    
+
     public var actionProviderCode: String?
     public var blockProviderCode: String?
-    
+
     public init(prefix: String) {
         self.prefix = ProviderGenerator.generateName(prefix: prefix)
     }
 
     public func generate(from files: [String]) throws {
         print("Generate providers...")
-        
+
         let (blocks, actions) = NativeBlockVisitor.extractNatives(from: files)
-        
+
         if blocks.isEmpty && actions.isEmpty {
             print("There is no actions or blocks to generate providers")
             return
         }
-        
-        if !actions.isEmpty{
-            actionProviderCode = try createActionProvider(prefix: prefix, actions: actions).formatted().description
+
+        if !actions.isEmpty {
+            actionProviderCode = try createActionProvider(prefix: prefix, actions: actions).formatted()
+                .description
         }
-        
-        if !blocks.isEmpty{
-            blockProviderCode = try createBlockProvider(prefix: prefix, blocks: blocks).formatted().description
+
+        if !blocks.isEmpty {
+            blockProviderCode = try createBlockProvider(prefix: prefix, blocks: blocks).formatted()
+                .description
         }
     }
-    
+
     public func save(to directory: String) throws {
         print("Save providers...")
-        
-        
+
         if actionProviderCode == nil && blockProviderCode == nil {
             print("There is no actions or blocks to save providers")
             return
         }
-        
+
         let actionFilePath = directory + "/\(prefix)ActionProvider.swift"
         let blockFilePath = directory + "/\(prefix)BlockProvider.swift"
-        
+
         try actionProviderCode?.write(toFile: actionFilePath, atomically: true, encoding: .utf8)
-        
+
         try blockProviderCode?.write(toFile: blockFilePath, atomically: true, encoding: .utf8)
-       
-        if(actionProviderCode != nil){
+
+        if actionProviderCode != nil {
             print("exportrd File: \(actionFilePath) =>")
             print(String(actionProviderCode!))
         }
-        
-        if(blockProviderCode != nil){
+
+        if blockProviderCode != nil {
             print("exportrd File: \(blockFilePath) =>")
             print(String(blockProviderCode!))
         }
-        
-        
+
     }
-    
+
     static func generateName(prefix: String?) -> String {
         guard ((prefix?.isEmpty) != nil) == true else { return "Default" }
         let firstCharacter = prefix!.prefix(1).uppercased()
         let remainingCharacters = prefix!.dropFirst()
         return firstCharacter + remainingCharacters
     }
-    
+
     func createBlockProvider(prefix: String, blocks: [NativeBlock]) throws -> SourceFileSyntax {
         return try SourceFileSyntax {
             """
@@ -84,7 +84,7 @@ public class ProviderGenerator {
             }
         }
     }
-    
+
     func createActionProvider(prefix: String, actions: [NativeAction]) throws -> SourceFileSyntax {
         return try SourceFileSyntax {
             """
@@ -96,7 +96,7 @@ public class ProviderGenerator {
                     \(refinActionArgumentName(name: action.declName)) : \(action.declName)
                     """
                 }.joined(separator: " ,")
-                
+
                 try FunctionDeclSyntax("public static func provideActions(\(raw: arguments))") {
                     for action in actions {
                         """
@@ -107,7 +107,7 @@ public class ProviderGenerator {
             }
         }
     }
-    
+
     func refinActionArgumentName(name: String) -> String {
         let firstCharacter = name.prefix(1).lowercased()
         let remainingCharacters = name.dropFirst()

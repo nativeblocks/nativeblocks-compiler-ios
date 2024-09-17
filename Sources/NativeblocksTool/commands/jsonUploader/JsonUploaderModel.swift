@@ -1,5 +1,5 @@
-import _NativeblocksCompilerCommon
 import Foundation
+import _NativeblocksCompilerCommon
 
 struct SyncIntegrationResultModel: Codable {
     var id: String

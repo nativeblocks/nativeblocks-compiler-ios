@@ -41,7 +41,8 @@ public enum NativeblocksCompilerDiagnostic: String, DiagnosticMessage {
         case .eventDistinctThen:
             return "'then' in '@NativeActionEvent' must be unique."
         case .actionNotsupportThrows:
-            return "'@NativeActionFunction' doesn't support throws. Use '@NativeActionEvent(then: Then.FAILURE)'."
+            return
+                "'@NativeActionFunction' doesn't support throws. Use '@NativeActionEvent(then: Then.FAILURE)'."
         }
     }
 

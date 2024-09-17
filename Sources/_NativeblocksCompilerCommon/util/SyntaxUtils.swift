@@ -1,10 +1,12 @@
 import SwiftSyntax
 
 public enum SyntaxUtils {
-    static func extractAttribute(for type: String, from attributes: AttributeListSyntax) -> AttributeSyntax? {
+    static func extractAttribute(for type: String, from attributes: AttributeListSyntax)
+        -> AttributeSyntax?
+    {
         for attribute in attributes {
             if let attr = attribute.as(AttributeSyntax.self),
-               attr.attributeName.as(IdentifierTypeSyntax.self)?.name.text == type
+                attr.attributeName.as(IdentifierTypeSyntax.self)?.name.text == type
             {
                 return attr
             }
@@ -15,7 +17,9 @@ public enum SyntaxUtils {
     static func extractDescription(from attribute: AttributeSyntax) -> String? {
         guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }
         for argument in arguments where argument.label?.text == "description" {
-            if let segments = argument.expression.as(StringLiteralExprSyntax.self)?.segments.as(StringLiteralSegmentListSyntax.self) {
+            if let segments = argument.expression.as(StringLiteralExprSyntax.self)?.segments.as(
+                StringLiteralSegmentListSyntax.self)
+            {
                 return segments.first?.as(StringSegmentSyntax.self)?.content.text
             }
         }
@@ -25,7 +29,8 @@ public enum SyntaxUtils {
     static func extractValuePicker(from attribute: AttributeSyntax) -> String? {
         guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }
         for argument in arguments where argument.label?.text == "valuePicker" {
-            return argument.expression.as(MemberAccessExprSyntax.self)?.declName.as(DeclReferenceExprSyntax.self)?.baseName.text
+            return argument.expression.as(MemberAccessExprSyntax.self)?.declName.as(
+                DeclReferenceExprSyntax.self)?.baseName.text
         }
         return nil
     }
@@ -33,7 +38,9 @@ public enum SyntaxUtils {
     static func extractValuePickerGroup(from attribute: AttributeSyntax) -> String? {
         guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }
         for argument in arguments where argument.label?.text == "valuePickerGroup" {
-            return argument.expression.as(FunctionCallExprSyntax.self)?.arguments.first?.as(LabeledExprSyntax.self)?.expression.as(StringLiteralExprSyntax.self)?.segments.first?.as(StringSegmentSyntax.self)?.content.text
+            return argument.expression.as(FunctionCallExprSyntax.self)?.arguments.first?.as(
+                LabeledExprSyntax.self)?.expression.as(StringLiteralExprSyntax.self)?.segments.first?.as(
+                    StringSegmentSyntax.self)?.content.text
         }
         return nil
     }
@@ -42,14 +49,19 @@ public enum SyntaxUtils {
         guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }
         var options: [ValuePickerOption] = []
         for argument in arguments where argument.label?.text == "valuePickerOptions" {
-            argument.expression.as(ArrayExprSyntax.self)?.elements.as(ArrayElementListSyntax.self)?.forEach { element in
-                let key = element.expression.as(FunctionCallExprSyntax.self)?.arguments.first?.as(LabeledExprSyntax.self)?.expression.as(StringLiteralExprSyntax.self)?.segments.first?.as(StringSegmentSyntax.self)?.content.text
-                let value = element.expression.as(FunctionCallExprSyntax.self)?.arguments.last?.as(LabeledExprSyntax.self)?.expression.as(StringLiteralExprSyntax.self)?.segments.first?.as(StringSegmentSyntax.self)?.content.text
+            argument.expression.as(ArrayExprSyntax.self)?.elements.as(ArrayElementListSyntax.self)?
+                .forEach { element in
+                    let key = element.expression.as(FunctionCallExprSyntax.self)?.arguments.first?.as(
+                        LabeledExprSyntax.self)?.expression.as(StringLiteralExprSyntax.self)?.segments.first?
+                        .as(StringSegmentSyntax.self)?.content.text
+                    let value = element.expression.as(FunctionCallExprSyntax.self)?.arguments.last?.as(
+                        LabeledExprSyntax.self)?.expression.as(StringLiteralExprSyntax.self)?.segments.first?
+                        .as(StringSegmentSyntax.self)?.content.text
 
-                if key != nil, value != nil {
-                    options.append(ValuePickerOption(id: key!, text: value!))
+                    if key != nil, value != nil {
+                        options.append(ValuePickerOption(id: key!, text: value!))
+                    }
                 }
-            }
         }
         return options
     }
@@ -74,7 +86,9 @@ public enum SyntaxUtils {
         }
 
         for argument in arguments where argument.label?.text == "then" {
-            if let declName = argument.expression.as(MemberAccessExprSyntax.self)?.declName.as(DeclReferenceExprSyntax.self) {
+            if let declName = argument.expression.as(MemberAccessExprSyntax.self)?.declName.as(
+                DeclReferenceExprSyntax.self)
+            {
                 return declName.baseName.text
             }
         }
@@ -83,7 +97,9 @@ public enum SyntaxUtils {
 
     static func extractDefaultValue(from initializer: InitializerClauseSyntax?) -> String {
         guard let initializer = initializer?.value else { return "" }
-        if let stringLiteral = initializer.as(StringLiteralExprSyntax.self)?.segments.first?.as(StringSegmentSyntax.self)?.content.text {
+        if let stringLiteral = initializer.as(StringLiteralExprSyntax.self)?.segments.first?.as(
+            StringSegmentSyntax.self)?.content.text
+        {
             return "\(stringLiteral)"
         } else if let intLiteral = initializer.as(IntegerLiteralExprSyntax.self)?.literal.text {
             return intLiteral
@@ -106,7 +122,9 @@ public enum SyntaxUtils {
         return supportedTypes.contains(type.uppercased())
     }
 
-    static func getType(from varDecl: VariableDeclSyntax, blockTypes: [String]) -> (String, AttributeSyntax)? {
+    static func getType(from varDecl: VariableDeclSyntax, blockTypes: [String]) -> (
+        String, AttributeSyntax
+    )? {
         for type in blockTypes {
             if let attribute = extractAttribute(for: type, from: varDecl.attributes) {
                 return (type, attribute)
@@ -128,7 +146,9 @@ public enum SyntaxUtils {
         return nil
     }
 
-    static func validateEventParams(_ function: FunctionTypeSyntax?, expectedCount: Int, binding: VariableDeclSyntax) -> Bool {
+    static func validateEventParams(
+        _ function: FunctionTypeSyntax?, expectedCount: Int, binding: VariableDeclSyntax
+    ) -> Bool {
         let parameters = function?.parameters ?? []
         return parameters.count == expectedCount
     }
@@ -136,7 +156,9 @@ public enum SyntaxUtils {
     static func extractFunctionFromType(_ type: TypeSyntax?) -> (FunctionTypeSyntax?, Bool) {
         if let function = type?.as(FunctionTypeSyntax.self) {
             return (function, false)
-        } else if let optionalFunction = type?.as(OptionalTypeSyntax.self)?.wrappedType.as(FunctionTypeSyntax.self) {
+        } else if let optionalFunction = type?.as(OptionalTypeSyntax.self)?.wrappedType.as(
+            FunctionTypeSyntax.self)
+        {
             return (optionalFunction, true)
         }
         return (nil, false)

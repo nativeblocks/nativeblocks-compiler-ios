@@ -12,7 +12,7 @@ enum JsonUploaderQuerys {
             }
             """
     }
-    
+
     static func syncIntegration() -> String {
         return
             """
@@ -30,7 +30,7 @@ enum JsonUploaderQuerys {
             }
             """
     }
-    
+
     static func syncIntegrationEvents() -> String {
         return
             """
@@ -41,7 +41,7 @@ enum JsonUploaderQuerys {
             }
             """
     }
-    
+
     static func syncIntegrationProperties() -> String {
         return
             """
@@ -58,7 +58,7 @@ enum JsonUploaderQuerys {
             }
             """
     }
-    
+
     static func syncIntegrationSlots() -> String {
         return
             """

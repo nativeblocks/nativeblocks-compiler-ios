@@ -11,8 +11,8 @@ struct SyncNativeblocks: CommandPlugin {
         let toolURL = URL(fileURLWithPath: tool.path.string)
         let command = "sync"
         var processArguments = arguments
-        
-        guard let config = try readNativeblocksConfig(rootPath:context.package.directory.string) else {
+
+        guard let config = try readNativeblocksConfig(rootPath: context.package.directory.string) else {
             return
         }
         processArguments.append(contentsOf: ["--endpoint", config.endpoint])
@@ -29,31 +29,32 @@ struct SyncNativeblocks: CommandPlugin {
 }
 
 #if canImport(XcodeProjectPlugin)
-import XcodeProjectPlugin
+    import XcodeProjectPlugin
 
-extension SyncNativeblocks: XcodeCommandPlugin {
-    func performCommand(context: XcodePluginContext, arguments: [String]) throws {
-        let tool = try context.tool(named: "NativeblocksTool")
-        let toolURL = URL(fileURLWithPath: tool.path.string)
-        var processArguments = arguments
-        let command = "sync"
-        
-        guard let config =  try readNativeblocksConfig(rootPath:context.xcodeProject.directory.string) else {
-            return
+    extension SyncNativeblocks: XcodeCommandPlugin {
+        func performCommand(context: XcodePluginContext, arguments: [String]) throws {
+            let tool = try context.tool(named: "NativeblocksTool")
+            let toolURL = URL(fileURLWithPath: tool.path.string)
+            var processArguments = arguments
+            let command = "sync"
+
+            guard let config = try readNativeblocksConfig(rootPath: context.xcodeProject.directory.string)
+            else {
+                return
+            }
+            processArguments.append(contentsOf: ["--endpoint", config.endpoint])
+            processArguments.append(contentsOf: ["--authToken", config.authToken])
+            processArguments.append(contentsOf: ["--organizationId", config.organizationId])
+
+            if processArguments.filter({ arg in
+                arg == "--directory"
+            }).count == 0 {
+                processArguments.append(contentsOf: ["--directory", context.xcodeProject.directory.string])
+            }
+
+            try callNativeblocksTool(toolURL: toolURL, command: command, arguments: processArguments)
         }
-        processArguments.append(contentsOf: ["--endpoint", config.endpoint])
-        processArguments.append(contentsOf: ["--authToken", config.authToken])
-        processArguments.append(contentsOf: ["--organizationId", config.organizationId])
-
-        if processArguments.filter({ arg in
-            arg == "--directory"
-        }).count == 0 {
-            processArguments.append(contentsOf: ["--directory", context.xcodeProject.directory.string])
-        }
-
-        try callNativeblocksTool(toolURL: toolURL, command: command, arguments: processArguments)
     }
-}
 
 #endif
 
@@ -70,11 +71,12 @@ func callNativeblocksTool(toolURL: URL, command: String, arguments: [String]) th
     if process.terminationStatus == 0 {
         print("Successfully ran call NativeblocksTool with arguments.")
     } else {
-        Diagnostics.error("Failed to run call NativeblocksTool. Exit code: \(process.terminationStatus)")
+        Diagnostics.error(
+            "Failed to run call NativeblocksTool. Exit code: \(process.terminationStatus)")
     }
 }
 
-func readNativeblocksConfig(rootPath:String) throws -> NativeblocksConfig? {
+func readNativeblocksConfig(rootPath: String) throws -> NativeblocksConfig? {
     let configFilePath = rootPath + "/nativeblocks.json"
 
     let fileManager = FileManager.default

@@ -16,7 +16,8 @@ public struct DataNativeMeta: NativeMeta {
     public var valriable: PatternBindingSyntax?
 
     init(
-        position: Int, key: String, type: String, description: String, block: AttributeSyntax? = nil, valriable: PatternBindingSyntax? = nil
+        position: Int, key: String, type: String, description: String, block: AttributeSyntax? = nil,
+        valriable: PatternBindingSyntax? = nil
     ) {
         self.position = position
         self.key = key
@@ -56,7 +57,8 @@ public struct PropertyNativeMeta: NativeMeta {
     public var valriable: PatternBindingSyntax?
 
     init(
-        position: Int, key: String, value: String, type: String, description: String, valuePicker: String, valuePickerOptions: [ValuePickerOption],
+        position: Int, key: String, value: String, type: String, description: String,
+        valuePicker: String, valuePickerOptions: [ValuePickerOption],
         valuePickerGroup: String, block: AttributeSyntax? = nil, valriable: PatternBindingSyntax? = nil
     ) {
         self.position = position
@@ -83,7 +85,8 @@ public struct PropertyNativeMeta: NativeMeta {
         try container.encode(self.value, forKey: .value)
         try container.encode(TypeUtils.valuePickerMapJson(self.valuePicker), forKey: .valuePicker)
         try container.encode(self.valuePickerGroup, forKey: .valuePickerGroup)
-        try container.encode(TypeUtils.valuePickerOptionsMapToJson(self.valuePickerOptions), forKey: .valuePickerOptions)
+        try container.encode(
+            TypeUtils.valuePickerOptionsMapToJson(self.valuePickerOptions), forKey: .valuePickerOptions)
     }
 }
 
@@ -99,7 +102,8 @@ public struct EventNativeMeta: NativeMeta {
     public var valriable: PatternBindingSyntax?
 
     init(
-        kind: NativeKind, position: Int, event: String, description: String, dataBinding: [String], isOptinalFunction: Bool, then: String? = nil,
+        kind: NativeKind, position: Int, event: String, description: String, dataBinding: [String],
+        isOptinalFunction: Bool, then: String? = nil,
         block: AttributeSyntax? = nil,
         valriable: PatternBindingSyntax? = nil
     ) {
@@ -139,7 +143,8 @@ public struct SlotNativeMeta: NativeMeta {
     public var valriable: PatternBindingSyntax?
 
     init(
-        position: Int, slot: String, description: String, hasBlockIndex: Bool, isOptinalFunction: Bool, block: AttributeSyntax? = nil,
+        position: Int, slot: String, description: String, hasBlockIndex: Bool, isOptinalFunction: Bool,
+        block: AttributeSyntax? = nil,
         valriable: PatternBindingSyntax? = nil
     ) {
         self.position = position

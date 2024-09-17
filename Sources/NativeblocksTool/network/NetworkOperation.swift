@@ -26,7 +26,8 @@ struct NetworkOperation: Encodable {
     }
 
     init(
-        _ operationString: String, operationName: String? = nil, variables: [String: AnyEncodable]? = nil,
+        _ operationString: String, operationName: String? = nil,
+        variables: [String: AnyEncodable]? = nil,
         headers: [String: String] = [:]
     ) {
         self.operationString = operationString

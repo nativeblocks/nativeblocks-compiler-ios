@@ -1,6 +1,6 @@
-import _NativeblocksCompilerCommon
 import SwiftSyntax
 import SwiftSyntaxBuilder
+import _NativeblocksCompilerCommon
 
 enum ActionCreator {
     static func create(
@@ -120,7 +120,9 @@ enum ActionCreator {
                     .map { $0.1 }
                     .joined(separator: ",\n")
 
-                if actionInfo?.functionParamName.isEmpty == false && actionInfo?.parameterClass.isEmpty == false {
+                if actionInfo?.functionParamName.isEmpty == false
+                    && actionInfo?.parameterClass.isEmpty == false
+                {
                     """
                     let param = \(raw: structName).\(raw: actionInfo?.parameterClass ?? "Struct")(\n\(raw: arguments))
                     """
@@ -148,8 +150,9 @@ enum ActionCreator {
                 """
                 \(dataItem.key)Data?.value ?? ""
                 """
-        case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8", "FLOAT", "FLOAT80", "FLOAT64",
-             "FLOAT32", "FLOAT16", "DOUBLE":
+        case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
+            "FLOAT", "FLOAT80", "FLOAT64",
+            "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
                 \(dataItem.type)(\(dataItem.key)Data?.value ?? "") ?? 0
@@ -176,8 +179,9 @@ enum ActionCreator {
                 """
                 properties["\(item.key)"]?.value ?? \(item.value.isEmpty ? "\"\"" : "\"\(item.value)\"")
                 """
-        case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8", "FLOAT", "FLOAT80", "FLOAT64",
-             "FLOAT32", "FLOAT16", "DOUBLE":
+        case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
+            "FLOAT", "FLOAT80", "FLOAT64",
+            "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
                 \(item.type)(properties["\(item.key)"]?.value ?? "") ?? \(item.value.isEmpty ? "0" : item.value)

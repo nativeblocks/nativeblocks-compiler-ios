@@ -4,17 +4,17 @@ import SwiftSyntax
 
 public class NativeBlockVisitor: SyntaxVisitor {
     public var nativeBlocks: [NativeItem] = []
-    
+
     public static func extractNatives(from sources: [String]) -> ([NativeBlock], [NativeAction]) {
         let nativeBlockVisitor = NativeBlockVisitor(viewMode: SyntaxTreeViewMode.sourceAccurate)
-        
+
         for source in sources {
             let sourceFile = Parser.parse(source: source)
             nativeBlockVisitor.walk(sourceFile)
         }
-        
+
         let natives = nativeBlockVisitor.nativeBlocks
-        
+
         let blocks = natives.compactMap { $0 as? NativeBlock }
         let actions = natives.compactMap { $0 as? NativeAction }
         return (blocks, actions)
@@ -27,7 +27,10 @@ public class NativeBlockVisitor: SyntaxVisitor {
             let keyType = getStringValue(name: "keyType", from: attribute)
             let name = getStringValue(name: "name", from: attribute)
             let description = getStringValue(name: "description", from: attribute)
-            nativeBlocks.append(NativeBlock(declName: structName, name: name!, keyType: keyType!, description: description!, syntax: node,meta: []))
+            nativeBlocks.append(
+                NativeBlock(
+                    declName: structName, name: name!, keyType: keyType!, description: description!,
+                    syntax: node, meta: []))
         }
         return .skipChildren
     }
@@ -39,15 +42,19 @@ public class NativeBlockVisitor: SyntaxVisitor {
             let keyType = getStringValue(name: "keyType", from: attribute)
             let name = getStringValue(name: "name", from: attribute)
             let description = getStringValue(name: "description", from: attribute)
-            nativeBlocks.append(NativeAction(declName: structName, name: name!, keyType: keyType!, description: description!, syntax: node,meta: []))
+            nativeBlocks.append(
+                NativeAction(
+                    declName: structName, name: name!, keyType: keyType!, description: description!,
+                    syntax: node, meta: []))
         }
         return .skipChildren
     }
 
     private func findAttribute(name: String, from attributes: AttributeListSyntax) -> AttributeSyntax? {
         for attribute in attributes {
-            if let attributeIdentifier = attribute.as(AttributeSyntax.self)?.attributeName.as(IdentifierTypeSyntax.self),
-               attributeIdentifier.name.text == name
+            if let attributeIdentifier = attribute.as(AttributeSyntax.self)?.attributeName.as(
+                IdentifierTypeSyntax.self),
+                attributeIdentifier.name.text == name
             {
                 return attribute.as(AttributeSyntax.self)
             }
@@ -59,7 +66,9 @@ public class NativeBlockVisitor: SyntaxVisitor {
         var value: String? = nil
         attribute.arguments?.as(LabeledExprListSyntax.self)?.forEach { arg in
             if arg.label?.text == name {
-                value = arg.expression.as(StringLiteralExprSyntax.self)?.segments.as(StringLiteralSegmentListSyntax.self)?.first?.as(StringSegmentSyntax.self)?.content.text
+                value =
+                    arg.expression.as(StringLiteralExprSyntax.self)?.segments.as(
+                        StringLiteralSegmentListSyntax.self)?.first?.as(StringSegmentSyntax.self)?.content.text
             }
         }
         return value

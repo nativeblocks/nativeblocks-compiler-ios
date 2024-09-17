@@ -53,13 +53,19 @@ public class NativeblocksToolExecutor {
             try generator.generate(from: files, organizationId: organizationId)
             try generator.save(to: output, with: fileManager)
 
-            let uploader = JsonUploader(endpoint: endpoint, authToken: authToken, organizationId: organizationId)
+            let uploader = JsonUploader(
+                endpoint: endpoint,
+                authToken: authToken,
+                organizationId: organizationId
+            )
 
             try uploader.upload(blocks: generator.blocks, actions: generator.actions)
         }
     }
 
-    private func parseArguments(_ arguments: [String]) throws -> (commands: [String], parsedArgs: [String: String]) {
+    private func parseArguments(_ arguments: [String]) throws -> (
+        commands: [String], parsedArgs: [String: String]
+    ) {
         var parsedArgs: [String: String] = [:]
         var commands: [String] = []
         var currentArgKey: String?
@@ -98,7 +104,9 @@ public class NativeblocksToolExecutor {
 
         let directoryURL = URL(fileURLWithPath: directoryPath)
         var isDirectory: ObjCBool = false
-        if !FileManager.default.fileExists(atPath: directoryURL.path, isDirectory: &isDirectory) || !isDirectory.boolValue {
+        if !FileManager.default.fileExists(atPath: directoryURL.path, isDirectory: &isDirectory)
+            || !isDirectory.boolValue
+        {
             throw ArgumentError.invalidDirectory(directoryPath)
         }
 
@@ -131,7 +139,7 @@ public class NativeblocksToolExecutor {
             DirectoryArgumentKey,
             EndpointArgumentKey,
             AuthTokenArgumentKey,
-            OrganizationIdArgumentKey
+            OrganizationIdArgumentKey,
         ])
 
         let extraArgs = parsedArgs.keys.filter { !validArgs.contains($0) }
