@@ -5,10 +5,10 @@ import _NativeblocksCompilerCommon
 enum ActionCreator {
     static func create(
         structName: String,
-        actionInfo: ActionNativeMeta?,
-        metaData: [DataNativeMeta],
-        metaProp: [PropertyNativeMeta],
-        metaEvent: [EventNativeMeta]
+        actionInfo: ActionMeta?,
+        metaData: [DataMeta],
+        metaProp: [PropertyMeta],
+        metaEvent: [EventMeta]
     ) throws -> ClassDeclSyntax {
         return try ClassDeclSyntax("public class \(raw: structName)Action: INativeAction") {
             """
@@ -120,9 +120,7 @@ enum ActionCreator {
                     .map { $0.1 }
                     .joined(separator: ",\n")
 
-                if actionInfo?.functionParamName.isEmpty == false
-                    && actionInfo?.parameterClass.isEmpty == false
-                {
+                if actionInfo?.functionParamName.isEmpty == false && actionInfo?.parameterClass.isEmpty == false {
                     """
                     let param = \(raw: structName).\(raw: actionInfo?.parameterClass ?? "Struct")(\n\(raw: arguments))
                     """
@@ -143,7 +141,7 @@ enum ActionCreator {
         }
     }
 
-    private static func dataTypeMapper(dataItem: DataNativeMeta) -> String? {
+    private static func dataTypeMapper(dataItem: DataMeta) -> String? {
         switch dataItem.type.uppercased() {
         case "STRING":
             return
@@ -172,7 +170,7 @@ enum ActionCreator {
         }
     }
 
-    private static func propTypeMapper(item: PropertyNativeMeta) -> String? {
+    private static func propTypeMapper(item: PropertyMeta) -> String? {
         switch item.type.uppercased() {
         case "STRING":
             return

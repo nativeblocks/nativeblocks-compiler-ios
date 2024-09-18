@@ -1,6 +1,6 @@
 import SwiftDiagnostics
 
-public enum NativeblocksCompilerDiagnostic: String, DiagnosticMessage {
+public enum DiagnosticType: String, DiagnosticMessage {
     case notAStruct
     case notAClass
     case singleVariableLimit

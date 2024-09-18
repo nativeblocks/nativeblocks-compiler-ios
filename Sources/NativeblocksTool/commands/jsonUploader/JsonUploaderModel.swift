@@ -13,25 +13,25 @@ struct SyncIntegrationResultRawModel: Codable {
 struct SyncIntegrationPropertiesInput: Encodable {
     var integrationId: String
     var organizationId: String
-    var properties: [PropertyNativeMeta]
+    var properties: [PropertyMeta]
 }
 
 struct SyncIntegrationEventsInput: Encodable {
     var integrationId: String
     var organizationId: String
-    var events: [EventNativeMeta]
+    var events: [EventMeta]
 }
 
 struct SyncIntegrationDataInput: Encodable {
     var integrationId: String
     var organizationId: String
-    var data: [DataNativeMeta]
+    var data: [DataMeta]
 }
 
 struct SyncIntegrationSlotsInput: Encodable {
     var integrationId: String
     var organizationId: String
-    var slots: [SlotNativeMeta]
+    var slots: [SlotMeta]
 }
 
 struct EmptyResultModel: Codable {}
