@@ -2,21 +2,18 @@ import Foundation
 import SwiftParser
 import SwiftSyntax
 
-public class NativeBlockVisitor: SyntaxVisitor {
-    public var nativeBlocks: [NativeItem] = []
+public class NativeItemVisitor: SyntaxVisitor {
+    private var nativeItems: [Integration] = []
 
-    public static func extractNatives(from sources: [String]) -> ([NativeBlock], [NativeAction]) {
-        let nativeBlockVisitor = NativeBlockVisitor(viewMode: SyntaxTreeViewMode.sourceAccurate)
-
+    public static func extractNatives(from sources: [String]) -> ([Integration], [Integration]) {
+        let visitor = NativeItemVisitor(viewMode: SyntaxTreeViewMode.sourceAccurate)
         for source in sources {
             let sourceFile = Parser.parse(source: source)
-            nativeBlockVisitor.walk(sourceFile)
+            visitor.walk(sourceFile)
         }
-
-        let natives = nativeBlockVisitor.nativeBlocks
-
-        let blocks = natives.compactMap { $0 as? NativeBlock }
-        let actions = natives.compactMap { $0 as? NativeAction }
+        let natives = visitor.nativeItems
+        let blocks = natives.filter { $0.kind == "BLOCK" && $0.syntaxStruct != nil }
+        let actions = natives.filter { $0.kind == "ACTION" && $0.syntaxClass != nil }
         return (blocks, actions)
     }
 
@@ -27,10 +24,17 @@ public class NativeBlockVisitor: SyntaxVisitor {
             let keyType = getStringValue(name: "keyType", from: attribute)
             let name = getStringValue(name: "name", from: attribute)
             let description = getStringValue(name: "description", from: attribute)
-            nativeBlocks.append(
-                NativeBlock(
-                    declName: structName, name: name!, keyType: keyType!, description: description!,
-                    syntax: node, meta: []))
+            nativeItems.append(
+                Integration(
+                    declName: structName,
+                    name: name!,
+                    keyType: keyType!,
+                    description: description!,
+                    syntaxStruct: node,
+                    meta: [],
+                    kind: "BLOCK"
+                )
+            )
         }
         return .skipChildren
     }
@@ -42,10 +46,17 @@ public class NativeBlockVisitor: SyntaxVisitor {
             let keyType = getStringValue(name: "keyType", from: attribute)
             let name = getStringValue(name: "name", from: attribute)
             let description = getStringValue(name: "description", from: attribute)
-            nativeBlocks.append(
-                NativeAction(
-                    declName: structName, name: name!, keyType: keyType!, description: description!,
-                    syntax: node, meta: []))
+            nativeItems.append(
+                Integration(
+                    declName: structName,
+                    name: name!,
+                    keyType: keyType!,
+                    description: description!,
+                    syntaxClass: node,
+                    meta: [],
+                    kind: "ACTION"
+                )
+            )
         }
         return .skipChildren
     }
@@ -53,9 +64,8 @@ public class NativeBlockVisitor: SyntaxVisitor {
     private func findAttribute(name: String, from attributes: AttributeListSyntax) -> AttributeSyntax? {
         for attribute in attributes {
             if let attributeIdentifier = attribute.as(AttributeSyntax.self)?.attributeName.as(
-                IdentifierTypeSyntax.self),
-                attributeIdentifier.name.text == name
-            {
+                IdentifierTypeSyntax.self
+            ), attributeIdentifier.name.text == name {
                 return attribute.as(AttributeSyntax.self)
             }
         }
@@ -67,8 +77,13 @@ public class NativeBlockVisitor: SyntaxVisitor {
         attribute.arguments?.as(LabeledExprListSyntax.self)?.forEach { arg in
             if arg.label?.text == name {
                 value =
-                    arg.expression.as(StringLiteralExprSyntax.self)?.segments.as(
-                        StringLiteralSegmentListSyntax.self)?.first?.as(StringSegmentSyntax.self)?.content.text
+                    arg.expression.as(
+                        StringLiteralExprSyntax.self
+                    )?.segments.as(
+                        StringLiteralSegmentListSyntax.self
+                    )?.first?.as(
+                        StringSegmentSyntax.self
+                    )?.content.text
             }
         }
         return value

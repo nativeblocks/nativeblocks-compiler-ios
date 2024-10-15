@@ -24,14 +24,12 @@ public class NativeblocksToolExecutor {
         }
 
         let fileManager = FileManager.default
-
         let directory = URL(fileURLWithPath: parsedArgs[DirectoryArgumentKey]!)
         let output = fileManager.currentDirectoryPath
         let files = try fileManager.getFilesContent(from: directory)
 
         if commands.contains(where: { command in command == GenerateProviderCommand }) {
             let target = parsedArgs[TargetArgumentKey]!
-
             let generator = ProviderGenerator(prefix: target)
             try generator.generate(from: files)
             try generator.save(to: output)
@@ -49,7 +47,6 @@ public class NativeblocksToolExecutor {
             let organizationId = parsedArgs[OrganizationIdArgumentKey]!
 
             let generator = JsonGenerator()
-
             try generator.generate(from: files, organizationId: organizationId)
             try generator.save(to: output, with: fileManager)
 
@@ -58,14 +55,11 @@ public class NativeblocksToolExecutor {
                 authToken: authToken,
                 organizationId: organizationId
             )
-
             try uploader.upload(blocks: generator.blocks, actions: generator.actions)
         }
     }
 
-    private func parseArguments(_ arguments: [String]) throws -> (
-        commands: [String], parsedArgs: [String: String]
-    ) {
+    private func parseArguments(_ arguments: [String]) throws -> (commands: [String], parsedArgs: [String: String]) {
         var parsedArgs: [String: String] = [:]
         var commands: [String] = []
         var currentArgKey: String?
@@ -93,20 +87,15 @@ public class NativeblocksToolExecutor {
         guard let target = parsedArgs[TargetArgumentKey] else {
             throw ArgumentError.missingTarget
         }
-
         if target.isEmpty {
             throw ArgumentError.missingTarget
         }
-
         guard let directoryPath = parsedArgs[DirectoryArgumentKey] else {
             throw ArgumentError.missingDirectory
         }
-
         let directoryURL = URL(fileURLWithPath: directoryPath)
         var isDirectory: ObjCBool = false
-        if !FileManager.default.fileExists(atPath: directoryURL.path, isDirectory: &isDirectory)
-            || !isDirectory.boolValue
-        {
+        if !FileManager.default.fileExists(atPath: directoryURL.path, isDirectory: &isDirectory) || !isDirectory.boolValue {
             throw ArgumentError.invalidDirectory(directoryPath)
         }
 
@@ -114,15 +103,12 @@ public class NativeblocksToolExecutor {
             guard let endpoint = parsedArgs[EndpointArgumentKey] else {
                 throw ArgumentError.missingEndpoint
             }
-
             guard let authToken = parsedArgs[AuthTokenArgumentKey] else {
                 throw ArgumentError.missingAuthToken
             }
-
             guard let organizationId = parsedArgs[OrganizationIdArgumentKey] else {
                 throw ArgumentError.missingOrganizationId
             }
-
             if endpoint.isEmpty {
                 throw ArgumentError.missingEndpoint
             }
@@ -133,7 +119,6 @@ public class NativeblocksToolExecutor {
                 throw ArgumentError.missingOrganizationId
             }
         }
-
         let validArgs = Set([
             TargetArgumentKey,
             DirectoryArgumentKey,
@@ -141,9 +126,7 @@ public class NativeblocksToolExecutor {
             AuthTokenArgumentKey,
             OrganizationIdArgumentKey,
         ])
-
         let extraArgs = parsedArgs.keys.filter { !validArgs.contains($0) }
-
         if !extraArgs.isEmpty {
             throw ArgumentError.extraArguments(extraArgs)
         }

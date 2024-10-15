@@ -4,11 +4,11 @@ import SwiftSyntax
 import _NativeblocksCompilerCommon
 
 public class ProviderGenerator {
-    var prefix: String
-
     public var actionProviderCode: String?
     public var blockProviderCode: String?
 
+    private let prefix: String
+    
     public init(prefix: String) {
         self.prefix = ProviderGenerator.generateName(prefix: prefix)
     }
@@ -16,7 +16,7 @@ public class ProviderGenerator {
     public func generate(from files: [String]) throws {
         print("Generate providers...")
 
-        let (blocks, actions) = NativeBlockVisitor.extractNatives(from: files)
+        let (blocks, actions) = NativeItemVisitor.extractNatives(from: files)
 
         if blocks.isEmpty && actions.isEmpty {
             print("There is no actions or blocks to generate providers")
@@ -24,13 +24,11 @@ public class ProviderGenerator {
         }
 
         if !actions.isEmpty {
-            actionProviderCode = try createActionProvider(prefix: prefix, actions: actions).formatted()
-                .description
+            actionProviderCode = try createActionProvider(prefix: prefix, actions: actions).formatted().description
         }
 
         if !blocks.isEmpty {
-            blockProviderCode = try createBlockProvider(prefix: prefix, blocks: blocks).formatted()
-                .description
+            blockProviderCode = try createBlockProvider(prefix: prefix, blocks: blocks).formatted().description
         }
     }
 
@@ -46,7 +44,6 @@ public class ProviderGenerator {
         let blockFilePath = directory + "/\(prefix)BlockProvider.swift"
 
         try actionProviderCode?.write(toFile: actionFilePath, atomically: true, encoding: .utf8)
-
         try blockProviderCode?.write(toFile: blockFilePath, atomically: true, encoding: .utf8)
 
         if actionProviderCode != nil {
@@ -58,7 +55,6 @@ public class ProviderGenerator {
             print("exportrd File: \(blockFilePath) =>")
             print(String(blockProviderCode!))
         }
-
     }
 
     static func generateName(prefix: String?) -> String {
@@ -68,7 +64,7 @@ public class ProviderGenerator {
         return firstCharacter + remainingCharacters
     }
 
-    func createBlockProvider(prefix: String, blocks: [NativeBlock]) throws -> SourceFileSyntax {
+    func createBlockProvider(prefix: String, blocks: [Integration]) throws -> SourceFileSyntax {
         return try SourceFileSyntax {
             """
             import Nativeblocks
@@ -85,7 +81,7 @@ public class ProviderGenerator {
         }
     }
 
-    func createActionProvider(prefix: String, actions: [NativeAction]) throws -> SourceFileSyntax {
+    func createActionProvider(prefix: String, actions: [Integration]) throws -> SourceFileSyntax {
         return try SourceFileSyntax {
             """
             import Nativeblocks

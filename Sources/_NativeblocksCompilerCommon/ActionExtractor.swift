@@ -9,9 +9,7 @@ public struct ActionExtractor {
     static let NativeActionFunctionType = "NativeActionFunction"
     static let NativeActionParameterType = "NativeActionParameter"
 
-    public static func extractVariable(from structDecl: ClassDeclSyntax) -> (
-        [NativeMeta], [Diagnostic]
-    ) {
+    public static func extractVariable(from structDecl: ClassDeclSyntax) -> ( [NativeMeta], [Diagnostic]) {
         var meta: [NativeMeta] = []
         var errors: [Diagnostic] = []
         var position = 0
@@ -26,17 +24,13 @@ public struct ActionExtractor {
 
         for parameter in parameters {
             position += 1
-
-            guard let (type, _) = SyntaxUtils.getType(from: parameter)
-            else {
+            guard let (type, _) = SyntaxUtils.getType(from: parameter) else {
                 continue
             }
             switch type {
             case NativeActionDataType:
                 do {
-                    guard
-                        let (block, blockErrors) = extractDataAction(from: parameter, startPosition: position)
-                    else {
+                    guard let (block, blockErrors) = extractDataAction(from: parameter, startPosition: position) else {
                         continue
                     }
                     position = block.last?.position ?? position
@@ -45,9 +39,7 @@ public struct ActionExtractor {
                 }
             case NativeActionPropType:
                 do {
-                    guard
-                        let (block, blockErrors) = extractPropAction(from: parameter, startPosition: position)
-                    else {
+                    guard let (block, blockErrors) = extractPropAction(from: parameter, startPosition: position) else {
                         continue
                     }
                     position = block.last?.position ?? position
@@ -56,9 +48,7 @@ public struct ActionExtractor {
                 }
             case NativeActionEventType:
                 do {
-                    guard
-                        let (block, blockErrors) = extractEventAction(from: parameter, startPosition: position)
-                    else {
+                    guard let (block, blockErrors) = extractEventAction(from: parameter, startPosition: position) else {
                         continue
                     }
                     position = block.last?.position ?? position
@@ -70,17 +60,13 @@ public struct ActionExtractor {
             }
         }
 
-        let dataActions = meta.compactMap { $0 as? DataNativeMeta }
-        let eventActions = meta.compactMap { $0 as? EventNativeMeta }
+        let dataActions = meta.compactMap { $0 as? DataMeta }
+        let eventActions = meta.compactMap { $0 as? EventMeta }
 
         for event in eventActions {
             for binding in event.dataBinding {
                 if dataActions.first(where: { data in data.key == binding }) == nil {
-                    errors.append(
-                        Diagnostic(
-                            node: event.valriable!,
-                            message: NativeblocksCompilerDiagnostic.eventDataMissing
-                        ))
+                    errors.append(Diagnostic(node: event.variable!, message: DiagnosticType.eventDataMissing))
                 }
             }
         }
@@ -91,20 +77,13 @@ public struct ActionExtractor {
 
         for eventGroup in eventGroupByThen {
             for event in eventGroup.value {
-                errors.append(
-                    Diagnostic(
-                        node: event.valriable!,
-                        message: NativeblocksCompilerDiagnostic.eventDistinctThen
-                    ))
+                errors.append(Diagnostic(node: event.variable!, message: DiagnosticType.eventDistinctThen))
             }
         }
-
         return (meta, errors)
     }
 
-    private static func extractActionInfo(from classDecl: ClassDeclSyntax) -> (
-        ActionNativeMeta?, [VariableDeclSyntax], [Diagnostic]
-    ) {
+    private static func extractActionInfo(from classDecl: ClassDeclSyntax) -> (ActionMeta?, [VariableDeclSyntax], [Diagnostic]) {
         var parameterClass = ""
         var functionName = ""
         var functionParamName = ""
@@ -116,17 +95,12 @@ public struct ActionExtractor {
         let functions = classDecl.memberBlock.members.compactMap { $0.decl.as(FunctionDeclSyntax.self) }
             .filter { function in
                 function.attributes.filter { element in
-                    element.as(AttributeSyntax.self)?.attributeName.as(IdentifierTypeSyntax.self)?.name.text
-                        == NativeActionFunctionType
+                    element.as(AttributeSyntax.self)?.attributeName.as(IdentifierTypeSyntax.self)?.name.text == NativeActionFunctionType
                 }.count > 0
             }
 
         if functions.count != 1 {
-            diagnostic.append(
-                Diagnostic(
-                    node: classDecl,
-                    message: NativeblocksCompilerDiagnostic.requiredNativeActionFunction
-                ))
+            diagnostic.append(Diagnostic(node: classDecl, message: DiagnosticType.requiredNativeActionFunction))
         }
 
         isAsync = functions.first?.signature.effectSpecifiers?.asyncSpecifier?.text == "async"
@@ -135,18 +109,13 @@ public struct ActionExtractor {
         let haveThrows = declThrows?.text == "throws"
 
         if haveThrows {
-            diagnostic.append(
-                Diagnostic(
-                    node: classDecl,
-                    message: NativeblocksCompilerDiagnostic.requiredNativeActionFunctionParameter
-                ))
+            diagnostic.append(Diagnostic(node: classDecl, message: DiagnosticType.requiredNativeActionFunctionParameter))
         }
 
         functionName = functions.first?.name.text ?? ""
-        functionParams =
-            functions.first?.signature.parameterClause.parameters.compactMap {
-                $0.as(FunctionParameterSyntax.self)
-            } ?? []
+        functionParams = functions.first?.signature.parameterClause.parameters.compactMap {
+            $0.as(FunctionParameterSyntax.self)
+        } ?? []
 
         functionParamName = functionParams.first?.firstName.text ?? ""
 
@@ -154,26 +123,19 @@ public struct ActionExtractor {
             let structs = classDecl.memberBlock.members.compactMap { $0.decl.as(StructDeclSyntax.self) }
                 .filter { structDecl in
                     structDecl.attributes.filter { element in
-                        element.as(AttributeSyntax.self)?.attributeName.as(IdentifierTypeSyntax.self)?.name.text
-                            == NativeActionParameterType
+                        element.as(AttributeSyntax.self)?.attributeName.as(IdentifierTypeSyntax.self)?.name.text == NativeActionParameterType
                     }.count > 0
                 }
             parameterClass = structs.first?.name.text ?? ""
-            parameters =
-                structs.first?.memberBlock.members.compactMap { $0.decl.as(VariableDeclSyntax.self) } ?? []
+            parameters = structs.first?.memberBlock.members.compactMap { $0.decl.as(VariableDeclSyntax.self) } ?? []
 
             if functionParams.count != 1 || structs.count != 1 {
-                diagnostic.append(
-                    Diagnostic(
-                        node: classDecl,
-                        message: NativeblocksCompilerDiagnostic.requiredNativeActionFunctionParameter
-                    ))
+                diagnostic.append(Diagnostic(node: classDecl, message: DiagnosticType.requiredNativeActionFunctionParameter))
             }
         }
 
-        return !functionName.isEmpty
-            ? (
-                ActionNativeMeta(
+        return !functionName.isEmpty ? (
+                ActionMeta(
                     parameterClass: parameterClass,
                     functionName: functionName,
                     functionParamName: functionParamName,
@@ -181,13 +143,10 @@ public struct ActionExtractor {
                 ),
                 parameters,
                 diagnostic
-            )
-            : (nil, parameters, diagnostic)
+            ) : (nil, parameters, diagnostic)
     }
 
-    private static func extractDataAction(from varDecl: VariableDeclSyntax, startPosition: Int)
-        -> ([DataNativeMeta], [Diagnostic])?
-    {
+    private static func extractDataAction(from varDecl: VariableDeclSyntax, startPosition: Int) -> ([DataMeta], [Diagnostic])? {
         var position = startPosition
         let attributes = varDecl.attributes
         var description = "" as String?
@@ -204,34 +163,26 @@ public struct ActionExtractor {
             varDecl.bindings.compactMap { binding in
                 position += 1
                 let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
-                let type =
-                    binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?
-                    .name.text ?? ""
+                let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
 
                 if !SyntaxUtils.isPrimitiveTypeSupported(type) {
-                    diagnostic.append(
-                        Diagnostic(
-                            node: blockAttribute!,
-                            message: NativeblocksCompilerDiagnostic.premitiveTypeSupported
-                        ))
+                    diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.premitiveTypeSupported))
                 }
 
                 return !key.isEmpty && !type.isEmpty
-                    ? DataNativeMeta(
+                    ? DataMeta(
                         position: position,
                         key: key,
                         type: type,
                         description: description ?? "",
                         block: blockAttribute,
-                        valriable: binding
+                        variable: binding
                     ) : nil
             }, diagnostic
         )
     }
 
-    private static func extractPropAction(from varDecl: VariableDeclSyntax, startPosition: Int)
-        -> ([PropertyNativeMeta], [Diagnostic])?
-    {
+    private static func extractPropAction(from varDecl: VariableDeclSyntax, startPosition: Int) -> ([PropertyMeta], [Diagnostic])? {
         var position = startPosition
         let attributes = varDecl.attributes
         var description = ""
@@ -250,32 +201,22 @@ public struct ActionExtractor {
         valuePickerOptions = SyntaxUtils.extractvaluePickerOptions(from: blockAttribute!) ?? []
 
         if varDecl.bindings.count > 1 {
-            diagnostic.append(
-                Diagnostic(
-                    node: blockAttribute!,
-                    message: NativeblocksCompilerDiagnostic.singleVariableLimit
-                ))
+            diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.singleVariableLimit))
         }
 
         return (
             varDecl.bindings.compactMap { binding in
                 position += 1
                 let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
-                let type =
-                    binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?
-                    .name.text ?? ""
+                let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
                 let value = SyntaxUtils.extractDefaultValue(from: binding.initializer)
 
                 if !SyntaxUtils.isPrimitiveTypeSupported(type) {
-                    diagnostic.append(
-                        Diagnostic(
-                            node: blockAttribute!,
-                            message: NativeblocksCompilerDiagnostic.premitiveTypeSupported
-                        ))
+                    diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.premitiveTypeSupported))
                 }
 
                 return !key.isEmpty && !type.isEmpty
-                    ? PropertyNativeMeta(
+                    ? PropertyMeta(
                         position: position,
                         key: key,
                         value: value,
@@ -285,17 +226,13 @@ public struct ActionExtractor {
                         valuePickerOptions: valuePickerOptions,
                         valuePickerGroup: valuePickerGroup,
                         block: blockAttribute,
-                        valriable: binding
+                        variable: binding
                     ) : nil
             }, diagnostic
         )
     }
 
-    private static func extractEventAction(
-        from varDecl: VariableDeclSyntax, startPosition: Int
-    )
-        -> ([EventNativeMeta], [Diagnostic])?
-    {
+    private static func extractEventAction(from varDecl: VariableDeclSyntax, startPosition: Int) -> ([EventMeta], [Diagnostic])? {
         var position = startPosition
         let attributes = varDecl.attributes
         var description = ""
@@ -312,11 +249,7 @@ public struct ActionExtractor {
         then = SyntaxUtils.extractThen(from: blockAttribute!)
 
         if varDecl.bindings.count > 1 {
-            diagnostic.append(
-                Diagnostic(
-                    node: blockAttribute!,
-                    message: NativeblocksCompilerDiagnostic.singleVariableLimit
-                ))
+            diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.singleVariableLimit))
         }
 
         return (
@@ -324,8 +257,7 @@ public struct ActionExtractor {
                 position += 1
                 let event = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
 
-                var function = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(
-                    FunctionTypeSyntax.self)
+                var function = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(FunctionTypeSyntax.self)
 
                 if function == nil {
                     function = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(
@@ -337,23 +269,15 @@ public struct ActionExtractor {
                 let parameters = function?.parameters ?? []
 
                 if function == nil {
-                    diagnostic.append(
-                        Diagnostic(
-                            node: binding,
-                            message: NativeblocksCompilerDiagnostic.functionTypeError
-                        ))
+                    diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.functionTypeError))
                 }
 
                 if parameters.count != dataBinding.count {
-                    diagnostic.append(
-                        Diagnostic(
-                            node: binding,
-                            message: NativeblocksCompilerDiagnostic.eventTypeMisMachParamCount
-                        ))
+                    diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.eventTypeMisMachParamCount))
                 }
 
                 return !event.isEmpty && function != nil
-                    ? EventNativeMeta(
+                    ? EventMeta(
                         kind: .action,
                         position: position,
                         event: event,
@@ -362,7 +286,7 @@ public struct ActionExtractor {
                         isOptinalFunction: isOptinalFunction,
                         then: then,
                         block: blockAttribute,
-                        valriable: binding
+                        variable: binding
                     ) : nil
             }, diagnostic
         )

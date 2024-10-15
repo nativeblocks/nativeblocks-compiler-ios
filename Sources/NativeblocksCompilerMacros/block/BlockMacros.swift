@@ -12,10 +12,7 @@ public struct NativeBlockMacro: PeerMacro {
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
         guard let structDecl = declaration.as(StructDeclSyntax.self) else {
-            let structError = Diagnostic(
-                node: declaration,
-                message: NativeblocksCompilerDiagnostic.notAStruct
-            )
+            let structError = Diagnostic(node: declaration, message: DiagnosticType.notAStruct)
             context.diagnose(structError)
             return []
         }
@@ -26,10 +23,10 @@ public struct NativeBlockMacro: PeerMacro {
             context.diagnose(error)
         }
 
-        let metaData = variables.compactMap { $0 as? DataNativeMeta }
-        let metaProp = variables.compactMap { $0 as? PropertyNativeMeta }
-        let metaEvent = variables.compactMap { $0 as? EventNativeMeta }
-        let metaSlot = variables.compactMap { $0 as? SlotNativeMeta }
+        let metaData = variables.compactMap { $0 as? DataMeta }
+        let metaProp = variables.compactMap { $0 as? PropertyMeta }
+        let metaEvent = variables.compactMap { $0 as? EventMeta }
+        let metaSlot = variables.compactMap { $0 as? SlotMeta }
 
         let newStructDecl = try BlockCreator.create(
             structName: structDecl.name.text,

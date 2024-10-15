@@ -50,40 +50,42 @@ final class GenerateJsonTest: XCTestCase {
             print(source)
         }
         print("+++++++++++++++++++++++++")
+        print("HELLO \(JsonMetaType.integration)")
 
-        print("\(JsonGenerateType.integration.fileName)=>")
-        print(actionJsons![JsonGenerateType.integration]!.toString()!)
 
-        print("\(JsonGenerateType.data.fileName)=>")
-        print(actionJsons![JsonGenerateType.data]!.toString()!)
+        print("\(JsonMetaType.integration.fileName)=>")
+        print(actionJsons![JsonMetaType.integration]!.toString()!)
 
-        print("\(JsonGenerateType.event.fileName)=>")
-        print(actionJsons![JsonGenerateType.event]!.toString()!)
+        print("\(JsonMetaType.data.fileName)=>")
+        print(actionJsons![JsonMetaType.data]!.toString()!)
 
-        print("\(JsonGenerateType.propertie.fileName)=>")
-        print(actionJsons![JsonGenerateType.propertie]!.toString()!)
+        print("\(JsonMetaType.event.fileName)=>")
+        print(actionJsons![JsonMetaType.event]!.toString()!)
+
+        print("\(JsonMetaType.properties.fileName)=>")
+        print(actionJsons![JsonMetaType.properties]!.toString()!)
         print("=========================")
 
         XCTAssertEqual(
-            String(actionJsons![JsonGenerateType.integration]!.toString()!),
+            String(actionJsons![JsonMetaType.integration]!.toString()!),
             """
             {"public":false,"platformSupport":"IOS","documentation":"","keyType":"ALERT","price":0,"organizationId":"","description":"Nativeblocks alert action","imageIcon":"","name":"Alert","kind":"ACTION"}
             """
         )
         XCTAssertEqual(
-            String(actionJsons![JsonGenerateType.data]!.toString()!),
+            String(actionJsons![JsonMetaType.data]!.toString()!),
             """
             [{"key":"message","type":"STRING","description":""}]
             """
         )
         XCTAssertEqual(
-            String(actionJsons![JsonGenerateType.event]!.toString()!),
+            String(actionJsons![JsonMetaType.event]!.toString()!),
             """
             [{"event":"END","description":""}]
             """
         )
         XCTAssertEqual(
-            String(actionJsons![JsonGenerateType.propertie]!.toString()!),
+            String(actionJsons![JsonMetaType.properties]!.toString()!),
             """
             [{"valuePicker":"text-input","valuePickerGroup":"General","valuePickerOptions":"[]","value":"false","key":"animated","type":"BOOLEAN","description":""}]
             """
@@ -162,7 +164,6 @@ final class GenerateJsonTest: XCTestCase {
                     }
                 }
             }
-
             """
         ]
 
@@ -177,48 +178,48 @@ final class GenerateJsonTest: XCTestCase {
         }
         print("+++++++++++++++++++++++++")
 
-        print("\(JsonGenerateType.integration.fileName)=>")
-        print(jsons![JsonGenerateType.integration]!.toString()!)
+        print("\(JsonMetaType.integration.fileName)=>")
+        print(jsons![JsonMetaType.integration]!.toString()!)
 
-        print("\(JsonGenerateType.data.fileName)=>")
-        print(jsons![JsonGenerateType.data]!.toString()!)
+        print("\(JsonMetaType.data.fileName)=>")
+        print(jsons![JsonMetaType.data]!.toString()!)
 
-        print("\(JsonGenerateType.event.fileName)=>")
-        print(jsons![JsonGenerateType.event]!.toString()!)
+        print("\(JsonMetaType.event.fileName)=>")
+        print(jsons![JsonMetaType.event]!.toString()!)
 
-        print("\(JsonGenerateType.propertie.fileName)=>")
-        print(jsons![JsonGenerateType.propertie]!.toString()!)
+        print("\(JsonMetaType.properties.fileName)=>")
+        print(jsons![JsonMetaType.properties]!.toString()!)
 
-        print("\(JsonGenerateType.slot.fileName)=>")
-        print(jsons![JsonGenerateType.slot]!.toString()!)
+        print("\(JsonMetaType.slot.fileName)=>")
+        print(jsons![JsonMetaType.slot]!.toString()!)
         print("=========================")
 
         XCTAssertEqual(
-            jsons![JsonGenerateType.integration]!.toString()!,
+            jsons![JsonMetaType.integration]!.toString()!,
             """
             {"public":false,"platformSupport":"IOS","documentation":"","keyType":"XBUTTON","price":0,"organizationId":"","description":"This is a button","imageIcon":"","name":"X button","kind":"BLOCK"}
             """
         )
         XCTAssertEqual(
-            jsons![JsonGenerateType.data]!.toString()!,
+            jsons![JsonMetaType.data]!.toString()!,
             """
             [{"key":"text","type":"STRING","description":"Button text"}]
             """
         )
         XCTAssertEqual(
-            jsons![JsonGenerateType.event]!.toString()!,
+            jsons![JsonMetaType.event]!.toString()!,
             """
             [{"event":"onClick","description":"Button on click"}]
             """
         )
         XCTAssertEqual(
-            jsons![JsonGenerateType.propertie]!.toString()!,
+            jsons![JsonMetaType.properties]!.toString()!,
             """
             [{"valuePicker":"color-picker","valuePickerGroup":"General","valuePickerOptions":"[]","value":"#ffffffff","key":"background","type":"STRING","description":""},{"valuePicker":"dropdown","valuePickerGroup":"Size","valuePickerOptions":"[{\\"id\\":\\"S\\",\\"text\\":\\"Small\\"},{\\"id\\":\\"M\\",\\"text\\":\\"Medium\\"},{\\"id\\":\\"L\\",\\"text\\":\\"Large\\"}]","value":"S","key":"size","type":"STRING","description":"Button size"}]
             """
         )
         XCTAssertEqual(
-            jsons![JsonGenerateType.slot]!.toString()!,
+            jsons![JsonMetaType.slot]!.toString()!,
             """
             [{"description":"Button leading icon","slot":"onLeadingIcon"},{"description":"Button trailing icon","slot":"onTrailingIcon"}]
             """
