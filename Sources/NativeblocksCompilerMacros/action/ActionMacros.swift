@@ -12,10 +12,7 @@ public struct NativeActionMacro: PeerMacro {
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
         guard let structDecl = declaration.as(ClassDeclSyntax.self) else {
-            let structError = Diagnostic(
-                node: declaration,
-                message: NativeblocksCompilerDiagnostic.notAClass
-            )
+            let structError = Diagnostic(node: declaration, message: DiagnosticType.notAClass)
             context.diagnose(structError)
             return []
         }
@@ -26,10 +23,10 @@ public struct NativeActionMacro: PeerMacro {
             context.diagnose(error)
         }
 
-        let metaData = variables.compactMap { $0 as? DataNativeMeta }
-        let metaProp = variables.compactMap { $0 as? PropertyNativeMeta }
-        let metaEvent = variables.compactMap { $0 as? EventNativeMeta }
-        let actionInfo = variables.compactMap { $0 as? ActionNativeMeta }.first
+        let metaData = variables.compactMap { $0 as? DataMeta }
+        let metaProp = variables.compactMap { $0 as? PropertyMeta }
+        let metaEvent = variables.compactMap { $0 as? EventMeta }
+        let actionInfo = variables.compactMap { $0 as? ActionMeta }.first
 
         let newStructDecl = try ActionCreator.create(
             structName: structDecl.name.text,

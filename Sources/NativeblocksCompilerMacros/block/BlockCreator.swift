@@ -5,10 +5,10 @@ import _NativeblocksCompilerCommon
 struct BlockCreator {
     static func create(
         structName: String,
-        metaData: [DataNativeMeta],
-        metaProp: [PropertyNativeMeta],
-        metaEvent: [EventNativeMeta],
-        metaSlot: [SlotNativeMeta]
+        metaData: [DataMeta],
+        metaProp: [PropertyMeta],
+        metaEvent: [EventMeta],
+        metaSlot: [SlotMeta]
     ) throws -> StructDeclSyntax {
         return try StructDeclSyntax("public struct \(raw: structName)Block: INativeBlock") {
             try FunctionDeclSyntax("public func blockView(blockProps: BlockProps) -> any View") {
@@ -151,7 +151,7 @@ struct BlockCreator {
         }
     }
 
-    private static func dataTypeMapper(dataItem: DataNativeMeta) -> String? {
+    private static func dataTypeMapper(dataItem: DataMeta) -> String? {
         switch dataItem.type.uppercased() {
         case "STRING":
             return
@@ -180,7 +180,7 @@ struct BlockCreator {
         }
     }
 
-    private static func propTypeMapper(item: PropertyNativeMeta) -> String? {
+    private static func propTypeMapper(item: PropertyMeta) -> String? {
         switch item.type.uppercased() {
         case "STRING":
             return

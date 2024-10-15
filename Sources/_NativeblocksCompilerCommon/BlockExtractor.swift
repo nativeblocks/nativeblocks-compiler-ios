@@ -2,35 +2,26 @@ import SwiftDiagnostics
 import SwiftSyntax
 import SwiftSyntaxBuilder
 
-public struct BlockExtractor {
+public enum BlockExtractor {
     static let NativeBlockDataType = "NativeBlockData"
     static let NativeBlockPropType = "NativeBlockProp"
     static let NativeBlockEventType = "NativeBlockEvent"
     static let NativeBlockSlotType = "NativeBlockSlot"
 
-    public static func extractVariable(from structDecl: StructDeclSyntax) -> (
-        [NativeMeta], [Diagnostic]
-    ) {
+    public static func extractVariable(from structDecl: StructDeclSyntax) -> ([NativeMeta], [Diagnostic]) {
         var meta: [NativeMeta] = []
         var errors: [Diagnostic] = []
         var position = 0
         for member in structDecl.memberBlock.members {
-            guard let varDecl = member.decl.as(VariableDeclSyntax.self)
-            else {
-                continue
-            }
+            guard let varDecl = member.decl.as(VariableDeclSyntax.self) else { continue }
             position += 1
 
-            guard let (type, _) = SyntaxUtils.getType(from: varDecl)
-            else {
-                continue
-            }
+            guard let (type, _) = SyntaxUtils.getType(from: varDecl) else { continue }
 
             switch type {
             case NativeBlockDataType:
                 do {
-                    guard let (block, blockErrors) = extractDataBlock(from: varDecl, startPosition: position)
-                    else {
+                    guard let (block, blockErrors) = extractDataBlock(from: varDecl, startPosition: position) else {
                         continue
                     }
                     position = block.last?.position ?? position
@@ -39,8 +30,7 @@ public struct BlockExtractor {
                 }
             case NativeBlockPropType:
                 do {
-                    guard let (block, blockErrors) = extractPropBlock(from: varDecl, startPosition: position)
-                    else {
+                    guard let (block, blockErrors) = extractPropBlock(from: varDecl, startPosition: position) else {
                         continue
                     }
                     position = block.last?.position ?? position
@@ -49,8 +39,7 @@ public struct BlockExtractor {
                 }
             case NativeBlockEventType:
                 do {
-                    guard let (block, blockErrors) = extractEventBlock(from: varDecl, startPosition: position)
-                    else {
+                    guard let (block, blockErrors) = extractEventBlock(from: varDecl, startPosition: position) else {
                         continue
                     }
                     position = block.last?.position ?? position
@@ -59,8 +48,7 @@ public struct BlockExtractor {
                 }
             case NativeBlockSlotType:
                 do {
-                    guard let (block, blockErrors) = extractSlotBlock(from: varDecl, startPosition: position)
-                    else {
+                    guard let (block, blockErrors) = extractSlotBlock(from: varDecl, startPosition: position) else {
                         continue
                     }
                     position = block.last?.position ?? position
@@ -72,27 +60,20 @@ public struct BlockExtractor {
             }
         }
 
-        let dataBlocks = meta.compactMap { $0 as? DataNativeMeta }
-        let eventBlocks = meta.compactMap { $0 as? EventNativeMeta }
+        let dataBlocks = meta.compactMap { $0 as? DataMeta }
+        let eventBlocks = meta.compactMap { $0 as? EventMeta }
 
         for event in eventBlocks {
             for binding in event.dataBinding {
                 if dataBlocks.first(where: { data in data.key == binding }) == nil {
-                    errors.append(
-                        Diagnostic(
-                            node: event.valriable!,
-                            message: NativeblocksCompilerDiagnostic.eventDataMissing
-                        ))
+                    errors.append(Diagnostic(node: event.variable!, message: DiagnosticType.eventDataMissing))
                 }
             }
         }
-
         return (meta, errors)
     }
 
-    private static func extractDataBlock(from varDecl: VariableDeclSyntax, startPosition: Int)
-        -> ([DataNativeMeta], [Diagnostic])?
-    {
+    private static func extractDataBlock(from varDecl: VariableDeclSyntax, startPosition: Int) -> ([DataMeta], [Diagnostic])? {
         var position = startPosition
         let attributes = varDecl.attributes
         var description = "" as String?
@@ -109,34 +90,25 @@ public struct BlockExtractor {
             varDecl.bindings.compactMap { binding in
                 position += 1
                 let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
-                let type =
-                    binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?
-                    .name.text ?? ""
+                let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
 
                 if !SyntaxUtils.isPrimitiveTypeSupported(type) {
-                    diagnostic.append(
-                        Diagnostic(
-                            node: blockAttribute!,
-                            message: NativeblocksCompilerDiagnostic.premitiveTypeSupported
-                        ))
+                    diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.premitiveTypeSupported))
                 }
 
                 return !key.isEmpty && !type.isEmpty
-                    ? DataNativeMeta(
+                    ? DataMeta(
                         position: position,
                         key: key,
                         type: type,
                         description: description ?? "",
                         block: blockAttribute,
-                        valriable: binding
-                    ) : nil
+                        variable: binding) : nil
             }, diagnostic
         )
     }
 
-    private static func extractPropBlock(from varDecl: VariableDeclSyntax, startPosition: Int)
-        -> ([PropertyNativeMeta], [Diagnostic])?
-    {
+    private static func extractPropBlock(from varDecl: VariableDeclSyntax, startPosition: Int) -> ([PropertyMeta], [Diagnostic])? {
         var position = startPosition
         let attributes = varDecl.attributes
         var description = ""
@@ -157,32 +129,22 @@ public struct BlockExtractor {
         valuePickerOptions = SyntaxUtils.extractvaluePickerOptions(from: blockAttribute!) ?? []
 
         if varDecl.bindings.count > 1 {
-            diagnostic.append(
-                Diagnostic(
-                    node: blockAttribute!,
-                    message: NativeblocksCompilerDiagnostic.singleVariableLimit
-                ))
+            diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.singleVariableLimit))
         }
 
         return (
             varDecl.bindings.compactMap { binding in
                 position += 1
                 let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
-                let type =
-                    binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?
-                    .name.text ?? ""
+                let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
                 let value = SyntaxUtils.extractDefaultValue(from: binding.initializer)
 
                 if !SyntaxUtils.isPrimitiveTypeSupported(type) {
-                    diagnostic.append(
-                        Diagnostic(
-                            node: blockAttribute!,
-                            message: NativeblocksCompilerDiagnostic.premitiveTypeSupported
-                        ))
+                    diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.premitiveTypeSupported))
                 }
 
                 return !key.isEmpty && !type.isEmpty
-                    ? PropertyNativeMeta(
+                    ? PropertyMeta(
                         position: position,
                         key: key,
                         value: value,
@@ -192,15 +154,12 @@ public struct BlockExtractor {
                         valuePickerOptions: valuePickerOptions,
                         valuePickerGroup: valuePickerGroup,
                         block: blockAttribute,
-                        valriable: binding
-                    ) : nil
+                        variable: binding) : nil
             }, diagnostic
         )
     }
 
-    private static func extractEventBlock(from varDecl: VariableDeclSyntax, startPosition: Int)
-        -> ([EventNativeMeta], [Diagnostic])?
-    {
+    private static func extractEventBlock(from varDecl: VariableDeclSyntax, startPosition: Int) -> ([EventMeta], [Diagnostic])? {
         var position = startPosition
         let attributes = varDecl.attributes
         var description = ""
@@ -217,11 +176,7 @@ public struct BlockExtractor {
         dataBinding = SyntaxUtils.extractDataBinding(from: blockAttribute!) ?? []
 
         if varDecl.bindings.count > 1 {
-            diagnostic.append(
-                Diagnostic(
-                    node: blockAttribute!,
-                    message: NativeblocksCompilerDiagnostic.singleVariableLimit
-                ))
+            diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.singleVariableLimit))
         }
 
         return (
@@ -243,23 +198,15 @@ public struct BlockExtractor {
                 let parameters = function?.parameters ?? []
 
                 if function == nil {
-                    diagnostic.append(
-                        Diagnostic(
-                            node: binding,
-                            message: NativeblocksCompilerDiagnostic.functionTypeError
-                        ))
+                    diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.functionTypeError))
                 }
 
                 if parameters.count != dataBinding.count {
-                    diagnostic.append(
-                        Diagnostic(
-                            node: binding,
-                            message: NativeblocksCompilerDiagnostic.eventTypeMisMachParamCount
-                        ))
+                    diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.eventTypeMisMachParamCount))
                 }
 
                 return !event.isEmpty && function != nil
-                    ? EventNativeMeta(
+                    ? EventMeta(
                         kind: .block,
                         position: position,
                         event: event,
@@ -267,15 +214,12 @@ public struct BlockExtractor {
                         dataBinding: dataBinding,
                         isOptinalFunction: isOptinalFunction,
                         block: blockAttribute,
-                        valriable: binding
-                    ) : nil
+                        variable: binding) : nil
             }, diagnostic
         )
     }
 
-    private static func extractSlotBlock(from varDecl: VariableDeclSyntax, startPosition: Int)
-        -> ([SlotNativeMeta], [Diagnostic])?
-    {
+    private static func extractSlotBlock(from varDecl: VariableDeclSyntax, startPosition: Int) -> ([SlotMeta], [Diagnostic])? {
         var position = startPosition
         let attributes = varDecl.attributes
         var description = ""
@@ -289,11 +233,7 @@ public struct BlockExtractor {
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
 
         if varDecl.bindings.count > 1 {
-            diagnostic.append(
-                Diagnostic(
-                    node: blockAttribute!,
-                    message: NativeblocksCompilerDiagnostic.singleVariableLimit
-                ))
+            diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.singleVariableLimit))
         }
 
         return (
@@ -315,43 +255,29 @@ public struct BlockExtractor {
                 let parameters = function?.parameters ?? []
 
                 if function == nil {
-                    diagnostic.append(
-                        Diagnostic(
-                            node: binding,
-                            message: NativeblocksCompilerDiagnostic.functionTypeError
-                        ))
+                    diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.functionTypeError))
                 }
 
                 if parameters.count > 1 {
-                    diagnostic.append(
-                        Diagnostic(
-                            node: binding,
-                            message: NativeblocksCompilerDiagnostic.blockIndexParamLimit
-                        ))
+                    diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.blockIndexParamLimit))
                 } else if parameters.count == 1 {
                     if let type = parameters.first?.as(TupleTypeElementSyntax.self)?.type.as(
-                        IdentifierTypeSyntax.self)?.name.text
-                    {
+                        IdentifierTypeSyntax.self)?.name.text {
                         if type != "BlockIndex" {
-                            diagnostic.append(
-                                Diagnostic(
-                                    node: binding,
-                                    message: NativeblocksCompilerDiagnostic.blockIndexParamLimit
-                                ))
+                            diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.blockIndexParamLimit))
                         }
                     }
                 }
 
                 return !slot.isEmpty
-                    ? SlotNativeMeta(
+                    ? SlotMeta(
                         position: position,
                         slot: slot,
                         description: description,
                         hasBlockIndex: parameters.count == 1,
                         isOptinalFunction: isOptinalFunction,
                         block: blockAttribute,
-                        valriable: binding
-                    ) : nil
+                        variable: binding) : nil
             }, diagnostic
         )
     }
