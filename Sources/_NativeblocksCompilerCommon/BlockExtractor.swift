@@ -88,7 +88,7 @@ public enum BlockExtractor {
             diagnostic.append(
                 Diagnostic(
                     node: blockAttribute!,
-                    message: NativeblocksCompilerDiagnostic.multiAttributes
+                    message: DiagnosticType.multiAttributes
                 ))
         }
 
@@ -134,7 +134,7 @@ public enum BlockExtractor {
             diagnostic.append(
                 Diagnostic(
                     node: blockAttribute!,
-                    message: NativeblocksCompilerDiagnostic.multiAttributes
+                    message: DiagnosticType.multiAttributes
                 ))
         }
 
@@ -192,7 +192,7 @@ public enum BlockExtractor {
             diagnostic.append(
                 Diagnostic(
                     node: blockAttribute!,
-                    message: NativeblocksCompilerDiagnostic.multiAttributes
+                    message: DiagnosticType.multiAttributes
                 ))
         }
 
@@ -258,7 +258,7 @@ public enum BlockExtractor {
             diagnostic.append(
                 Diagnostic(
                     node: blockAttribute!,
-                    message: NativeblocksCompilerDiagnostic.multiAttributes
+                    message: DiagnosticType.multiAttributes
                 ))
         }
 
