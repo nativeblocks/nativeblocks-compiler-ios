@@ -11,6 +11,7 @@ let package = Package(
         .library(name: "NativeblocksCompiler", targets: ["NativeblocksCompiler"]),
         .plugin(name: "GenerateProvider", targets: ["GenerateProvider"]),
         .plugin(name: "SyncNativeblocks", targets: ["SyncNativeblocks"]),
+        .plugin(name: "PrepareSchema", targets: ["PrepareSchema"]),
         .executable(name: "NativeblocksTool", targets: ["NativeblocksTool"]),
     ],
     dependencies: [
@@ -57,6 +58,23 @@ let package = Package(
                         scope: PluginNetworkPermissionScope.all(),
                         reason: "This command will sync jsons with nativeblocks server."
                     ),
+                ]
+            ),
+            dependencies: [
+                .target(name: "NativeblocksTool")
+            ]
+        ),
+        
+        .plugin(
+            name: "PrepareSchema",
+            capability: .command(
+                intent: .custom(
+                    verb: "PrepareSchema",
+                    description: "Prepare Schema"
+                ),
+                permissions: [
+                    .writeToPackageDirectory(
+                        reason: "This command write the new json blocks to the source root."),
                 ]
             ),
             dependencies: [

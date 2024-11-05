@@ -25,7 +25,7 @@ enum ArgumentError: Error, CustomStringConvertible {
         case .missingOrganizationId:
             return "--organizationId argument is missing."
         case .missingCommand:
-            return "please use commands like: 'generate-provider', 'generate-json', 'sync'"
+            return "please use commands like: 'generate-provider', 'sync', 'prepare-schema'"
         case .invalidDirectory(let path):
             return "The directory \(path) does not exist."
         case .extraArguments(let extraArgs):
