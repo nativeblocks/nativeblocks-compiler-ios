@@ -13,6 +13,20 @@ public enum SyntaxUtils {
         }
         return nil
     }
+    
+    static func extractAttributes(from attributes: AttributeListSyntax)
+        -> [String]
+    {
+        var attrs: [String] = []
+        for attribute in attributes {
+            if let attr = attribute.as(AttributeSyntax.self),
+               let name = attr.attributeName.as(IdentifierTypeSyntax.self)?.name.text
+            {
+                attrs.append(name)
+            }
+        }
+        return attrs
+    }
 
     static func extractDescription(from attribute: AttributeSyntax) -> String? {
         guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }

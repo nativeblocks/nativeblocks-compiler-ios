@@ -81,8 +81,16 @@ public enum BlockExtractor {
         var diagnostic: [Diagnostic] = []
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockDataType, from: attributes)
-
+        
         guard blockAttribute != nil else { return nil }
+        
+        if attributes.count > 1 {
+            diagnostic.append(
+                Diagnostic(
+                    node: blockAttribute!,
+                    message: DiagnosticType.multiAttributes
+                ))
+        }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
 
@@ -121,6 +129,14 @@ public enum BlockExtractor {
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockPropType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
+        
+        if attributes.count > 1 {
+            diagnostic.append(
+                Diagnostic(
+                    node: blockAttribute!,
+                    message: DiagnosticType.multiAttributes
+                ))
+        }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         valuePicker = SyntaxUtils.extractValuePicker(from: blockAttribute!) ?? "TEXT_INPUT"
@@ -171,6 +187,14 @@ public enum BlockExtractor {
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockEventType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
+        
+        if attributes.count > 1 {
+            diagnostic.append(
+                Diagnostic(
+                    node: blockAttribute!,
+                    message: DiagnosticType.multiAttributes
+                ))
+        }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         dataBinding = SyntaxUtils.extractDataBinding(from: blockAttribute!) ?? []
@@ -229,6 +253,14 @@ public enum BlockExtractor {
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockSlotType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
+        
+        if attributes.count > 1 {
+            diagnostic.append(
+                Diagnostic(
+                    node: blockAttribute!,
+                    message: DiagnosticType.multiAttributes
+                ))
+        }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
 

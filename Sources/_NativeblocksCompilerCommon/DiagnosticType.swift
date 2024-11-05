@@ -13,6 +13,7 @@ public enum DiagnosticType: String, DiagnosticMessage {
     case requiredNativeActionFunction
     case requiredNativeActionFunctionParameter
     case actionNotsupportThrows
+    case multiAttributes
 
     public var severity: DiagnosticSeverity { return .error }
 
@@ -40,6 +41,8 @@ public enum DiagnosticType: String, DiagnosticMessage {
             return "'@NativeActionFunction' needs a struct with '@NativeActionParameter'."
         case .eventDistinctThen:
             return "'then' in '@NativeActionEvent' must be unique."
+        case .multiAttributes:
+                return "Multi attribiute not supported."
         case .actionNotsupportThrows:
             return
                 "'@NativeActionFunction' doesn't support throws. Use '@NativeActionEvent(then: Then.FAILURE)'."
