@@ -13,6 +13,13 @@ struct BlockCreator {
         return try StructDeclSyntax("public struct \(raw: structName)Block: INativeBlock") {
             try FunctionDeclSyntax("public func blockView(blockProps: BlockProps) -> any View") {
                 """
+                if let visibilityKey = blockProps.block?.visibility,
+                       let visibility = blockProps.variables?[visibilityKey]?.value,
+                       visibility == "false" {
+                        return EmptyView()
+                    }
+                """
+                """
                 return InternalRootView(blockProps: blockProps)
                 """
             }
