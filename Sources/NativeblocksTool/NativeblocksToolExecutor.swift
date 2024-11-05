@@ -48,7 +48,6 @@ public class NativeblocksToolExecutor {
 
             let generator = JsonGenerator()
             try generator.generate(from: files, organizationId: organizationId)
-            try generator.save(to: output, with: fileManager)
 
             let uploader = JsonUploader(
                 endpoint: endpoint,
