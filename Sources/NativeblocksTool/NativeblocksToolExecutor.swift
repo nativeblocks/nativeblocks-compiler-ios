@@ -2,7 +2,6 @@ import Foundation
 
 public class NativeblocksToolExecutor {
     let GenerateProviderCommand = "generate-provider"
-    let GenerateJsonCommand = "generate-json"
     let SyncCommand = "sync"
     let PrepareSchemaCommand = "prepare-schema"
     let TargetArgumentKey = "--target"
@@ -34,12 +33,6 @@ public class NativeblocksToolExecutor {
             let generator = ProviderGenerator(prefix: target)
             try generator.generate(from: files)
             try generator.save(to: output)
-        }
-
-        if commands.contains(where: { command in command == GenerateJsonCommand }) {
-            let generator = JsonGenerator()
-            try generator.generate(from: files)
-            try generator.save(to: output, with: fileManager)
         }
 
         if commands.contains(where: { command in command == PrepareSchemaCommand }) {
@@ -77,9 +70,6 @@ public class NativeblocksToolExecutor {
                 parsedArgs[currentKey] = argument
                 currentArgKey = nil
             } else if argument == GenerateProviderCommand {
-                commands.append(argument)
-                currentArgKey = nil
-            } else if argument == GenerateJsonCommand {
                 commands.append(argument)
                 currentArgKey = nil
             } else if argument == SyncCommand {
