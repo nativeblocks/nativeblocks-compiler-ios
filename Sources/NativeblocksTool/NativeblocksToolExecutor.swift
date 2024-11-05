@@ -4,6 +4,7 @@ public class NativeblocksToolExecutor {
     let GenerateProviderCommand = "generate-provider"
     let GenerateJsonCommand = "generate-json"
     let SyncCommand = "sync"
+    let PrepareSchemaCommand = "prepare-schema"
     let TargetArgumentKey = "--target"
     let DirectoryArgumentKey = "--directory"
     let EndpointArgumentKey = "--endpoint"
@@ -41,6 +42,12 @@ public class NativeblocksToolExecutor {
             try generator.save(to: output, with: fileManager)
         }
 
+        if commands.contains(where: { command in command == PrepareSchemaCommand }) {
+            let generator = JsonGenerator()
+            try generator.generate(from: files)
+            try generator.save(to: output, with: fileManager, prefix: "/.nativeblocks/integrations")
+        }
+
         if commands.contains(where: { command in command == SyncCommand }) {
             let endpoint = parsedArgs[EndpointArgumentKey]!
             let authToken = parsedArgs[AuthTokenArgumentKey]!
@@ -76,6 +83,9 @@ public class NativeblocksToolExecutor {
                 commands.append(argument)
                 currentArgKey = nil
             } else if argument == SyncCommand {
+                commands.append(argument)
+                currentArgKey = nil
+            } else if argument == PrepareSchemaCommand {
                 commands.append(argument)
                 currentArgKey = nil
             }
