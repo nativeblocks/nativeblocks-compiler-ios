@@ -42,7 +42,7 @@ public enum DiagnosticType: String, DiagnosticMessage {
         case .eventDistinctThen:
             return "'then' in '@NativeActionEvent' must be unique."
         case .multiAttributes:
-                return "Multi attribiute not supported."
+            return "Multi attribiute not supported."
         case .actionNotsupportThrows:
             return
                 "'@NativeActionFunction' doesn't support throws. Use '@NativeActionEvent(then: Then.FAILURE)'."

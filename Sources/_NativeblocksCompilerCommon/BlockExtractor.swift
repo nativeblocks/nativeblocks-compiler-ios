@@ -81,9 +81,9 @@ public enum BlockExtractor {
         var diagnostic: [Diagnostic] = []
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockDataType, from: attributes)
-        
+
         guard blockAttribute != nil else { return nil }
-        
+
         if attributes.count > 1 {
             diagnostic.append(
                 Diagnostic(
@@ -129,7 +129,7 @@ public enum BlockExtractor {
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockPropType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
-        
+
         if attributes.count > 1 {
             diagnostic.append(
                 Diagnostic(
@@ -187,7 +187,7 @@ public enum BlockExtractor {
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockEventType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
-        
+
         if attributes.count > 1 {
             diagnostic.append(
                 Diagnostic(
@@ -253,7 +253,7 @@ public enum BlockExtractor {
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockSlotType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
-        
+
         if attributes.count > 1 {
             diagnostic.append(
                 Diagnostic(
@@ -294,7 +294,8 @@ public enum BlockExtractor {
                     diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.blockIndexParamLimit))
                 } else if parameters.count == 1 {
                     if let type = parameters.first?.as(TupleTypeElementSyntax.self)?.type.as(
-                        IdentifierTypeSyntax.self)?.name.text {
+                        IdentifierTypeSyntax.self)?.name.text
+                    {
                         if type != "BlockIndex" {
                             diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.blockIndexParamLimit))
                         }

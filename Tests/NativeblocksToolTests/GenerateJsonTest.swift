@@ -52,7 +52,6 @@ final class GenerateJsonTest: XCTestCase {
         print("+++++++++++++++++++++++++")
         print("HELLO \(JsonMetaType.integration)")
 
-
         print("\(JsonMetaType.integration.fileName)=>")
         print(actionJsons![JsonMetaType.integration]!.toString()!)
 
