@@ -2,7 +2,7 @@ import Foundation
 import PackagePlugin
 
 @main
-struct SyncNativeblocks: CommandPlugin {
+struct Sync: CommandPlugin {
     func performCommand(
         context: PluginContext,
         arguments: [String]
@@ -31,7 +31,7 @@ struct SyncNativeblocks: CommandPlugin {
 #if canImport(XcodeProjectPlugin)
     import XcodeProjectPlugin
 
-    extension SyncNativeblocks: XcodeCommandPlugin {
+    extension Sync: XcodeCommandPlugin {
         func performCommand(context: XcodePluginContext, arguments: [String]) throws {
             let tool = try context.tool(named: "NativeblocksTool")
             let toolURL = URL(fileURLWithPath: tool.path.string)
