@@ -16,7 +16,7 @@ public struct DataMeta: NativeMeta {
     public var variable: PatternBindingSyntax?
 
     init(
-        position: Int, 
+        position: Int,
         key: String,
         type: String,
         description: String,
@@ -61,14 +61,14 @@ public struct PropertyMeta: NativeMeta {
     public var variable: PatternBindingSyntax?
 
     init(
-        position: Int, 
+        position: Int,
         key: String,
         value: String,
         type: String,
         description: String,
-        valuePicker: String, 
+        valuePicker: String,
         valuePickerOptions: [ValuePickerOption],
-        valuePickerGroup: String, 
+        valuePickerGroup: String,
         block: AttributeSyntax? = nil,
         variable: PatternBindingSyntax? = nil
     ) {
@@ -112,12 +112,12 @@ public struct EventMeta: NativeMeta {
     public var variable: PatternBindingSyntax?
 
     init(
-        kind: NativeKind, 
+        kind: NativeKind,
         position: Int,
         event: String,
         description: String,
         dataBinding: [String],
-        isOptinalFunction: Bool, 
+        isOptinalFunction: Bool,
         then: String? = nil,
         block: AttributeSyntax? = nil,
         variable: PatternBindingSyntax? = nil
@@ -158,7 +158,7 @@ public struct SlotMeta: NativeMeta {
     public var variable: PatternBindingSyntax?
 
     init(
-        position: Int, 
+        position: Int,
         slot: String,
         description: String,
         hasBlockIndex: Bool,

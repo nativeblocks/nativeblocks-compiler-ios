@@ -64,7 +64,7 @@ let package = Package(
                 .target(name: "NativeblocksTool")
             ]
         ),
-        
+
         .plugin(
             name: "PrepareSchema",
             capability: .command(
@@ -74,7 +74,7 @@ let package = Package(
                 ),
                 permissions: [
                     .writeToPackageDirectory(
-                        reason: "This command write the new json blocks to the source root."),
+                        reason: "This command write the new json blocks to the source root.")
                 ]
             ),
             dependencies: [

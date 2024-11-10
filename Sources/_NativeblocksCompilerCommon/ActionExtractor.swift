@@ -9,7 +9,7 @@ public struct ActionExtractor {
     static let NativeActionFunctionType = "NativeActionFunction"
     static let NativeActionParameterType = "NativeActionParameter"
 
-    public static func extractVariable(from structDecl: ClassDeclSyntax) -> ( [NativeMeta], [Diagnostic]) {
+    public static func extractVariable(from structDecl: ClassDeclSyntax) -> ([NativeMeta], [Diagnostic]) {
         var meta: [NativeMeta] = []
         var errors: [Diagnostic] = []
         var position = 0
@@ -113,9 +113,10 @@ public struct ActionExtractor {
         }
 
         functionName = functions.first?.name.text ?? ""
-        functionParams = functions.first?.signature.parameterClause.parameters.compactMap {
-            $0.as(FunctionParameterSyntax.self)
-        } ?? []
+        functionParams =
+            functions.first?.signature.parameterClause.parameters.compactMap {
+                $0.as(FunctionParameterSyntax.self)
+            } ?? []
 
         functionParamName = functionParams.first?.firstName.text ?? ""
 
@@ -123,7 +124,8 @@ public struct ActionExtractor {
             let structs = classDecl.memberBlock.members.compactMap { $0.decl.as(StructDeclSyntax.self) }
                 .filter { structDecl in
                     structDecl.attributes.filter { element in
-                        element.as(AttributeSyntax.self)?.attributeName.as(IdentifierTypeSyntax.self)?.name.text == NativeActionParameterType
+                        element.as(AttributeSyntax.self)?.attributeName.as(IdentifierTypeSyntax.self)?.name.text
+                            == NativeActionParameterType
                     }.count > 0
                 }
             parameterClass = structs.first?.name.text ?? ""
@@ -134,7 +136,8 @@ public struct ActionExtractor {
             }
         }
 
-        return !functionName.isEmpty ? (
+        return !functionName.isEmpty
+            ? (
                 ActionMeta(
                     parameterClass: parameterClass,
                     functionName: functionName,

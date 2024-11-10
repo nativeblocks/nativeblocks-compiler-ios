@@ -46,14 +46,18 @@ class NetworkExecutor {
                 do {
                     let responseModel = try decoder.decode(NetworkResult<Output>.self, from: data)
                     if let errors = responseModel.errors {
-                        completion(ResultModel.error(ErrorModel(message: errors.first?.message, errorType: errors.first?.extensions.classification)))
+                        completion(
+                            ResultModel.error(
+                                ErrorModel(message: errors.first?.message, errorType: errors.first?.extensions.classification)))
                     } else if let resultData = responseModel.data {
                         completion(ResultModel.success(resultData))
                     } else {
                         completion(ResultModel.error(ErrorModel(message: "There’s an issue. Please try again later", errorType: "NETWORK")))
                     }
                 } catch {
-                    completion(ResultModel.error(ErrorModel(message: "Failed to parse response: \(error.localizedDescription)", errorType: "PARSING")))
+                    completion(
+                        ResultModel.error(
+                            ErrorModel(message: "Failed to parse response: \(error.localizedDescription)", errorType: "PARSING")))
                 }
             }
             task.resume()

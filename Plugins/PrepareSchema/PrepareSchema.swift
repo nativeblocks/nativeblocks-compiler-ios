@@ -88,4 +88,3 @@ struct NativeblocksConfig: Codable {
     var authToken: String
     var organizationId: String
 }
-
