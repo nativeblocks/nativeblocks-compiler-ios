@@ -1,5 +1,12 @@
 @attached(peer, names: suffixed(Block))
-public macro NativeBlock(name: String, keyType: String, description: String) =
+public macro NativeBlock(
+    name: String,
+    keyType: String,
+    description: String,
+    version: Int = 1,
+    deprecated: Bool = false,
+    deprecatedReason: String = ""
+) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeBlockMacro")
 
 @attached(peer)
@@ -49,7 +56,14 @@ public struct NativeBlockValuePickerPosition {
 }
 
 @attached(peer, names: suffixed(Action))
-public macro NativeAction(name: String, keyType: String, description: String) =
+public macro NativeAction(
+    name: String,
+    keyType: String,
+    description: String,
+    version: Int = 1,
+    deprecated: Bool = false,
+    deprecatedReason: String = ""
+) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeActionMacro")
 
 @attached(peer)

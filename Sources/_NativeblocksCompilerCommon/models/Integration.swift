@@ -5,6 +5,9 @@ public struct Integration: Encodable {
     public var name: String
     public var keyType: String
     public var description: String
+    public var version: Int
+    public var deprecated: Bool
+    public var deprecatedReason: String
     public var syntaxStruct: StructDeclSyntax? = nil
     public var syntaxClass: ClassDeclSyntax? = nil
     public var meta: [NativeMeta]
@@ -22,6 +25,9 @@ public struct Integration: Encodable {
             documentation,
             imageIcon,
             keyType,
+            version,
+            deprecated,
+            deprecatedReason,
             kind,
             platformSupport,
             price,
