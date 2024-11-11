@@ -152,15 +152,19 @@ public struct ActionExtractor {
     private static func extractDataAction(from varDecl: VariableDeclSyntax, startPosition: Int) -> ([DataMeta], [Diagnostic])? {
         var position = startPosition
         let attributes = varDecl.attributes
-        var description = "" as String?
+        var description = nil as String?
         var blockAttribute: AttributeSyntax?
         var diagnostic: [Diagnostic] = []
+        var deprecated = false
+        var deprecatedReason = nil as String?
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeActionDataType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
+        deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
+        deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
 
         return (
             varDecl.bindings.compactMap { binding in
@@ -178,6 +182,8 @@ public struct ActionExtractor {
                         key: key,
                         type: type,
                         description: description ?? "",
+                        deprecated: deprecated,
+                        deprecatedReason: deprecatedReason ?? "",
                         block: blockAttribute,
                         variable: binding
                     ) : nil
@@ -194,12 +200,16 @@ public struct ActionExtractor {
         var valuePicker = ""
         var valuePickerGroup = ""
         var valuePickerOptions: [ValuePickerOption] = []
+        var deprecated = false
+        var deprecatedReason = nil as String?
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeActionPropType, from: attributes)
         guard blockAttribute != nil else { return nil }
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         valuePicker = SyntaxUtils.extractValuePicker(from: blockAttribute!) ?? "TEXT_INPUT"
         valuePickerGroup = SyntaxUtils.extractValuePickerGroup(from: blockAttribute!) ?? "General"
+        deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
+        deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
 
         valuePickerOptions = SyntaxUtils.extractvaluePickerOptions(from: blockAttribute!) ?? []
 
@@ -225,6 +235,8 @@ public struct ActionExtractor {
                         value: value,
                         type: type,
                         description: description,
+                        deprecated: deprecated,
+                        deprecatedReason: deprecatedReason ?? "",
                         valuePicker: valuePicker,
                         valuePickerOptions: valuePickerOptions,
                         valuePickerGroup: valuePickerGroup,
@@ -244,12 +256,16 @@ public struct ActionExtractor {
         var then: String?
         var blockAttribute: AttributeSyntax?
         var diagnostic: [Diagnostic] = []
+        var deprecated = false
+        var deprecatedReason = nil as String?
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeActionEventType, from: attributes)
         guard blockAttribute != nil else { return nil }
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         dataBinding = SyntaxUtils.extractDataBinding(from: blockAttribute!) ?? []
         then = SyntaxUtils.extractThen(from: blockAttribute!)
+        deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
+        deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
 
         if varDecl.bindings.count > 1 {
             diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.singleVariableLimit))
@@ -285,6 +301,8 @@ public struct ActionExtractor {
                         position: position,
                         event: event,
                         description: description,
+                        deprecated: deprecated,
+                        deprecatedReason: deprecatedReason ?? "",
                         dataBinding: dataBinding,
                         isOptinalFunction: isOptinalFunction,
                         then: then,
