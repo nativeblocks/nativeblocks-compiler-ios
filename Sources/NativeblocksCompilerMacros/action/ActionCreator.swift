@@ -163,7 +163,7 @@ enum ActionCreator {
         case "BOOL":
             return
                 """
-                \(dataItem.key)Data?.value?.lowercased() == "true"
+                \(dataItem.key)Data?.value.lowercased() == "true"
                 """
         default:
             return nil
