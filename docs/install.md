@@ -7,7 +7,7 @@ If your project uses its own `Package.swift` file, you can add NativeblocksCompi
 dependencies: [
     .package(
         url: "https://github.com/nativeblocks/nativeblocks-compiler-ios.git",
-        .upToNextMajor(from: "0.0.1")
+        .upToNextMajor(from: "1.1.0")
     ),
 
 ],

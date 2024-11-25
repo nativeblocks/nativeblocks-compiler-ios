@@ -17,7 +17,7 @@ usable as building blocks in a visual editor.
 **Example:**
 
 ```swift
-@NativeBlock(name : "X button", keyType : "XBUTTON", description : "This is a button")
+@NativeBlock(name : "My button", keyType : "MY_BUTTON", description : "This is a button")
 ```
 
 ##### `@NativeBlockProp`
@@ -92,11 +92,11 @@ This example demonstrates a simple button block with configurable properties, sl
 
 ```swift
 @NativeBlock(
-    name: "X button",
-    keyType: "XBUTTON",
+    name: "My button",
+    keyType: "MY_BUTTON",
     description: "This is a button"
 )
-struct XButton: View {
+struct MyButton: View {
     @NativeBlockData(description: "Button text")
     @State var text: String
     @NativeBlockProp(valuePicker: NativeBlockValuePicker.COLOR_PICKER)
