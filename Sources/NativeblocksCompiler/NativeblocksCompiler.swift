@@ -1,9 +1,20 @@
 @attached(peer, names: suffixed(Block))
-public macro NativeBlock(name: String, keyType: String, description: String) =
+public macro NativeBlock(
+    name: String,
+    keyType: String,
+    description: String,
+    version: Int = 1,
+    deprecated: Bool = false,
+    deprecatedReason: String = ""
+) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeBlockMacro")
 
 @attached(peer)
-public macro NativeBlockData(description: String = "") =
+public macro NativeBlockData(
+    description: String = "",
+    deprecated: Bool = false,
+    deprecatedReason: String = ""
+) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeBlockDataMacro")
 
 @attached(peer)
@@ -11,16 +22,27 @@ public macro NativeBlockProp(
     description: String = "",
     valuePicker: NativeBlockValuePicker = NativeBlockValuePicker.TEXT_INPUT,
     valuePickerOptions: [NativeBlockValuePickerOption] = [],
-    valuePickerGroup: NativeBlockValuePickerPosition = NativeBlockValuePickerPosition("General")
+    valuePickerGroup: NativeBlockValuePickerPosition = NativeBlockValuePickerPosition("General"),
+    deprecated: Bool = false,
+    deprecatedReason: String = ""
 ) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeBlockPropMacro")
 
 @attached(peer)
-public macro NativeBlockEvent(description: String = "", dataBinding: [String] = []) =
+public macro NativeBlockEvent(
+    description: String = "",
+    dataBinding: [String] = [],
+    deprecated: Bool = false,
+    deprecatedReason: String = ""
+) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeBlockEventMacro")
 
 @attached(peer)
-public macro NativeBlockSlot(description: String = "") =
+public macro NativeBlockSlot(
+    description: String = "",
+    deprecated: Bool = false,
+    deprecatedReason: String = ""
+) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeBlockSlotMacro")
 
 public enum NativeBlockValuePicker {
@@ -49,7 +71,14 @@ public struct NativeBlockValuePickerPosition {
 }
 
 @attached(peer, names: suffixed(Action))
-public macro NativeAction(name: String, keyType: String, description: String) =
+public macro NativeAction(
+    name: String,
+    keyType: String,
+    description: String,
+    version: Int = 1,
+    deprecated: Bool = false,
+    deprecatedReason: String = ""
+) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeActionMacro")
 
 @attached(peer)
@@ -61,7 +90,11 @@ public macro NativeActionFunction(description: String = "") =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeActionFunctionMacro")
 
 @attached(peer)
-public macro NativeActionData(description: String = "") =
+public macro NativeActionData(
+    description: String = "",
+    deprecated: Bool = false,
+    deprecatedReason: String = ""
+) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeActionDataMacro")
 
 @attached(peer)
@@ -69,7 +102,9 @@ public macro NativeActionProp(
     description: String = "",
     valuePicker: NativeActionValuePicker = NativeActionValuePicker.TEXT_INPUT,
     valuePickerOptions: [NativeActionValuePickerOption] = [],
-    valuePickerGroup: NativeActionValuePickerPosition = NativeActionValuePickerPosition("General")
+    valuePickerGroup: NativeActionValuePickerPosition = NativeActionValuePickerPosition("General"),
+    deprecated: Bool = false,
+    deprecatedReason: String = ""
 ) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeActionPropMacro")
 
@@ -77,7 +112,9 @@ public macro NativeActionProp(
 public macro NativeActionEvent(
     description: String = "",
     dataBinding: [String] = [],
-    then: Then = Then.END
+    then: Then = Then.END,
+    deprecated: Bool = false,
+    deprecatedReason: String = ""
 ) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeActionEventMacro")
 

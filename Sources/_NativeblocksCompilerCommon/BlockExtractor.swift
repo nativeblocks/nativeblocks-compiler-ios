@@ -76,14 +76,16 @@ public enum BlockExtractor {
     private static func extractDataBlock(from varDecl: VariableDeclSyntax, startPosition: Int) -> ([DataMeta], [Diagnostic])? {
         var position = startPosition
         let attributes = varDecl.attributes
-        var description = "" as String?
+        var description = nil as String?
         var blockAttribute: AttributeSyntax?
         var diagnostic: [Diagnostic] = []
+        var deprecated = false
+        var deprecatedReason = nil as String?
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockDataType, from: attributes)
-        
+
         guard blockAttribute != nil else { return nil }
-        
+
         if attributes.count > 1 {
             diagnostic.append(
                 Diagnostic(
@@ -93,6 +95,8 @@ public enum BlockExtractor {
         }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
+        deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
+        deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
 
         return (
             varDecl.bindings.compactMap { binding in
@@ -110,6 +114,8 @@ public enum BlockExtractor {
                         key: key,
                         type: type,
                         description: description ?? "",
+                        deprecated: deprecated,
+                        deprecatedReason: deprecatedReason ?? "",
                         block: blockAttribute,
                         variable: binding) : nil
             }, diagnostic
@@ -125,11 +131,13 @@ public enum BlockExtractor {
         var valuePicker = ""
         var valuePickerGroup = ""
         var valuePickerOptions: [ValuePickerOption] = []
+        var deprecated = false
+        var deprecatedReason = nil as String?
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockPropType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
-        
+
         if attributes.count > 1 {
             diagnostic.append(
                 Diagnostic(
@@ -141,6 +149,8 @@ public enum BlockExtractor {
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         valuePicker = SyntaxUtils.extractValuePicker(from: blockAttribute!) ?? "TEXT_INPUT"
         valuePickerGroup = SyntaxUtils.extractValuePickerGroup(from: blockAttribute!) ?? "General"
+        deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
+        deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
 
         valuePickerOptions = SyntaxUtils.extractvaluePickerOptions(from: blockAttribute!) ?? []
 
@@ -166,6 +176,8 @@ public enum BlockExtractor {
                         value: value,
                         type: type,
                         description: description,
+                        deprecated: deprecated,
+                        deprecatedReason: deprecatedReason ?? "",
                         valuePicker: valuePicker,
                         valuePickerOptions: valuePickerOptions,
                         valuePickerGroup: valuePickerGroup,
@@ -183,11 +195,13 @@ public enum BlockExtractor {
         var isOptinalFunction = false
         var blockAttribute: AttributeSyntax?
         var diagnostic: [Diagnostic] = []
+        var deprecated = false
+        var deprecatedReason = nil as String?
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockEventType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
-        
+
         if attributes.count > 1 {
             diagnostic.append(
                 Diagnostic(
@@ -198,6 +212,8 @@ public enum BlockExtractor {
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         dataBinding = SyntaxUtils.extractDataBinding(from: blockAttribute!) ?? []
+        deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
+        deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
 
         if varDecl.bindings.count > 1 {
             diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.singleVariableLimit))
@@ -235,6 +251,8 @@ public enum BlockExtractor {
                         position: position,
                         event: event,
                         description: description,
+                        deprecated: deprecated,
+                        deprecatedReason: deprecatedReason ?? "",
                         dataBinding: dataBinding,
                         isOptinalFunction: isOptinalFunction,
                         block: blockAttribute,
@@ -249,11 +267,13 @@ public enum BlockExtractor {
         var description = ""
         var blockAttribute: AttributeSyntax?
         var diagnostic: [Diagnostic] = []
+        var deprecated = false
+        var deprecatedReason = nil as String?
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockSlotType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
-        
+
         if attributes.count > 1 {
             diagnostic.append(
                 Diagnostic(
@@ -263,6 +283,8 @@ public enum BlockExtractor {
         }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
+        deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
+        deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
 
         if varDecl.bindings.count > 1 {
             diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.singleVariableLimit))
@@ -294,7 +316,8 @@ public enum BlockExtractor {
                     diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.blockIndexParamLimit))
                 } else if parameters.count == 1 {
                     if let type = parameters.first?.as(TupleTypeElementSyntax.self)?.type.as(
-                        IdentifierTypeSyntax.self)?.name.text {
+                        IdentifierTypeSyntax.self)?.name.text
+                    {
                         if type != "BlockIndex" {
                             diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.blockIndexParamLimit))
                         }
@@ -306,6 +329,8 @@ public enum BlockExtractor {
                         position: position,
                         slot: slot,
                         description: description,
+                        deprecated: deprecated,
+                        deprecatedReason: deprecatedReason ?? "",
                         hasBlockIndex: parameters.count == 1,
                         isOptinalFunction: isOptinalFunction,
                         block: blockAttribute,

@@ -44,6 +44,11 @@ final class NativeBlockTests: XCTestCase {
 
                     public struct MyTextBlock: INativeBlock {
                         public func blockView(blockProps: BlockProps) -> any View {
+                            if let visibilityKey = blockProps.block?.visibility,
+                                   let visibility = blockProps.variables? [visibilityKey]?.value,
+                                   visibility == "false" {
+                                    return EmptyView()
+                                }
                             return InternalRootView(blockProps: blockProps)
                         }
                         private struct InternalRootView: View {
@@ -111,6 +116,11 @@ final class NativeBlockTests: XCTestCase {
 
                     public struct MyTextBlock: INativeBlock {
                         public func blockView(blockProps: BlockProps) -> any View {
+                            if let visibilityKey = blockProps.block?.visibility,
+                                   let visibility = blockProps.variables? [visibilityKey]?.value,
+                                   visibility == "false" {
+                                    return EmptyView()
+                                }
                             return InternalRootView(blockProps: blockProps)
                         }
                         private struct InternalRootView: View {
@@ -185,6 +195,11 @@ final class NativeBlockTests: XCTestCase {
 
                     public struct MyTextBlock: INativeBlock {
                         public func blockView(blockProps: BlockProps) -> any View {
+                            if let visibilityKey = blockProps.block?.visibility,
+                                   let visibility = blockProps.variables? [visibilityKey]?.value,
+                                   visibility == "false" {
+                                    return EmptyView()
+                                }
                             return InternalRootView(blockProps: blockProps)
                         }
                         private struct InternalRootView: View {
@@ -265,6 +280,11 @@ final class NativeBlockTests: XCTestCase {
 
                     public struct MyColumnBlock: INativeBlock {
                         public func blockView(blockProps: BlockProps) -> any View {
+                            if let visibilityKey = blockProps.block?.visibility,
+                                   let visibility = blockProps.variables? [visibilityKey]?.value,
+                                   visibility == "false" {
+                                    return EmptyView()
+                                }
                             return InternalRootView(blockProps: blockProps)
                         }
                         private struct InternalRootView: View {

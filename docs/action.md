@@ -18,9 +18,9 @@ usable as building actions in a visual editor.
 
 ```swift
 @NativeAction(
-    keyType : "XBOT",
-    name : "X bot",
-    description : "This is a bot"
+    keyType : "MY_ALERT",
+    name : "My alert",
+    description : "This is an alert"
 )
 ```
 
@@ -38,7 +38,7 @@ usable as building actions in a visual editor.
 **Example:**
 
 ```swift
-@NativeActionProp(description : "api key") apiKey: String
+@NativeActionProp(description : "show animation") showAnimation: String
 ```
 
 ##### `@NativeActionData`
@@ -53,7 +53,7 @@ configuration, often from other actions or data sources.
 **Example:**
 
 ```swift
-@NativeActionData(description : "user input value") userPrompt: String
+@NativeActionData(description : "message value") message: String
 ```
 
 ##### `@NativeActionEvent`
@@ -70,13 +70,11 @@ configuration, often from other actions or data sources.
 
 ```swift
 @NativeActionEvent(
-    then : Then.SUCCESS,
-    dataBinding = ["result"]
+    then : Then.NEXT
 )
 ```
 
-This example demonstrates a bot action with configurable properties (apiKey, aiModelId), data inputs (userPrompt,
-result, errorMessage), and events for success (onMessageStream) and failure (onError).
+This example demonstrates an alert action with configurable properties (animated), data inputs (message), and events for completion (completion).
 
 ```swift
 import Nativeblocks

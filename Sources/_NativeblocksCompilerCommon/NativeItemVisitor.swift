@@ -24,12 +24,18 @@ public class NativeItemVisitor: SyntaxVisitor {
             let keyType = getStringValue(name: "keyType", from: attribute)
             let name = getStringValue(name: "name", from: attribute)
             let description = getStringValue(name: "description", from: attribute)
+            let version = getIntValue(name: "version", from: attribute)
+            let deprecated = getBoolValue(name: "deprecated", from: attribute)
+            let deprecatedReason = getStringValue(name: "deprecatedReason", from: attribute)
             nativeItems.append(
                 Integration(
                     declName: structName,
                     name: name!,
                     keyType: keyType!,
                     description: description!,
+                    version: version ?? 1,
+                    deprecated: deprecated ?? false,
+                    deprecatedReason: deprecatedReason ?? "",
                     syntaxStruct: node,
                     meta: [],
                     kind: "BLOCK"
@@ -46,12 +52,18 @@ public class NativeItemVisitor: SyntaxVisitor {
             let keyType = getStringValue(name: "keyType", from: attribute)
             let name = getStringValue(name: "name", from: attribute)
             let description = getStringValue(name: "description", from: attribute)
+            let version = getIntValue(name: "version", from: attribute)
+            let deprecated = getBoolValue(name: "deprecated", from: attribute)
+            let deprecatedReason = getStringValue(name: "deprecatedReason", from: attribute)
             nativeItems.append(
                 Integration(
                     declName: structName,
                     name: name!,
                     keyType: keyType!,
                     description: description!,
+                    version: version ?? 1,
+                    deprecated: deprecated,
+                    deprecatedReason: deprecatedReason ?? "",
                     syntaxClass: node,
                     meta: [],
                     kind: "ACTION"
@@ -87,5 +99,31 @@ public class NativeItemVisitor: SyntaxVisitor {
             }
         }
         return value
+    }
+
+    private func getIntValue(name: String, from attribute: AttributeSyntax) -> Int? {
+        var value: String? = nil
+        attribute.arguments?.as(LabeledExprListSyntax.self)?.forEach { arg in
+            if arg.label?.text == name {
+                value =
+                    arg.expression.as(
+                        IntegerLiteralExprSyntax.self
+                    )?.literal.text
+            }
+        }
+        return Int(value ?? "")
+    }
+
+    private func getBoolValue(name: String, from attribute: AttributeSyntax) -> Bool {
+        var value: String? = nil
+        attribute.arguments?.as(LabeledExprListSyntax.self)?.forEach { arg in
+            if arg.label?.text == name {
+                value =
+                    arg.expression.as(
+                        BooleanLiteralExprSyntax.self
+                    )?.literal.text
+            }
+        }
+        return value == "true"
     }
 }

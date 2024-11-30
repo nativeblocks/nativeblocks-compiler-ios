@@ -8,7 +8,7 @@ public class ProviderGenerator {
     public var blockProviderCode: String?
 
     private let prefix: String
-    
+
     public init(prefix: String) {
         self.prefix = ProviderGenerator.generateName(prefix: prefix)
     }

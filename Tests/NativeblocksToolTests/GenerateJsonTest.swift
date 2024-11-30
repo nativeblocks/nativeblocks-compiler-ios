@@ -18,11 +18,11 @@ final class GenerateJsonTest: XCTestCase {
 
                 @NativeActionParameter
                 struct Parameter {
-                    @NativeActionData
+                    @NativeActionData( deprecated: true,deprecatedReason: "reasion")
                     var message: String
-                    @NativeActionProp
+                    @NativeActionProp( deprecated: true,deprecatedReason: "reasion")
                     var animated: Bool = false
-                    @NativeActionEvent
+                    @NativeActionEvent( deprecated: true,deprecatedReason: "reasion")
                     var completion: (() -> Void)? = nil
                 }
 
@@ -52,7 +52,6 @@ final class GenerateJsonTest: XCTestCase {
         print("+++++++++++++++++++++++++")
         print("HELLO \(JsonMetaType.integration)")
 
-
         print("\(JsonMetaType.integration.fileName)=>")
         print(actionJsons![JsonMetaType.integration]!.toString()!)
 
@@ -69,25 +68,25 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             String(actionJsons![JsonMetaType.integration]!.toString()!),
             """
-            {"public":false,"platformSupport":"IOS","documentation":"","keyType":"ALERT","price":0,"organizationId":"","description":"Nativeblocks alert action","imageIcon":"","name":"Alert","kind":"ACTION"}
+            {"documentation":"","description":"Nativeblocks alert action","imageIcon":"","version":1,"deprecatedReason":"","platformSupport":"IOS","deprecated":false,"price":0,"keyType":"ALERT","kind":"ACTION","organizationId":"","name":"Alert","public":false}
             """
         )
         XCTAssertEqual(
             String(actionJsons![JsonMetaType.data]!.toString()!),
             """
-            [{"key":"message","type":"STRING","description":""}]
+            [{"deprecatedReason":"reasion","key":"message","type":"STRING","description":"","deprecated":true}]
             """
         )
         XCTAssertEqual(
             String(actionJsons![JsonMetaType.event]!.toString()!),
             """
-            [{"event":"END","description":""}]
+            [{"deprecatedReason":"reasion","event":"END","description":"","deprecated":true}]
             """
         )
         XCTAssertEqual(
             String(actionJsons![JsonMetaType.properties]!.toString()!),
             """
-            [{"valuePicker":"text-input","valuePickerGroup":"General","valuePickerOptions":"[]","value":"false","key":"animated","type":"BOOLEAN","description":""}]
+            [{"deprecatedReason":"reasion","valuePicker":"text-input","valuePickerGroup":"General","valuePickerOptions":"[]","value":"false","key":"animated","type":"BOOLEAN","description":"","deprecated":true}]
             """
         )
     }
@@ -98,7 +97,10 @@ final class GenerateJsonTest: XCTestCase {
             @NativeBlock(
                 name: "X button",
                 keyType: "XBUTTON",
-                description: "This is a button"
+                description: "This is a button",
+                version: 2,
+                deprecated: true,
+                deprecatedReason: "reasion"
             )
             struct XButton: View {
                 @NativeBlockData(description: "Button text")
@@ -113,14 +115,15 @@ final class GenerateJsonTest: XCTestCase {
                         NativeBlockValuePickerOption("M", "Medium"),
                         NativeBlockValuePickerOption("L", "Large"),
                     ],
-                    valuePickerGroup : NativeBlockValuePickerPosition("Size")
+                    valuePickerGroup : NativeBlockValuePickerPosition("Size"),
+                    deprecated: true,deprecatedReason: "reasion"
                 )
                 @State var size: String = "S"
-                @NativeBlockSlot(description: "Button leading icon")
+                @NativeBlockSlot(description: "Button leading icon",deprecated: true,deprecatedReason: "reasion")
                 var onLeadingIcon: () -> AnyView
-                @NativeBlockSlot(description: "Button trailing icon")
+                @NativeBlockSlot(description: "Button trailing icon",deprecated: true,deprecatedReason: "reasion")
                 var onTrailingIcon: (() -> AnyView)? = nil
-                @NativeBlockEvent(description: "Button on click")
+                @NativeBlockEvent(description: "Button on click",deprecated: true,deprecatedReason: "reasion")
                 var onClick: (() -> Void)?
 
                 var body: some View {
@@ -197,31 +200,31 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             jsons![JsonMetaType.integration]!.toString()!,
             """
-            {"public":false,"platformSupport":"IOS","documentation":"","keyType":"XBUTTON","price":0,"organizationId":"","description":"This is a button","imageIcon":"","name":"X button","kind":"BLOCK"}
+            {"documentation":"","description":"This is a button","imageIcon":"","version":2,"deprecatedReason":"reasion","platformSupport":"IOS","deprecated":true,"price":0,"keyType":"XBUTTON","kind":"BLOCK","organizationId":"","name":"X button","public":false}
             """
         )
         XCTAssertEqual(
             jsons![JsonMetaType.data]!.toString()!,
             """
-            [{"key":"text","type":"STRING","description":"Button text"}]
+            [{"deprecatedReason":"","key":"text","type":"STRING","description":"Button text","deprecated":false}]
             """
         )
         XCTAssertEqual(
             jsons![JsonMetaType.event]!.toString()!,
             """
-            [{"event":"onClick","description":"Button on click"}]
+            [{"deprecatedReason":"reasion","event":"onClick","description":"Button on click","deprecated":true}]
             """
         )
         XCTAssertEqual(
             jsons![JsonMetaType.properties]!.toString()!,
             """
-            [{"valuePicker":"color-picker","valuePickerGroup":"General","valuePickerOptions":"[]","value":"#ffffffff","key":"background","type":"STRING","description":""},{"valuePicker":"dropdown","valuePickerGroup":"Size","valuePickerOptions":"[{\\"id\\":\\"S\\",\\"text\\":\\"Small\\"},{\\"id\\":\\"M\\",\\"text\\":\\"Medium\\"},{\\"id\\":\\"L\\",\\"text\\":\\"Large\\"}]","value":"S","key":"size","type":"STRING","description":"Button size"}]
+            [{"deprecatedReason":"","valuePicker":"color-picker","valuePickerGroup":"General","valuePickerOptions":"[]","value":"#ffffffff","key":"background","type":"STRING","description":"","deprecated":false},{"deprecatedReason":"reasion","valuePicker":"dropdown","valuePickerGroup":"Size","valuePickerOptions":"[{\"id\":\"S\",\"text\":\"Small\"},{\"id\":\"M\",\"text\":\"Medium\"},{\"id\":\"L\",\"text\":\"Large\"}]","value":"S","key":"size","type":"STRING","description":"Button size","deprecated":true}]
             """
         )
         XCTAssertEqual(
             jsons![JsonMetaType.slot]!.toString()!,
             """
-            [{"description":"Button leading icon","slot":"onLeadingIcon"},{"description":"Button trailing icon","slot":"onTrailingIcon"}]
+            [{"slot":"onLeadingIcon","deprecatedReason":"reasion","description":"Button leading icon","deprecated":true},{"slot":"onTrailingIcon","deprecatedReason":"reasion","description":"Button trailing icon","deprecated":true}]
             """
         )
     }

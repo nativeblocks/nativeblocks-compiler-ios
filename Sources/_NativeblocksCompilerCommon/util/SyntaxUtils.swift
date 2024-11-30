@@ -13,14 +13,14 @@ public enum SyntaxUtils {
         }
         return nil
     }
-    
+
     static func extractAttributes(from attributes: AttributeListSyntax)
         -> [String]
     {
         var attrs: [String] = []
         for attribute in attributes {
             if let attr = attribute.as(AttributeSyntax.self),
-               let name = attr.attributeName.as(IdentifierTypeSyntax.self)?.name.text
+                let name = attr.attributeName.as(IdentifierTypeSyntax.self)?.name.text
             {
                 attrs.append(name)
             }
@@ -31,6 +31,28 @@ public enum SyntaxUtils {
     static func extractDescription(from attribute: AttributeSyntax) -> String? {
         guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }
         for argument in arguments where argument.label?.text == "description" {
+            if let segments = argument.expression.as(StringLiteralExprSyntax.self)?.segments.as(
+                StringLiteralSegmentListSyntax.self)
+            {
+                return segments.first?.as(StringSegmentSyntax.self)?.content.text
+            }
+        }
+        return nil
+    }
+
+    static func extractDeprecated(from attribute: AttributeSyntax) -> Bool? {
+        guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }
+        for argument in arguments where argument.label?.text == "deprecated" {
+            if let segments = argument.expression.as(BooleanLiteralExprSyntax.self) {
+                return segments.literal.text == "true"
+            }
+        }
+        return nil
+    }
+
+    static func extractDeprecatedReason(from attribute: AttributeSyntax) -> String? {
+        guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }
+        for argument in arguments where argument.label?.text == "deprecatedReason" {
             if let segments = argument.expression.as(StringLiteralExprSyntax.self)?.segments.as(
                 StringLiteralSegmentListSyntax.self)
             {

@@ -10,7 +10,7 @@ let package = Package(
     products: [
         .library(name: "NativeblocksCompiler", targets: ["NativeblocksCompiler"]),
         .plugin(name: "GenerateProvider", targets: ["GenerateProvider"]),
-        .plugin(name: "SyncNativeblocks", targets: ["SyncNativeblocks"]),
+        .plugin(name: "Sync", targets: ["Sync"]),
         .plugin(name: "PrepareSchema", targets: ["PrepareSchema"]),
         .executable(name: "NativeblocksTool", targets: ["NativeblocksTool"]),
     ],
@@ -45,11 +45,11 @@ let package = Package(
         ),
 
         .plugin(
-            name: "SyncNativeblocks",
+            name: "Sync",
             capability: .command(
                 intent: .custom(
-                    verb: "SyncNativeblocks",
-                    description: "Sync Nativeblocks"
+                    verb: "Sync",
+                    description: "Sync"
                 ),
                 permissions: [
                     .writeToPackageDirectory(
@@ -64,7 +64,7 @@ let package = Package(
                 .target(name: "NativeblocksTool")
             ]
         ),
-        
+
         .plugin(
             name: "PrepareSchema",
             capability: .command(
@@ -74,7 +74,7 @@ let package = Package(
                 ),
                 permissions: [
                     .writeToPackageDirectory(
-                        reason: "This command write the new json blocks to the source root."),
+                        reason: "This command write the new json blocks to the source root.")
                 ]
             ),
             dependencies: [
