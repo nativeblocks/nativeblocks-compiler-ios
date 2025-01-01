@@ -8,7 +8,8 @@ struct BlockCreator {
         metaData: [DataMeta],
         metaProp: [PropertyMeta],
         metaEvent: [EventMeta],
-        metaSlot: [SlotMeta]
+        metaSlot: [SlotMeta],
+        metaExtraParams: [ExtraParamMeta]
     ) throws -> StructDeclSyntax {
         return try StructDeclSyntax("public struct \(raw: structName)Block: INativeBlock") {
             try FunctionDeclSyntax("public func blockView(blockProps: BlockProps) -> any View") {
@@ -150,7 +151,16 @@ struct BlockCreator {
                         )
                     }
 
-                    let arguments = (dataArguments + propArguments + eventArguments + slotArguments)
+                    let extraParamArguments = metaExtraParams.map {
+                        (
+                            $0.position,
+                            """
+                            \($0.key): \($0.key)
+                            """
+                        )
+                    }
+
+                    let arguments = (dataArguments + propArguments + eventArguments + slotArguments + extraParamArguments)
                         .sorted { $0.0 < $1.0 }
                         .map { $0.1 }
                         .joined(separator: ",\n")

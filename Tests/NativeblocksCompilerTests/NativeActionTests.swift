@@ -132,6 +132,7 @@ final class NativeActionTests: XCTestCase {
                     struct Parameter {
                         @NativeActionData
                         var message: String
+                        var blockProps: BlockProps? = nil
                         @NativeActionProp
                         var animated: Bool = false
                         @NativeActionEvent(then: Then.SUCCESS)
@@ -162,6 +163,7 @@ final class NativeActionTests: XCTestCase {
                         struct Parameter {
                             @NativeActionData
                             var message: String
+                            var blockProps: BlockProps? = nil
                             @NativeActionProp
                             var animated: Bool = false
                             @NativeActionEvent(then: Then.SUCCESS)
@@ -194,6 +196,7 @@ final class NativeActionTests: XCTestCase {
                             let animatedProp = Bool(properties["animated"]?.value ?? "") ??  false
                             let param = NativeAlert.Parameter(
                                 message: messageDataValue,
+                                blockProps: blockProps,
                                 animated: animatedProp,
                                 completion: {
 

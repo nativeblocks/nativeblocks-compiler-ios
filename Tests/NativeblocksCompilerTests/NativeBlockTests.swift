@@ -176,6 +176,7 @@ final class NativeBlockTests: XCTestCase {
                     var onChange: (String, Int) -> Void
                     @NativeBlockEvent(description: "desc")
                     var onClick: () -> Void
+                    var blockProps: BlockProps? = nil
                     var body: some View {
                         return Text("\\(text)")
                     }
@@ -189,6 +190,7 @@ final class NativeBlockTests: XCTestCase {
                         var visiable: Bool
                         var onChange: (String, Int) -> Void
                         var onClick: () -> Void
+                        var blockProps: BlockProps? = nil
                         var body: some View {
                             return Text("\\(text)")
                         }
@@ -236,7 +238,8 @@ final class NativeBlockTests: XCTestCase {
                                     onClick: {
 
                                         onClickEvent?()
-                                    }
+                                    },
+                                    blockProps: blockProps
                                 )
                             }
                         }

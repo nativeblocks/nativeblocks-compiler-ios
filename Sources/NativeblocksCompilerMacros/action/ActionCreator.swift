@@ -8,7 +8,8 @@ enum ActionCreator {
         actionInfo: ActionMeta?,
         metaData: [DataMeta],
         metaProp: [PropertyMeta],
-        metaEvent: [EventMeta]
+        metaEvent: [EventMeta],
+        metaExtraParams: [ExtraParamMeta]
     ) throws -> ClassDeclSyntax {
         return try ClassDeclSyntax("public class \(raw: structName)Action: INativeAction") {
             """
@@ -120,7 +121,16 @@ enum ActionCreator {
                     )
                 }
 
-                let arguments = (dataArguments + propArguments + eventArguments)
+                let extraParamArguments = metaExtraParams.map {
+                    (
+                        $0.position,
+                        """
+                        \($0.key): \($0.key)
+                        """
+                    )
+                }
+
+                let arguments = (dataArguments + propArguments + eventArguments + extraParamArguments)
                     .sorted { $0.0 < $1.0 }
                     .map { $0.1 }
                     .joined(separator: ",\n")
