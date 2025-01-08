@@ -212,7 +212,10 @@ struct BlockCreator {
                 Bool(findWindowSizeClass(verticalSizeClass, horizontalSizeClass,properties["\(item.key)"]) ?? "") ??  \(item.value.isEmpty ? "false" : item.value)
                 """
         default:
-            return nil
+            return
+                """
+                try NativeblocksManager.getInstance().getSerializer(\(item.type).self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass,properties["\(item.key)"]) ?? \(item.value.isEmpty ? "\"\"" : "\"\(item.value)\""))
+                """
         }
     }
 }

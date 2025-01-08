@@ -195,7 +195,10 @@ enum ActionCreator {
                 Bool(properties["\(item.key)"]?.value ?? "") ??  \(item.value.isEmpty ? "false" : item.value)
                 """
         default:
-            return nil
+            return
+                """
+                try NativeblocksManager.getInstance().getSerializer(\(item.type).self).fromString(properties["\(item.key)"]?.value ?? \(item.value.isEmpty ? "\"\"" : "\"\(item.value)\""))
+                """
         }
     }
 }

@@ -224,10 +224,6 @@ public struct ActionExtractor {
                 let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
                 let value = SyntaxUtils.extractDefaultValue(from: binding.initializer)
 
-                if !SyntaxUtils.isPrimitiveTypeSupported(type) {
-                    diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.premitiveTypeSupported))
-                }
-
                 return !key.isEmpty && !type.isEmpty
                     ? PropertyMeta(
                         position: position,

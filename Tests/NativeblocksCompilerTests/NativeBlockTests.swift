@@ -27,6 +27,8 @@ final class NativeBlockTests: XCTestCase {
                     var text: String
                     @NativeBlockProp(description: "desc number")
                     var number: Int
+                    @NativeBlockProp(description: "desc number")
+                    var user: User = User(name:"Name")
                     var body: some View {
                         return Text(text+number)
                     }
@@ -37,6 +39,7 @@ final class NativeBlockTests: XCTestCase {
                     struct MyText: View {
                         var text: String
                         var number: Int
+                        var user: User = User(name:"Name")
                         var body: some View {
                             return Text(text+number)
                         }
@@ -60,9 +63,11 @@ final class NativeBlockTests: XCTestCase {
                                 let properties = blockProps.block?.properties ?? [:]
                                 let textData = blockProps.variables? [data["text"]?.value ?? ""]
                                 let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 0
+                                let userProp = try NativeblocksManager.getInstance().getSerializer(User.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["user"]) ?? "")
                                 return MyText(
                                     text: textData?.value ?? "",
-                                    number: numberProp
+                                    number: numberProp,
+                                    user: userProp
                                 )
                             }
                         }
