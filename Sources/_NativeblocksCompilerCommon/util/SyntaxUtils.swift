@@ -149,6 +149,18 @@ public enum SyntaxUtils {
         return ""
     }
 
+    static func extractDefaultValue(from attribute: AttributeSyntax) -> String? {
+        guard let arguments = attribute.arguments?.as(LabeledExprListSyntax.self) else { return nil }
+        for argument in arguments where argument.label?.text == "defaultValue" {
+            if let segments = argument.expression.as(StringLiteralExprSyntax.self)?.segments.as(
+                StringLiteralSegmentListSyntax.self)
+            {
+                return segments.first?.as(StringSegmentSyntax.self)?.content.text
+            }
+        }
+        return nil
+    }
+
     static func isPrimitiveTypeSupported(_ type: String) -> Bool {
         let supportedTypes: Set<String> = [
             "STRING", "BOOL", "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64",

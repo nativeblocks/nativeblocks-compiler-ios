@@ -81,6 +81,7 @@ public enum BlockExtractor {
         var diagnostic: [Diagnostic] = []
         var deprecated = false
         var deprecatedReason = nil as String?
+        var defaultValue = ""
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockDataType, from: attributes)
 
@@ -97,6 +98,7 @@ public enum BlockExtractor {
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
         deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
+        defaultValue = SyntaxUtils.extractDefaultValue(from: blockAttribute!) ?? ""
 
         return (
             varDecl.bindings.compactMap { binding in
@@ -117,7 +119,9 @@ public enum BlockExtractor {
                         deprecated: deprecated,
                         deprecatedReason: deprecatedReason ?? "",
                         block: blockAttribute,
-                        variable: binding) : nil
+                        variable: binding,
+                        value: defaultValue
+                    ) : nil
             }, diagnostic
         )
     }
@@ -133,6 +137,7 @@ public enum BlockExtractor {
         var valuePickerOptions: [ValuePickerOption] = []
         var deprecated = false
         var deprecatedReason = nil as String?
+        var defaultValue = ""
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockPropType, from: attributes)
 
@@ -151,6 +156,7 @@ public enum BlockExtractor {
         valuePickerGroup = SyntaxUtils.extractValuePickerGroup(from: blockAttribute!) ?? "General"
         deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
         deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
+        defaultValue = SyntaxUtils.extractDefaultValue(from: blockAttribute!) ?? ""
 
         valuePickerOptions = SyntaxUtils.extractvaluePickerOptions(from: blockAttribute!) ?? []
 
@@ -163,13 +169,12 @@ public enum BlockExtractor {
                 position += 1
                 let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
                 let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
-                let value = SyntaxUtils.extractDefaultValue(from: binding.initializer)
 
                 return !key.isEmpty && !type.isEmpty
                     ? PropertyMeta(
                         position: position,
                         key: key,
-                        value: value,
+                        value: defaultValue,
                         type: type,
                         description: description,
                         deprecated: deprecated,

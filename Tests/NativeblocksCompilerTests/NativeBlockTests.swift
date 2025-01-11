@@ -92,13 +92,13 @@ final class NativeBlockTests: XCTestCase {
                     description: "My text description"
                 )
                 struct MyText: View {
-                    @NativeBlockProp()
+                    @NativeBlockProp(defaultValue: "true")
                     var visiable: Bool = true
-                    @NativeBlockProp()
+                    @NativeBlockProp(defaultValue: "12")
                     var number: Int = 12
-                    @NativeBlockProp()
+                    @NativeBlockProp(defaultValue: "")
                     var price: Float
-                    @NativeBlockProp()
+                    @NativeBlockProp(defaultValue: "{\\\"name\\\":\\\"test\\\"}")
                     var description: String = "desc"
 
                     var body: some View {
@@ -137,7 +137,7 @@ final class NativeBlockTests: XCTestCase {
                                 let visiableProp = Bool(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["visiable"]) ?? "") ??  true
                                 let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 12
                                 let priceProp = Float(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["price"]) ?? "") ?? 0
-                                let descriptionProp = findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["description"]) ?? "desc"
+                                let descriptionProp = findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["description"]) ?? "{\\\"name\\\":\\\"test\\\"}"
                                 return MyText(
                                     visiable: visiableProp,
                                     number: numberProp,

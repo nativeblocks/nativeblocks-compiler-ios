@@ -157,6 +157,7 @@ public struct ActionExtractor {
         var diagnostic: [Diagnostic] = []
         var deprecated = false
         var deprecatedReason = nil as String?
+        var defaultValue = ""
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeActionDataType, from: attributes)
 
@@ -165,6 +166,7 @@ public struct ActionExtractor {
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
         deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
+        defaultValue = SyntaxUtils.extractDefaultValue(from: blockAttribute!) ?? ""
 
         return (
             varDecl.bindings.compactMap { binding in
@@ -185,7 +187,8 @@ public struct ActionExtractor {
                         deprecated: deprecated,
                         deprecatedReason: deprecatedReason ?? "",
                         block: blockAttribute,
-                        variable: binding
+                        variable: binding,
+                        value: defaultValue
                     ) : nil
             }, diagnostic
         )
@@ -202,6 +205,7 @@ public struct ActionExtractor {
         var valuePickerOptions: [ValuePickerOption] = []
         var deprecated = false
         var deprecatedReason = nil as String?
+        var defaultValue = ""
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeActionPropType, from: attributes)
         guard blockAttribute != nil else { return nil }
@@ -210,6 +214,7 @@ public struct ActionExtractor {
         valuePickerGroup = SyntaxUtils.extractValuePickerGroup(from: blockAttribute!) ?? "General"
         deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
         deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
+        defaultValue = SyntaxUtils.extractDefaultValue(from: blockAttribute!) ?? ""
 
         valuePickerOptions = SyntaxUtils.extractvaluePickerOptions(from: blockAttribute!) ?? []
 
@@ -222,13 +227,12 @@ public struct ActionExtractor {
                 position += 1
                 let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
                 let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
-                let value = SyntaxUtils.extractDefaultValue(from: binding.initializer)
 
                 return !key.isEmpty && !type.isEmpty
                     ? PropertyMeta(
                         position: position,
                         key: key,
-                        value: value,
+                        value: defaultValue,
                         type: type,
                         description: description,
                         deprecated: deprecated,

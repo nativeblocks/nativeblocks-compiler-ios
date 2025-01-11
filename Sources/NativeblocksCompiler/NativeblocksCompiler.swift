@@ -16,7 +16,8 @@ public macro NativeBlock(
 public macro NativeBlockData(
     description: String = "",  // A description of the data property
     deprecated: Bool = false,  // Indicates if the property is deprecated
-    deprecatedReason: String = ""  // Reason for deprecation if applicable
+    deprecatedReason: String = "",  // Reason for deprecation if applicable
+    defaultValue: String = ""
 ) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeBlockDataMacro")
 
@@ -28,7 +29,8 @@ public macro NativeBlockProp(
     valuePickerOptions: [NativeBlockValuePickerOption] = [],  // Dropdown or other selectable options
     valuePickerGroup: NativeBlockValuePickerPosition = NativeBlockValuePickerPosition("General"),  // Category for grouping
     deprecated: Bool = false,  // Indicates if the property is deprecated
-    deprecatedReason: String = ""  // Reason for deprecation if applicable
+    deprecatedReason: String = "",  // Reason for deprecation if applicable
+    defaultValue: String = ""
 ) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeBlockPropMacro")
 
@@ -107,7 +109,8 @@ public macro NativeActionFunction(description: String = "") =
 public macro NativeActionData(
     description: String = "",  // A description of the data property
     deprecated: Bool = false,  // Indicates if the property is deprecated
-    deprecatedReason: String = ""  // Reason for deprecation if applicable
+    deprecatedReason: String = "",  // Reason for deprecation if applicable
+    defaultValue: String = ""
 ) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeActionDataMacro")
 
@@ -119,7 +122,8 @@ public macro NativeActionProp(
     valuePickerOptions: [NativeActionValuePickerOption] = [],  // Dropdown or other selectable options
     valuePickerGroup: NativeActionValuePickerPosition = NativeActionValuePickerPosition("General"),  // Category for grouping
     deprecated: Bool = false,  // Indicates if the property is deprecated
-    deprecatedReason: String = ""  // Reason for deprecation if applicable
+    deprecatedReason: String = "",  // Reason for deprecation if applicable
+    defaultValue: String = ""
 ) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeActionPropMacro")
 
