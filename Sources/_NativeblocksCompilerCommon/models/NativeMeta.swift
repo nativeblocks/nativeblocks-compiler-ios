@@ -226,3 +226,21 @@ public struct ActionMeta: NativeMeta {
         self.isAsync = isAsync
     }
 }
+
+public struct ExtraParamMeta: NativeMeta {
+    public var position: Int
+    public var key: String
+    public var type: String
+    public var variable: PatternBindingSyntax?
+
+    init(position: Int, key: String, type: String, variable: PatternBindingSyntax? = nil) {
+        self.position = position
+        self.key = key
+        self.type = type
+        self.variable = variable
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case key, type
+    }
+}
