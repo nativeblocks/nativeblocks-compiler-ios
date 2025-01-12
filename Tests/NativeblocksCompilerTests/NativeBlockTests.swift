@@ -178,6 +178,11 @@ final class NativeBlockTests: XCTestCase {
                         dataBinding: ["text", "number"]
                     )
                     var onChange: (String, Int) -> Void
+                    @NativeBlockEvent(
+                        description: "desc",
+                        dataBinding: ["text", "number"]
+                    )
+                    var onChange2: ((String, Int) -> Void)?
                     @NativeBlockEvent(description: "desc")
                     var onClick: () -> Void
                     var body: some View {
@@ -192,6 +197,7 @@ final class NativeBlockTests: XCTestCase {
                         var number: Int
                         var visiable: Bool
                         var onChange: (String, Int) -> Void
+                        var onChange2: ((String, Int) -> Void)?
                         var onClick: () -> Void
                         var body: some View {
                             return Text("\\(text)")
@@ -219,6 +225,7 @@ final class NativeBlockTests: XCTestCase {
                                 let numberData = blockProps.variables? [data["number"]?.value ?? ""]
                                 let visiableProp = Bool(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["visiable"]) ?? "") ??  false
                                 let onChangeEvent = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onChange")
+                                let onChange2Event = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onChange2")
                                 let onClickEvent = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onClick")
                                 return MyText(
                                     text: textData?.value ?? "",
@@ -234,6 +241,17 @@ final class NativeBlockTests: XCTestCase {
                                             blockProps.onVariableChange?(numberUpdated)
                                         }
                                         onChangeEvent?()
+                                    },
+                                    onChange2: onChange2Event == nil ? nil : { textParam, numberParam in
+                                        if var textUpdated = textData {
+                                            textUpdated.value = String(describing: textParam)
+                                            blockProps.onVariableChange?(textUpdated)
+                                        }
+                                        if var numberUpdated = numberData {
+                                            numberUpdated.value = String(describing: numberParam)
+                                            blockProps.onVariableChange?(numberUpdated)
+                                        }
+                                        onChange2Event?()
                                     },
                                     onClick: {
 
@@ -264,7 +282,11 @@ final class NativeBlockTests: XCTestCase {
                 )
                 struct MyColumn<Content>: View where Content: View {
                     @NativeBlockSlot(description: "content description")
-                    var content: (BlockIndex) -> Content
+                    var content: (BlockIndex) -> Content?
+                    @NativeBlockSlot(description: "content description")
+                    var content2: (BlockIndex) -> Content
+                    @NativeBlockSlot(description: "content description")
+                    var content3: (() -> Content)?
                     var body: some View {
                         return VStack {
                             content(-1)
@@ -275,7 +297,9 @@ final class NativeBlockTests: XCTestCase {
                 expandedSource:
                     """
                     struct MyColumn<Content>: View where Content: View {
-                        var content: (BlockIndex) -> Content
+                        var content: (BlockIndex) -> Content?
+                        var content2: (BlockIndex) -> Content
+                        var content3: (() -> Content)?
                         var body: some View {
                             return VStack {
                                 content(-1)
@@ -298,12 +322,22 @@ final class NativeBlockTests: XCTestCase {
                             @Environment(\\.horizontalSizeClass) var horizontalSizeClass
                             var body: some View {
                                 let slots = blockProps.block?.slots ?? [:]
-                                let contentSlot = slots["content"]
+                                let contentSlot = blockProvideSlot(blockProps: blockProps, slots: slots, slotType: "content")
+                                let content2Slot = blockProvideSlot(blockProps: blockProps, slots: slots, slotType: "content2")
+                                let content3Slot = blockProvideSlot(blockProps: blockProps, slots: slots, slotType: "content3")
                                 return MyColumn(
                                     content: contentSlot == nil ? { index in
                                         AnyView(EmptyView())
                                     } : { index in
                                         (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], contentSlot!, index)) ?? AnyView(EmptyView())
+                                    },
+                                    content2: content2Slot == nil ? { index in
+                                        AnyView(EmptyView())
+                                    } : { index in
+                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], content2Slot!, index)) ?? AnyView(EmptyView())
+                                    },
+                                    content3: content3Slot == nil ? nil : {
+                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], content3Slot!, -1)) ?? AnyView(EmptyView())
                                     }
                                 )
                             }

@@ -94,7 +94,7 @@ struct BlockCreator {
                     """
                     for slot in metaSlot {
                         """
-                        let \(raw: slot.slot)Slot = slots["\(raw: slot.slot)"]
+                        let \(raw: slot.slot)Slot = blockProvideSlot(blockProps: blockProps, slots: slots, slotType: "\(raw: slot.slot)")
                         """
                     }
 
@@ -120,7 +120,7 @@ struct BlockCreator {
                         (
                             event.position,
                             """
-                            \(event.event): { \(event.dataBinding.map { "\($0)Param" }.joined(separator: ",")) \(event.dataBinding.isEmpty ? "" : "in")
+                            \(event.event):\(event.isOptinalFunction ? "\(event.event)Event == nil ? nil :" : "") { \(event.dataBinding.map { "\($0)Param" }.joined(separator: ",")) \(event.dataBinding.isEmpty ? "" : "in")
                             \(event.dataBinding.map { param in
                                 """
                                 if var \(param)Updated = \(param)Data {
