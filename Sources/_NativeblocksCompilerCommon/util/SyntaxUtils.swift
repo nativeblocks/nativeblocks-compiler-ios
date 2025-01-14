@@ -211,4 +211,32 @@ public enum SyntaxUtils {
         }
         return (nil, false)
     }
+
+    static func getType(typeAnnotation: TypeAnnotationSyntax?) -> String {
+        if let identifierType = typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self) {
+            return identifierType.name.text
+        } else if let memberType = typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(MemberTypeSyntax.self) {
+            return getType(memberType: memberType)
+        } else {
+            return ""
+        }
+    }
+
+    private static func getType(memberType: MemberTypeSyntax?) -> String {
+        guard let memberType = memberType else {
+            return ""
+        }
+
+        if let nestedMemberType = memberType.baseType.as(MemberTypeSyntax.self) {
+            let baseType = getType(memberType: nestedMemberType)
+            let type = memberType.name.text
+            return "\(baseType).\(type)"
+        } else if let identifierType = memberType.baseType.as(IdentifierTypeSyntax.self) {
+            let baseType = identifierType.name.text
+            let type = memberType.name.text
+            return "\(baseType).\(type)"
+        } else {
+            return memberType.name.text
+        }
+    }
 }

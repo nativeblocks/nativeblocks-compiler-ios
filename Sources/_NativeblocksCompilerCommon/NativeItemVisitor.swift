@@ -34,7 +34,7 @@ public class NativeItemVisitor: SyntaxVisitor {
                     keyType: keyType!,
                     description: description!,
                     version: version ?? 1,
-                    deprecated: deprecated ?? false,
+                    deprecated: deprecated,
                     deprecatedReason: deprecatedReason ?? "",
                     syntaxStruct: node,
                     meta: [],

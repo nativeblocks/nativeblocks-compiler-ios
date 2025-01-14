@@ -59,7 +59,7 @@ public enum BlockExtractor {
                 guard let (block, blockErrors) = extractExtraParam(from: varDecl, startPosition: position) else {
                     continue
                 }
-                block.forEach { param in
+                for param in block {
                     if param.key == "blockProps" && param.type == "BlockProps" {
                         meta.append(param)
                     }
@@ -100,8 +100,7 @@ public enum BlockExtractor {
             diagnostic.append(
                 Diagnostic(
                     node: blockAttribute!,
-                    message: DiagnosticType.multiAttributes
-                ))
+                    message: DiagnosticType.multiAttributes))
         }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
@@ -129,8 +128,7 @@ public enum BlockExtractor {
                         deprecatedReason: deprecatedReason ?? "",
                         block: blockAttribute,
                         variable: binding,
-                        value: defaultValue
-                    ) : nil
+                        value: defaultValue) : nil
             }, diagnostic
         )
     }
@@ -156,8 +154,7 @@ public enum BlockExtractor {
             diagnostic.append(
                 Diagnostic(
                     node: blockAttribute!,
-                    message: DiagnosticType.multiAttributes
-                ))
+                    message: DiagnosticType.multiAttributes))
         }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
@@ -177,7 +174,7 @@ public enum BlockExtractor {
             varDecl.bindings.compactMap { binding in
                 position += 1
                 let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
-                let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
+                let type = SyntaxUtils.getType(typeAnnotation: binding.typeAnnotation)
 
                 return !key.isEmpty && !type.isEmpty
                     ? PropertyMeta(
@@ -216,8 +213,7 @@ public enum BlockExtractor {
             diagnostic.append(
                 Diagnostic(
                     node: blockAttribute!,
-                    message: DiagnosticType.multiAttributes
-                ))
+                    message: DiagnosticType.multiAttributes))
         }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
@@ -288,8 +284,7 @@ public enum BlockExtractor {
             diagnostic.append(
                 Diagnostic(
                     node: blockAttribute!,
-                    message: DiagnosticType.multiAttributes
-                ))
+                    message: DiagnosticType.multiAttributes))
         }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""

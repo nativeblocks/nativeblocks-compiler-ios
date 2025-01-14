@@ -161,27 +161,29 @@ enum ActionCreator {
         case "STRING":
             return
                 """
-                \(dataItem.key)Data?.value.toActionDataStringValue(variables: actionProps.variables, index: actionProps.listItemIndex) ?? ""
+                \(dataItem.key)Data?.value.toActionDataStringValue(variables: actionProps.variables, index: actionProps.listItemIndex) ?? "\(dataItem.value)"
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
             "FLOAT", "FLOAT80", "FLOAT64",
             "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
-                \(dataItem.type)(\(dataItem.key)Data?.value.toActionDataStringValue(variables: actionProps.variables, index: actionProps.listItemIndex) ?? "") ?? 0
+                \(dataItem.type)(\(dataItem.key)Data?.value.toActionDataStringValue(variables: actionProps.variables, index: actionProps.listItemIndex) ?? "") ?? \(dataItem.value.isEmpty ? "0" : dataItem.value)
                 """
         case "CGFLOAT":
             return
                 """
-                (\(dataItem.key)Data?.value ?? "").toActionDataStringValue(variables: actionProps.variables, index: actionProps.listItemIndex).toCGFloat() ?? 0.0
+                (\(dataItem.key)Data?.value ?? "").toActionDataStringValue(variables: actionProps.variables, index: actionProps.listItemIndex).toCGFloat() ?? \(dataItem.value.isEmpty ? "0.0" : dataItem.value)
                 """
         case "BOOL":
             return
                 """
-                \(dataItem.key)Data?.value.toActionDataStringValue(variables: actionProps.variables, index: actionProps.listItemIndex).lowercased() == "true"
+                Bool(\(dataItem.key)Data?.value.toActionDataStringValue(variables: actionProps.variables, index: actionProps.listItemIndex) ?? "") ?? \(dataItem.value.isEmpty ? "false" : dataItem.value)
                 """
         default:
-            return nil
+            return
+                """
+                """
         }
     }
 
@@ -190,7 +192,7 @@ enum ActionCreator {
         case "STRING":
             return
                 """
-                properties["\(item.key)"]?.value ?? \(item.value.isEmpty ? "\"\"" : "\"\(item.value)\"")
+                properties["\(item.key)"]?.value ?? "\(item.value)"
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
             "FLOAT", "FLOAT80", "FLOAT64",
@@ -212,7 +214,7 @@ enum ActionCreator {
         default:
             return
                 """
-                try NativeblocksManager.getInstance().getSerializer(\(item.type).self).fromString(properties["\(item.key)"]?.value ?? \(item.value.isEmpty ? "\"\"" : "\"\(item.value)\""))
+                NativeblocksManager.getInstance().getSerializer(\(item.type).self).fromString(properties["\(item.key)"]?.value ?? "\(item.value)")
                 """
         }
     }

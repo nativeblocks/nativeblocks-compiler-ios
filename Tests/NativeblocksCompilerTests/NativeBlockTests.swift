@@ -25,10 +25,12 @@ final class NativeBlockTests: XCTestCase {
                 struct MyText: View {
                     @NativeBlockData(description: "desc text")
                     var text: String
-                    @NativeBlockProp(description: "desc number")
-                    var number: Int
-                    @NativeBlockProp(description: "desc number")
+                    @NativeBlockProp(description: "desc number",defaultValue: "1")
+                    var number: Int = 1
+                    @NativeBlockProp(description: "desc number",defaultValue: "{\\\"name\\\":\\\"Name2\\\"}")
                     var user: User = User(name:"Name")
+                    @NativeBlockProp(description: "Weight",defaultValue: "regular")
+                    var fontWeight: Font.Weight.Big = .regular
                     var body: some View {
                         return Text(text+number)
                     }
@@ -38,8 +40,9 @@ final class NativeBlockTests: XCTestCase {
                     """
                     struct MyText: View {
                         var text: String
-                        var number: Int
+                        var number: Int = 1
                         var user: User = User(name:"Name")
+                        var fontWeight: Font.Weight.Big = .regular
                         var body: some View {
                             return Text(text+number)
                         }
@@ -63,11 +66,14 @@ final class NativeBlockTests: XCTestCase {
                                 let properties = blockProps.block?.properties ?? [:]
                                 let textData = blockProps.variables? [data["text"]?.value ?? ""]
                                 let textDataValue = textData?.value.toBlockDataStringValue(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
-                                let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 0
-                                let userProp = try NativeblocksManager.getInstance().getSerializer(User.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["user"]) ?? "")
+                                let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 1
+                                let userProp = NativeblocksManager.getInstance().getSerializer(User.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["user"]) ?? "{\\\"name\\\":\\\"Name2\\\"}")
+                                let fontWeightProp = NativeblocksManager.getInstance().getSerializer(Font.Weight.Big.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["fontWeight"]) ?? "regular")
                                 return MyText(
                                     text: textDataValue,
-                                    number: numberProp
+                                    number: numberProp,
+                                    user: userProp,
+                                    fontWeight: fontWeightProp
                                 )
                             }
                         }
@@ -98,7 +104,7 @@ final class NativeBlockTests: XCTestCase {
                     var number: Int = 12
                     @NativeBlockProp(defaultValue: "")
                     var price: Float
-                    @NativeBlockProp(defaultValue: "{\\\"name\\\":\\\"test\\\"}")
+                    @NativeBlockProp(defaultValue: "desc")
                     var description: String = "desc"
 
                     var body: some View {
@@ -137,7 +143,7 @@ final class NativeBlockTests: XCTestCase {
                                 let visiableProp = Bool(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["visiable"]) ?? "") ??  true
                                 let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 12
                                 let priceProp = Float(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["price"]) ?? "") ?? 0
-                                let descriptionProp = findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["description"]) ?? "{\\\"name\\\":\\\"test\\\"}"
+                                let descriptionProp = findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["description"]) ?? "desc"
                                 return MyText(
                                     visiable: visiableProp,
                                     number: numberProp,

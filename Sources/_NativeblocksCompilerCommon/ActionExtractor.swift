@@ -170,6 +170,13 @@ public struct ActionExtractor {
 
         guard blockAttribute != nil else { return nil }
 
+        if attributes.count > 1 {
+            diagnostic.append(
+                Diagnostic(
+                    node: blockAttribute!,
+                    message: DiagnosticType.multiAttributes))
+        }
+
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
         deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
@@ -215,7 +222,16 @@ public struct ActionExtractor {
         var defaultValue = ""
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeActionPropType, from: attributes)
+
         guard blockAttribute != nil else { return nil }
+
+        if attributes.count > 1 {
+            diagnostic.append(
+                Diagnostic(
+                    node: blockAttribute!,
+                    message: DiagnosticType.multiAttributes))
+        }
+
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         valuePicker = SyntaxUtils.extractValuePicker(from: blockAttribute!) ?? "TEXT_INPUT"
         valuePickerGroup = SyntaxUtils.extractValuePickerGroup(from: blockAttribute!) ?? "General"
@@ -233,7 +249,7 @@ public struct ActionExtractor {
             varDecl.bindings.compactMap { binding in
                 position += 1
                 let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
-                let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
+                let type = SyntaxUtils.getType(typeAnnotation: binding.typeAnnotation)
 
                 return !key.isEmpty && !type.isEmpty
                     ? PropertyMeta(
@@ -268,6 +284,14 @@ public struct ActionExtractor {
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeActionEventType, from: attributes)
         guard blockAttribute != nil else { return nil }
+
+        if attributes.count > 1 {
+            diagnostic.append(
+                Diagnostic(
+                    node: blockAttribute!,
+                    message: DiagnosticType.multiAttributes))
+        }
+
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         dataBinding = SyntaxUtils.extractDataBinding(from: blockAttribute!) ?? []
         then = SyntaxUtils.extractThen(from: blockAttribute!)
