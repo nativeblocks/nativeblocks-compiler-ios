@@ -58,7 +58,7 @@ public struct ActionExtractor {
                     continue
                 }
                 block.forEach { param in
-                    if param.key == "blockProps" && param.type == "BlockProps" {
+                    if param.key == "actionProps" && param.type == "ActionProps" {
                         meta.append(param)
                     }
                 }
