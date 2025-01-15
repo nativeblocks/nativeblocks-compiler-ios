@@ -214,7 +214,7 @@ enum ActionCreator {
         default:
             return
                 """
-                NativeblocksManager.getInstance().getSerializer(\(item.type).self).fromString(properties["\(item.key)"]?.value ?? "\(item.value)")
+                NativeblocksManager.getInstance().getConverter(\(item.type).self).fromString(properties["\(item.key)"]?.value ?? "\(item.value)")
                 """
         }
     }

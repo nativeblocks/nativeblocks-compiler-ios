@@ -231,7 +231,7 @@ struct BlockCreator {
         default:
             return
                 """
-                NativeblocksManager.getInstance().getSerializer(\(item.type).self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass,properties["\(item.key)"]) ?? "\(item.value)")
+                NativeblocksManager.getInstance().getConverter(\(item.type).self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass,properties["\(item.key)"]) ?? "\(item.value)")
                 """
         }
     }
