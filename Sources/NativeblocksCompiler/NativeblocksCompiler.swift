@@ -17,7 +17,7 @@ public macro NativeBlockData(
     description: String = "",  // A description of the data property
     deprecated: Bool = false,  // Indicates if the property is deprecated
     deprecatedReason: String = "",  // Reason for deprecation if applicable
-    defaultValue: String = ""
+    defaultValue: String = ""  // The default value for the Data.
 ) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeBlockDataMacro")
 
@@ -30,7 +30,7 @@ public macro NativeBlockProp(
     valuePickerGroup: NativeBlockValuePickerPosition = NativeBlockValuePickerPosition("General"),  // Category for grouping
     deprecated: Bool = false,  // Indicates if the property is deprecated
     deprecatedReason: String = "",  // Reason for deprecation if applicable
-    defaultValue: String = ""
+    defaultValue: String = ""  // The default value for the property.
 ) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeBlockPropMacro")
 
@@ -110,7 +110,7 @@ public macro NativeActionData(
     description: String = "",  // A description of the data property
     deprecated: Bool = false,  // Indicates if the property is deprecated
     deprecatedReason: String = "",  // Reason for deprecation if applicable
-    defaultValue: String = ""
+    defaultValue: String = ""  // The default value for the data.
 ) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeActionDataMacro")
 
@@ -123,7 +123,7 @@ public macro NativeActionProp(
     valuePickerGroup: NativeActionValuePickerPosition = NativeActionValuePickerPosition("General"),  // Category for grouping
     deprecated: Bool = false,  // Indicates if the property is deprecated
     deprecatedReason: String = "",  // Reason for deprecation if applicable
-    defaultValue: String = ""
+    defaultValue: String = ""  // The default value for the property.
 ) =
     #externalMacro(module: "NativeblocksCompilerMacros", type: "NativeActionPropMacro")
 
