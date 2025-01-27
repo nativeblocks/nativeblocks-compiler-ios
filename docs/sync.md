@@ -1,6 +1,6 @@
 ## Sync
 
-After providing annotations for blocks and actions, you can use the `SyncNativeblocks` plugin to sync blocks and actions with nativeblocks server.
+After providing annotations for blocks and actions, you can use the `Sync` plugin to sync blocks and actions with nativeblocks server.
 
 It needed to provide compiler arguments, Properties belonging to each Studio account, from Nativeblocks Studio, find Link Device and copy properties to `nativeblocks.json` file.
 ```json
@@ -11,7 +11,7 @@ It needed to provide compiler arguments, Properties belonging to each Studio acc
 }
 ```
 
-1) Choose `SyncNativeblocks`
+1) Choose `Sync`
 
 <img src="./resource/sync-1.png" alt="sync-1.png" height="400"/>
 

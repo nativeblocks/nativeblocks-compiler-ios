@@ -8,7 +8,8 @@ enum ActionCreator {
         actionInfo: ActionMeta?,
         metaData: [DataMeta],
         metaProp: [PropertyMeta],
-        metaEvent: [EventMeta]
+        metaEvent: [EventMeta],
+        metaExtraParams: [ExtraParamMeta]
     ) throws -> ClassDeclSyntax {
         return try ClassDeclSyntax("public class \(raw: structName)Action: INativeAction") {
             """
@@ -46,6 +47,11 @@ enum ActionCreator {
                     let \(raw: data.key)Data = actionProps.variables?[data["\(raw: data.key)"]?.value ?? ""]
                     """
                 }
+                for data in metaData {
+                    """
+                    let \(raw: data.key)DataValue = \(raw: dataTypeMapper(dataItem: data) ?? "")
+                    """
+                }
                 """
                 //Action trigger properties
                 """
@@ -59,7 +65,7 @@ enum ActionCreator {
                     (
                         $0.position,
                         """
-                        \($0.key): \(dataTypeMapper(dataItem: $0) ?? "")
+                        \($0.key): \($0.key)DataValue
                         """
                     )
                 }
@@ -115,7 +121,16 @@ enum ActionCreator {
                     )
                 }
 
-                let arguments = (dataArguments + propArguments + eventArguments)
+                let extraParamArguments = metaExtraParams.map {
+                    (
+                        $0.position,
+                        """
+                        \($0.key): \($0.key)
+                        """
+                    )
+                }
+
+                let arguments = (dataArguments + propArguments + eventArguments + extraParamArguments)
                     .sorted { $0.0 < $1.0 }
                     .map { $0.1 }
                     .joined(separator: ",\n")
@@ -146,24 +161,24 @@ enum ActionCreator {
         case "STRING":
             return
                 """
-                \(dataItem.key)Data?.value ?? ""
+                \(dataItem.key)Data?.value.parseWithJsonPath(variables: actionProps.variables, index: actionProps.listItemIndex) ?? ""
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
             "FLOAT", "FLOAT80", "FLOAT64",
             "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
-                \(dataItem.type)(\(dataItem.key)Data?.value ?? "") ?? 0
+                \(dataItem.type)(\(dataItem.key)Data?.value.parseWithJsonPath(variables: actionProps.variables, index: actionProps.listItemIndex) ?? "") ?? 0
                 """
         case "CGFLOAT":
             return
                 """
-                (\(dataItem.key)Data?.value ?? "").toCGFloat() ?? 0.0
+                (\(dataItem.key)Data?.value ?? "").parseWithJsonPath(variables: actionProps.variables, index: actionProps.listItemIndex).toCGFloat() ?? 0.0
                 """
         case "BOOL":
             return
                 """
-                \(dataItem.key)Data?.value.lowercased() == "true"
+                \(dataItem.key)Data?.value.parseWithJsonPath(variables: actionProps.variables, index: actionProps.listItemIndex).lowercased() == "true"
                 """
         default:
             return nil

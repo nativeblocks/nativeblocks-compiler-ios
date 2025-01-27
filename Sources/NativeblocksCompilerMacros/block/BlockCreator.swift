@@ -8,7 +8,8 @@ struct BlockCreator {
         metaData: [DataMeta],
         metaProp: [PropertyMeta],
         metaEvent: [EventMeta],
-        metaSlot: [SlotMeta]
+        metaSlot: [SlotMeta],
+        metaExtraParams: [ExtraParamMeta]
     ) throws -> StructDeclSyntax {
         return try StructDeclSyntax("public struct \(raw: structName)Block: INativeBlock") {
             try FunctionDeclSyntax("public func blockView(blockProps: BlockProps) -> any View") {
@@ -71,6 +72,11 @@ struct BlockCreator {
                         let \(raw: data.key)Data = blockProps.variables?[data["\(raw: data.key)"]?.value ?? ""]
                         """
                     }
+                    for data in metaData {
+                        """
+                        let \(raw: data.key)DataValue = \(raw: dataTypeMapper(dataItem: data) ?? "")
+                        """
+                    }
                     """
                     //Block Properties
                     """
@@ -102,7 +108,7 @@ struct BlockCreator {
                         (
                             $0.position,
                             """
-                            \($0.key): \(dataTypeMapper(dataItem: $0) ?? "")
+                            \($0.key): \($0.key)DataValue
                             """
                         )
                     }
@@ -145,7 +151,16 @@ struct BlockCreator {
                         )
                     }
 
-                    let arguments = (dataArguments + propArguments + eventArguments + slotArguments)
+                    let extraParamArguments = metaExtraParams.map {
+                        (
+                            $0.position,
+                            """
+                            \($0.key): \($0.key)
+                            """
+                        )
+                    }
+
+                    let arguments = (dataArguments + propArguments + eventArguments + slotArguments + extraParamArguments)
                         .sorted { $0.0 < $1.0 }
                         .map { $0.1 }
                         .joined(separator: ",\n")
@@ -163,24 +178,24 @@ struct BlockCreator {
         case "STRING":
             return
                 """
-                \(dataItem.key)Data?.value ?? ""
+                \(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
             "FLOAT", "FLOAT80", "FLOAT64",
             "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
-                \(dataItem.type)(\(dataItem.key)Data?.value ?? "") ?? 0
+                \(dataItem.type)(\(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "") ?? 0
                 """
         case "CGFLOAT":
             return
                 """
-                (\(dataItem.key)Data?.value ?? "").toCGFloat() ?? 0.0
+                (\(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "").toCGFloat() ?? 0.0
                 """
         case "BOOL":
             return
                 """
-                \(dataItem.key)Data?.value.lowercased() == "true"
+                \(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy).lowercased() == "true"
                 """
         default:
             return nil
