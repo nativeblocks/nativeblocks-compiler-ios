@@ -89,7 +89,7 @@ final class NativeActionTests: XCTestCase {
                             let data = actionProps.trigger?.data ?? [:]
                             let properties = actionProps.trigger?.properties ?? [:]
                             let messageData = actionProps.variables? [data["message"]?.value ?? ""]
-                            let messageDataValue = messageData?.value.toActionDataStringValue(variables: actionProps.variables, index: actionProps.listItemIndex) ?? ""
+                            let messageDataValue = messageData?.value.parseWithJsonPath(variables: actionProps.variables, index: actionProps.listItemIndex) ?? ""
                             let animatedProp = Bool(properties["animated"]?.value ?? "") ??  false
                             let param = NativeAlert.Parameter(
                                 message: messageDataValue,
@@ -192,7 +192,7 @@ final class NativeActionTests: XCTestCase {
                             let data = actionProps.trigger?.data ?? [:]
                             let properties = actionProps.trigger?.properties ?? [:]
                             let messageData = actionProps.variables? [data["message"]?.value ?? ""]
-                            let messageDataValue = messageData?.value.toActionDataStringValue(variables: actionProps.variables, index: actionProps.listItemIndex) ?? ""
+                            let messageDataValue = messageData?.value.parseWithJsonPath(variables: actionProps.variables, index: actionProps.listItemIndex) ?? ""
                             let animatedProp = Bool(properties["animated"]?.value ?? "") ??  false
                             let param = NativeAlert.Parameter(
                                 message: messageDataValue,

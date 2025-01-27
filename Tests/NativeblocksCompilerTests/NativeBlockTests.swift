@@ -59,7 +59,7 @@ final class NativeBlockTests: XCTestCase {
                                 let data = blockProps.block?.data ?? [:]
                                 let properties = blockProps.block?.properties ?? [:]
                                 let textData = blockProps.variables? [data["text"]?.value ?? ""]
-                                let textDataValue = textData?.value.toBlockDataStringValue(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
+                                let textDataValue = textData?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
                                 let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 0
                                 return MyText(
                                     text: textDataValue,
@@ -215,8 +215,8 @@ final class NativeBlockTests: XCTestCase {
                                 let action = blockProps.actions? [blockProps.block?.key ?? ""] ?? []
                                 let textData = blockProps.variables? [data["text"]?.value ?? ""]
                                 let numberData = blockProps.variables? [data["number"]?.value ?? ""]
-                                let textDataValue = textData?.value.toBlockDataStringValue(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
-                                let numberDataValue = Int(numberData?.value.toBlockDataStringValue(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "") ?? 0
+                                let textDataValue = textData?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
+                                let numberDataValue = Int(numberData?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "") ?? 0
                                 let visiableProp = Bool(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["visiable"]) ?? "") ??  false
                                 let onChangeEvent = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onChange")
                                 let onClickEvent = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onClick")
