@@ -67,8 +67,8 @@ final class NativeBlockTests: XCTestCase {
                                 let textData = blockProps.variables? [data["text"]?.value ?? ""]
                                 let textDataValue = textData?.value.toBlockDataStringValue(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
                                 let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 1
-                                let userProp = NativeblocksManager.getInstance().getConverter(User.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["user"]) ?? "{\\\"name\\\":\\\"Name2\\\"}")
-                                let fontWeightProp = NativeblocksManager.getInstance().getConverter(Font.Weight.Big.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["fontWeight"]) ?? "regular")
+                                let userProp = NativeblocksManager.getInstance().getTypeConverter(User.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["user"]) ?? "{\\\"name\\\":\\\"Name2\\\"}")
+                                let fontWeightProp = NativeblocksManager.getInstance().getTypeConverter(Font.Weight.Big.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["fontWeight"]) ?? "regular")
                                 return MyText(
                                     text: textDataValue,
                                     number: numberProp,

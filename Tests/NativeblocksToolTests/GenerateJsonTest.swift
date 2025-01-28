@@ -20,7 +20,7 @@ final class GenerateJsonTest: XCTestCase {
                 struct Parameter {
                     @NativeActionData( deprecated: true,deprecatedReason: "reasion")
                     var message: String
-                    @NativeActionProp( deprecated: true,deprecatedReason: "reasion")
+                    @NativeActionProp( deprecated: true,deprecatedReason: "reasion",defaultValue: "false")
                     var animated: Bool = false
                     @NativeActionEvent( deprecated: true,deprecatedReason: "reasion")
                     var completion: (() -> Void)? = nil
@@ -104,9 +104,9 @@ final class GenerateJsonTest: XCTestCase {
             )
             struct XButton: View {
                 @NativeBlockData(description: "Button text")
-                @State var text: String
-                @NativeBlockProp(valuePicker: NativeBlockValuePicker.COLOR_PICKER)
-                @State var background: String = "#ffffffff"
+                var text: String
+                @NativeBlockProp(valuePicker: NativeBlockValuePicker.COLOR_PICKER,defaultValue: "#ffffffff")
+                var background: String = "#ffffffff"
                 @NativeBlockProp(
                     description: "Button size",
                     valuePicker: NativeBlockValuePicker.DROPDOWN,
@@ -116,7 +116,8 @@ final class GenerateJsonTest: XCTestCase {
                         NativeBlockValuePickerOption("L", "Large"),
                     ],
                     valuePickerGroup : NativeBlockValuePickerPosition("Size"),
-                    deprecated: true,deprecatedReason: "reasion"
+                    deprecated: true,deprecatedReason: "reasion",
+                    defaultValue: "S"
                 )
                 @State var size: String = "S"
                 @NativeBlockSlot(description: "Button leading icon",deprecated: true,deprecatedReason: "reasion")
@@ -218,7 +219,7 @@ final class GenerateJsonTest: XCTestCase {
         XCTAssertEqual(
             jsons![JsonMetaType.properties]!.toString()!,
             """
-            [{"deprecatedReason":"","valuePicker":"color-picker","valuePickerGroup":"General","valuePickerOptions":"[]","value":"#ffffffff","key":"background","type":"STRING","description":"","deprecated":false},{"deprecatedReason":"reasion","valuePicker":"dropdown","valuePickerGroup":"Size","valuePickerOptions":"[{\"id\":\"S\",\"text\":\"Small\"},{\"id\":\"M\",\"text\":\"Medium\"},{\"id\":\"L\",\"text\":\"Large\"}]","value":"S","key":"size","type":"STRING","description":"Button size","deprecated":true}]
+            [{"deprecatedReason":"","valuePicker":"color-picker","valuePickerGroup":"General","valuePickerOptions":"[]","value":"#ffffffff","key":"background","type":"STRING","description":"","deprecated":false},{"deprecatedReason":"reasion","valuePicker":"dropdown","valuePickerGroup":"Size","valuePickerOptions":"[{\\\"id\\\":\\\"S\\\",\\\"text\\\":\\\"Small\\\"},{\\\"id\\\":\\\"M\",\\\"text\\\":\\\"Medium\\\"},{\\\"id\\\":\\\"L\\\",\\\"text\\\":\\\"Large\\\"}]","value":"S","key":"size","type":"STRING","description":"Button size","deprecated":true}]
             """
         )
         XCTAssertEqual(
