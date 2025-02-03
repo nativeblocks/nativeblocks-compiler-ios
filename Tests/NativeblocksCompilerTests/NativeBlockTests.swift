@@ -25,8 +25,12 @@ final class NativeBlockTests: XCTestCase {
                 struct MyText: View {
                     @NativeBlockData(description: "desc text")
                     var text: String
-                    @NativeBlockProp(description: "desc number")
-                    var number: Int
+                    @NativeBlockProp(description: "desc number",defaultValue: "1")
+                    var number: Int = 1
+                    @NativeBlockProp(description: "desc number",defaultValue: "{\\\"name\\\":\\\"Name2\\\"}")
+                    var user: User = User(name:"Name")
+                    @NativeBlockProp(description: "Weight",defaultValue: "regular")
+                    var fontWeight: Font.Weight.Big = .regular
                     var body: some View {
                         return Text(text+number)
                     }
@@ -36,7 +40,9 @@ final class NativeBlockTests: XCTestCase {
                     """
                     struct MyText: View {
                         var text: String
-                        var number: Int
+                        var number: Int = 1
+                        var user: User = User(name:"Name")
+                        var fontWeight: Font.Weight.Big = .regular
                         var body: some View {
                             return Text(text+number)
                         }
@@ -60,10 +66,14 @@ final class NativeBlockTests: XCTestCase {
                                 let properties = blockProps.block?.properties ?? [:]
                                 let textData = blockProps.variables? [data["text"]?.value ?? ""]
                                 let textDataValue = textData?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
-                                let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 0
+                                let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 1
+                                let userProp = NativeblocksManager.getInstance().getTypeConverter(User.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["user"]) ?? "{\\\"name\\\":\\\"Name2\\\"}")
+                                let fontWeightProp = NativeblocksManager.getInstance().getTypeConverter(Font.Weight.Big.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["fontWeight"]) ?? "regular")
                                 return MyText(
                                     text: textDataValue,
-                                    number: numberProp
+                                    number: numberProp,
+                                    user: userProp,
+                                    fontWeight: fontWeightProp
                                 )
                             }
                         }
@@ -88,13 +98,13 @@ final class NativeBlockTests: XCTestCase {
                     description: "My text description"
                 )
                 struct MyText: View {
-                    @NativeBlockProp()
+                    @NativeBlockProp(defaultValue: "true")
                     var visiable: Bool = true
-                    @NativeBlockProp()
+                    @NativeBlockProp(defaultValue: "12")
                     var number: Int = 12
-                    @NativeBlockProp()
+                    @NativeBlockProp(defaultValue: "")
                     var price: Float
-                    @NativeBlockProp()
+                    @NativeBlockProp(defaultValue: "desc")
                     var description: String = "desc"
 
                     var body: some View {

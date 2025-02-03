@@ -16,6 +16,7 @@ public struct DataMeta: NativeMeta {
     public var deprecatedReason: String
     public var block: AttributeSyntax?
     public var variable: PatternBindingSyntax?
+    public var value: String
 
     init(
         position: Int,
@@ -25,7 +26,8 @@ public struct DataMeta: NativeMeta {
         deprecated: Bool,
         deprecatedReason: String,
         block: AttributeSyntax? = nil,
-        variable: PatternBindingSyntax? = nil
+        variable: PatternBindingSyntax? = nil,
+        value: String
     ) {
         self.position = position
         self.key = key
@@ -35,6 +37,7 @@ public struct DataMeta: NativeMeta {
         self.variable = variable
         self.deprecated = deprecated
         self.deprecatedReason = deprecatedReason
+        self.value = value
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -105,7 +108,7 @@ public struct PropertyMeta: NativeMeta {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(self.key, forKey: .key)
-        try container.encode(TypeUtils.typeMapToJson(self.type)!, forKey: .type)
+        try container.encode(TypeUtils.typeMapToJson(self.type) ?? "STRING", forKey: .type)
         try container.encode(self.description, forKey: .description)
         try container.encode(self.value, forKey: .value)
         try container.encode(TypeUtils.valuePickerMapJson(self.valuePicker), forKey: .valuePicker)

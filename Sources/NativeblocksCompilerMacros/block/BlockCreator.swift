@@ -74,7 +74,7 @@ struct BlockCreator {
                     }
                     for data in metaData {
                         """
-                        let \(raw: data.key)DataValue = \(raw: dataTypeMapper(dataItem: data) ?? "")
+                        let \(raw: data.key)DataValue = \(raw: dataTypeMapper(dataItem: data))
                         """
                     }
                     """
@@ -173,32 +173,34 @@ struct BlockCreator {
         }
     }
 
-    private static func dataTypeMapper(dataItem: DataMeta) -> String? {
+    private static func dataTypeMapper(dataItem: DataMeta) -> String {
         switch dataItem.type.uppercased() {
         case "STRING":
             return
                 """
-                \(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
+                \(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "\(dataItem.value)"
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
             "FLOAT", "FLOAT80", "FLOAT64",
             "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
-                \(dataItem.type)(\(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "") ?? 0
+                \(dataItem.type)(\(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "") ?? \(dataItem.value.isEmpty ? "0" : dataItem.value)
                 """
         case "CGFLOAT":
             return
                 """
-                (\(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "").toCGFloat() ?? 0.0
+                (\(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "").toCGFloat() ?? \(dataItem.value.isEmpty ? "0.0" : dataItem.value)
                 """
         case "BOOL":
             return
                 """
-                \(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy).lowercased() == "true"
+                Bool(\(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "") ?? \(dataItem.value.isEmpty ? "false" : dataItem.value)
                 """
         default:
-            return nil
+            return
+                """
+                """
         }
     }
 
@@ -207,7 +209,7 @@ struct BlockCreator {
         case "STRING":
             return
                 """
-                findWindowSizeClass(verticalSizeClass, horizontalSizeClass,properties["\(item.key)"]) ?? \(item.value.isEmpty ? "\"\"" : "\"\(item.value)\"")
+                findWindowSizeClass(verticalSizeClass, horizontalSizeClass,properties["\(item.key)"]) ?? "\(item.value)"
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
             "FLOAT", "FLOAT80", "FLOAT64",
@@ -227,7 +229,10 @@ struct BlockCreator {
                 Bool(findWindowSizeClass(verticalSizeClass, horizontalSizeClass,properties["\(item.key)"]) ?? "") ??  \(item.value.isEmpty ? "false" : item.value)
                 """
         default:
-            return nil
+            return
+                """
+                NativeblocksManager.getInstance().getTypeConverter(\(item.type).self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass,properties["\(item.key)"]) ?? "\(item.value)")
+                """
         }
     }
 }

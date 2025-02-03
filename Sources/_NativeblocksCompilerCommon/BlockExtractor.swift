@@ -59,7 +59,7 @@ public enum BlockExtractor {
                 guard let (block, blockErrors) = extractExtraParam(from: varDecl, startPosition: position) else {
                     continue
                 }
-                block.forEach { param in
+                for param in block {
                     if param.key == "blockProps" && param.type == "BlockProps" {
                         meta.append(param)
                     }
@@ -90,6 +90,7 @@ public enum BlockExtractor {
         var diagnostic: [Diagnostic] = []
         var deprecated = false
         var deprecatedReason = nil as String?
+        var defaultValue = ""
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockDataType, from: attributes)
 
@@ -99,13 +100,13 @@ public enum BlockExtractor {
             diagnostic.append(
                 Diagnostic(
                     node: blockAttribute!,
-                    message: DiagnosticType.multiAttributes
-                ))
+                    message: DiagnosticType.multiAttributes))
         }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
         deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
+        defaultValue = SyntaxUtils.extractDefaultValue(from: blockAttribute!) ?? ""
 
         return (
             varDecl.bindings.compactMap { binding in
@@ -126,7 +127,8 @@ public enum BlockExtractor {
                         deprecated: deprecated,
                         deprecatedReason: deprecatedReason ?? "",
                         block: blockAttribute,
-                        variable: binding) : nil
+                        variable: binding,
+                        value: defaultValue) : nil
             }, diagnostic
         )
     }
@@ -142,6 +144,7 @@ public enum BlockExtractor {
         var valuePickerOptions: [ValuePickerOption] = []
         var deprecated = false
         var deprecatedReason = nil as String?
+        var defaultValue = ""
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeBlockPropType, from: attributes)
 
@@ -151,8 +154,7 @@ public enum BlockExtractor {
             diagnostic.append(
                 Diagnostic(
                     node: blockAttribute!,
-                    message: DiagnosticType.multiAttributes
-                ))
+                    message: DiagnosticType.multiAttributes))
         }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
@@ -160,6 +162,7 @@ public enum BlockExtractor {
         valuePickerGroup = SyntaxUtils.extractValuePickerGroup(from: blockAttribute!) ?? "General"
         deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
         deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
+        defaultValue = SyntaxUtils.extractDefaultValue(from: blockAttribute!) ?? ""
 
         valuePickerOptions = SyntaxUtils.extractvaluePickerOptions(from: blockAttribute!) ?? []
 
@@ -171,18 +174,13 @@ public enum BlockExtractor {
             varDecl.bindings.compactMap { binding in
                 position += 1
                 let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
-                let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
-                let value = SyntaxUtils.extractDefaultValue(from: binding.initializer)
-
-                if !SyntaxUtils.isPrimitiveTypeSupported(type) {
-                    diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.premitiveTypeSupported))
-                }
+                let type = SyntaxUtils.getType(typeAnnotation: binding.typeAnnotation)
 
                 return !key.isEmpty && !type.isEmpty
                     ? PropertyMeta(
                         position: position,
                         key: key,
-                        value: value,
+                        value: defaultValue,
                         type: type,
                         description: description,
                         deprecated: deprecated,
@@ -215,8 +213,7 @@ public enum BlockExtractor {
             diagnostic.append(
                 Diagnostic(
                     node: blockAttribute!,
-                    message: DiagnosticType.multiAttributes
-                ))
+                    message: DiagnosticType.multiAttributes))
         }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
@@ -287,8 +284,7 @@ public enum BlockExtractor {
             diagnostic.append(
                 Diagnostic(
                     node: blockAttribute!,
-                    message: DiagnosticType.multiAttributes
-                ))
+                    message: DiagnosticType.multiAttributes))
         }
 
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
