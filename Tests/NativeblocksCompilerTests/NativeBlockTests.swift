@@ -65,7 +65,7 @@ final class NativeBlockTests: XCTestCase {
                                 let data = blockProps.block?.data ?? [:]
                                 let properties = blockProps.block?.properties ?? [:]
                                 let textData = blockProps.variables? [data["text"]?.value ?? ""]
-                                let textDataValue = textData?.value.toBlockDataStringValue(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
+                                let textDataValue = textData?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
                                 let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 1
                                 let userProp = NativeblocksManager.getInstance().getTypeConverter(User.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["user"]) ?? "{\\\"name\\\":\\\"Name2\\\"}")
                                 let fontWeightProp = NativeblocksManager.getInstance().getTypeConverter(Font.Weight.Big.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["fontWeight"]) ?? "regular")
@@ -231,8 +231,8 @@ final class NativeBlockTests: XCTestCase {
                                 let action = blockProps.actions? [blockProps.block?.key ?? ""] ?? []
                                 let textData = blockProps.variables? [data["text"]?.value ?? ""]
                                 let numberData = blockProps.variables? [data["number"]?.value ?? ""]
-                                let textDataValue = textData?.value.toBlockDataStringValue(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
-                                let numberDataValue = Int(numberData?.value.toBlockDataStringValue(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "") ?? 0
+                                let textDataValue = textData?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? ""
+                                let numberDataValue = Int(numberData?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "") ?? 0
                                 let visiableProp = Bool(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["visiable"]) ?? "") ??  false
                                 let onChangeEvent = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onChange")
                                 let onChange2Event = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onChange2")
