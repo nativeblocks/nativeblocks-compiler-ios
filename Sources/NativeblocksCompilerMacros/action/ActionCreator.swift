@@ -161,24 +161,24 @@ enum ActionCreator {
         case "STRING":
             return
                 """
-                \(dataItem.key)Data?.value.parseWithJsonPath(variables: actionProps.variables, index: actionProps.listItemIndex) ?? "\(dataItem.value)"
+                actionHandleVariableValue(actionProps: actionProps, variable: \(dataItem.key)Data) ?? "\(dataItem.value)"
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
             "FLOAT", "FLOAT80", "FLOAT64",
             "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
-                \(dataItem.type)(\(dataItem.key)Data?.value.parseWithJsonPath(variables: actionProps.variables, index: actionProps.listItemIndex) ?? "") ?? \(dataItem.value.isEmpty ? "0" : dataItem.value)
+                \(dataItem.type)(actionHandleVariableValue(actionProps: actionProps, variable: \(dataItem.key)Data) ?? "") ?? \(dataItem.value.isEmpty ? "0" : dataItem.value)
                 """
         case "CGFLOAT":
             return
                 """
-                (\(dataItem.key)Data?.value ?? "").parseWithJsonPath(variables: actionProps.variables, index: actionProps.listItemIndex).toCGFloat() ?? \(dataItem.value.isEmpty ? "0.0" : dataItem.value)
+                (actionHandleVariableValue(actionProps: actionProps, variable: \(dataItem.key)Data).toCGFloat() ?? \(dataItem.value.isEmpty ? "0.0" : dataItem.value)
                 """
         case "BOOL":
             return
                 """
-                Bool(\(dataItem.key)Data?.value.parseWithJsonPath(variables: actionProps.variables, index: actionProps.listItemIndex) ?? "") ?? \(dataItem.value.isEmpty ? "false" : dataItem.value)
+                Bool(actionHandleVariableValue(actionProps: actionProps, variable: \(dataItem.key)Data) ?? \(dataItem.value.isEmpty ? "false" : dataItem.value)
                 """
         default:
             return
