@@ -178,24 +178,24 @@ struct BlockCreator {
         case "STRING":
             return
                 """
-                \(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "\(dataItem.value)"
+                blockHandleVariableValue(blockProps: blockProps, variable: \(dataItem.key)Data) ?? "\(dataItem.value)"
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
             "FLOAT", "FLOAT80", "FLOAT64",
             "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
-                \(dataItem.type)(\(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "") ?? \(dataItem.value.isEmpty ? "0" : dataItem.value)
+                \(dataItem.type)(blockHandleVariableValue(blockProps: blockProps, variable: \(dataItem.key)Data) ?? "") ?? \(dataItem.value.isEmpty ? "0" : dataItem.value)
                 """
         case "CGFLOAT":
             return
                 """
-                (\(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "").toCGFloat() ?? \(dataItem.value.isEmpty ? "0.0" : dataItem.value)
+                (blockHandleVariableValue(blockProps: blockProps, variable: \(dataItem.key)Data) ?? "").toCGFloat() ?? \(dataItem.value.isEmpty ? "0.0" : dataItem.value)
                 """
         case "BOOL":
             return
                 """
-                Bool(\(dataItem.key)Data?.value.parseWithJsonPath(variables: blockProps.variables, hierarchy: blockProps.hierarchy) ?? "") ?? \(dataItem.value.isEmpty ? "false" : dataItem.value)
+                Bool(blockHandleVariableValue(blockProps: blockProps, variable: \(dataItem.key)Data) ?? "") ?? \(dataItem.value.isEmpty ? "false" : dataItem.value)
                 """
         default:
             return
