@@ -27,13 +27,15 @@ public struct NativeActionMacro: PeerMacro {
         let metaProp = variables.compactMap { $0 as? PropertyMeta }
         let metaEvent = variables.compactMap { $0 as? EventMeta }
         let actionInfo = variables.compactMap { $0 as? ActionMeta }.first
+        let metaExtraParams = variables.compactMap { $0 as? ExtraParamMeta }
 
         let newStructDecl = try ActionCreator.create(
             structName: structDecl.name.text,
             actionInfo: actionInfo,
             metaData: metaData,
             metaProp: metaProp,
-            metaEvent: metaEvent
+            metaEvent: metaEvent,
+            metaExtraParams: metaExtraParams
         )
         return [DeclSyntax(newStructDecl)]
     }

@@ -36,6 +36,7 @@ final class NativeActionTests: XCTestCase {
                         var animated: Bool = false
                         @NativeActionEvent(then: Then.SUCCESS)
                         var completion: () -> Void
+                        var actionProps: ActionProps? = nil
                     }
 
                     @NativeActionFunction
@@ -66,6 +67,7 @@ final class NativeActionTests: XCTestCase {
                             var animated: Bool = false
                             @NativeActionEvent(then: Then.SUCCESS)
                             var completion: () -> Void
+                            var actionProps: ActionProps? = nil
                         }
 
                         @NativeActionFunction
@@ -89,16 +91,18 @@ final class NativeActionTests: XCTestCase {
                             let data = actionProps.trigger?.data ?? [:]
                             let properties = actionProps.trigger?.properties ?? [:]
                             let messageData = actionProps.variables? [data["message"]?.value ?? ""]
+                            let messageDataValue = actionHandleVariableValue(actionProps: actionProps, variable: messageData) ?? ""
                             let animatedProp = Bool(properties["animated"]?.value ?? "") ??  false
                             let param = NativeAlert.Parameter(
-                                message: messageData?.value ?? "",
+                                message: messageDataValue,
                                 animated: animatedProp,
                                 completion: {
 
                                     if actionProps.trigger != nil {
                                         actionProps.onHandleSuccessNextTrigger?(actionProps.trigger!)
                                     }
-                                })
+                                },
+                                actionProps: actionProps)
                             action.callAsFunction(param: param)
                         }
                     }
@@ -189,9 +193,10 @@ final class NativeActionTests: XCTestCase {
                             let data = actionProps.trigger?.data ?? [:]
                             let properties = actionProps.trigger?.properties ?? [:]
                             let messageData = actionProps.variables? [data["message"]?.value ?? ""]
+                            let messageDataValue = actionHandleVariableValue(actionProps: actionProps, variable: messageData) ?? ""
                             let animatedProp = Bool(properties["animated"]?.value ?? "") ??  false
                             let param = NativeAlert.Parameter(
-                                message: messageData?.value ?? "",
+                                message: messageDataValue,
                                 animated: animatedProp,
                                 completion: {
 

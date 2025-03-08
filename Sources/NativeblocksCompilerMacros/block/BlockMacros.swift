@@ -27,13 +27,15 @@ public struct NativeBlockMacro: PeerMacro {
         let metaProp = variables.compactMap { $0 as? PropertyMeta }
         let metaEvent = variables.compactMap { $0 as? EventMeta }
         let metaSlot = variables.compactMap { $0 as? SlotMeta }
+        let metaExtraParams = variables.compactMap { $0 as? ExtraParamMeta }
 
         let newStructDecl = try BlockCreator.create(
             structName: structDecl.name.text,
             metaData: metaData,
             metaProp: metaProp,
             metaEvent: metaEvent,
-            metaSlot: metaSlot
+            metaSlot: metaSlot,
+            metaExtraParams: metaExtraParams
         )
         return [DeclSyntax(newStructDecl)]
     }

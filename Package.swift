@@ -15,7 +15,8 @@ let package = Package(
         .executable(name: "NativeblocksTool", targets: ["NativeblocksTool"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0")
+        .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
+        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
     ],
     targets: [
         .macro(
@@ -32,8 +33,7 @@ let package = Package(
             capability: .command(
                 intent: .custom(
                     verb: "GenerateProvider",
-                    description: "Generate Provider"
-                ),
+                    description: "Generate `{Target}ActionProvider.swift` and `{Target}BlockProvider.swift` from Block and Action macros."),
                 permissions: [
                     .writeToPackageDirectory(
                         reason: "This command write the new Provider to the source root.")
@@ -49,15 +49,13 @@ let package = Package(
             capability: .command(
                 intent: .custom(
                     verb: "Sync",
-                    description: "Sync"
-                ),
+                    description: "Synchronize JSON blocks and actions with the Nativeblocks Studio."),
                 permissions: [
                     .writeToPackageDirectory(
-                        reason: "This command write the new json blocks to the source root."),
+                        reason: "This command writes the new JSON files to the source root."),
                     .allowNetworkConnections(
                         scope: PluginNetworkPermissionScope.all(),
-                        reason: "This command will sync jsons with nativeblocks server."
-                    ),
+                        reason: "This command synchronizes JSONs with the Nativeblocks server."),
                 ]
             ),
             dependencies: [
@@ -70,7 +68,7 @@ let package = Package(
             capability: .command(
                 intent: .custom(
                     verb: "PrepareSchema",
-                    description: "Prepare Schema"
+                    description: "Generate local JSON schemas for Blocks and Actions in the `.nativeblocks` directory."
                 ),
                 permissions: [
                     .writeToPackageDirectory(

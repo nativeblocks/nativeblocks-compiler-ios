@@ -24,9 +24,7 @@ public struct ActionExtractor {
 
         for parameter in parameters {
             position += 1
-            guard let (type, _) = SyntaxUtils.getType(from: parameter) else {
-                continue
-            }
+            let (type, _) = SyntaxUtils.getType(from: parameter) ?? (nil, nil)
             switch type {
             case NativeActionDataType:
                 do {
@@ -56,7 +54,16 @@ public struct ActionExtractor {
                     meta.append(contentsOf: block)
                 }
             default:
-                continue
+                guard let (block, blockErrors) = extractExtraParam(from: parameter, startPosition: position) else {
+                    continue
+                }
+                block.forEach { param in
+                    if param.key == "actionProps" && param.type == "ActionProps" {
+                        meta.append(param)
+                    }
+                }
+                position = block.last?.position ?? position
+                errors.append(contentsOf: blockErrors)
             }
         }
 
@@ -157,14 +164,23 @@ public struct ActionExtractor {
         var diagnostic: [Diagnostic] = []
         var deprecated = false
         var deprecatedReason = nil as String?
+        var defaultValue = ""
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeActionDataType, from: attributes)
 
         guard blockAttribute != nil else { return nil }
 
+        if attributes.count > 1 {
+            diagnostic.append(
+                Diagnostic(
+                    node: blockAttribute!,
+                    message: DiagnosticType.multiAttributes))
+        }
+
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
         deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
+        defaultValue = SyntaxUtils.extractDefaultValue(from: blockAttribute!) ?? ""
 
         return (
             varDecl.bindings.compactMap { binding in
@@ -185,7 +201,8 @@ public struct ActionExtractor {
                         deprecated: deprecated,
                         deprecatedReason: deprecatedReason ?? "",
                         block: blockAttribute,
-                        variable: binding
+                        variable: binding,
+                        value: defaultValue
                     ) : nil
             }, diagnostic
         )
@@ -202,14 +219,25 @@ public struct ActionExtractor {
         var valuePickerOptions: [ValuePickerOption] = []
         var deprecated = false
         var deprecatedReason = nil as String?
+        var defaultValue = ""
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeActionPropType, from: attributes)
+
         guard blockAttribute != nil else { return nil }
+
+        if attributes.count > 1 {
+            diagnostic.append(
+                Diagnostic(
+                    node: blockAttribute!,
+                    message: DiagnosticType.multiAttributes))
+        }
+
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         valuePicker = SyntaxUtils.extractValuePicker(from: blockAttribute!) ?? "TEXT_INPUT"
         valuePickerGroup = SyntaxUtils.extractValuePickerGroup(from: blockAttribute!) ?? "General"
         deprecated = SyntaxUtils.extractDeprecated(from: blockAttribute!) ?? false
         deprecatedReason = SyntaxUtils.extractDeprecatedReason(from: blockAttribute!) ?? ""
+        defaultValue = SyntaxUtils.extractDefaultValue(from: blockAttribute!) ?? ""
 
         valuePickerOptions = SyntaxUtils.extractvaluePickerOptions(from: blockAttribute!) ?? []
 
@@ -221,18 +249,13 @@ public struct ActionExtractor {
             varDecl.bindings.compactMap { binding in
                 position += 1
                 let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
-                let type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
-                let value = SyntaxUtils.extractDefaultValue(from: binding.initializer)
-
-                if !SyntaxUtils.isPrimitiveTypeSupported(type) {
-                    diagnostic.append(Diagnostic(node: blockAttribute!, message: DiagnosticType.premitiveTypeSupported))
-                }
+                let type = SyntaxUtils.getType(typeAnnotation: binding.typeAnnotation)
 
                 return !key.isEmpty && !type.isEmpty
                     ? PropertyMeta(
                         position: position,
                         key: key,
-                        value: value,
+                        value: defaultValue,
                         type: type,
                         description: description,
                         deprecated: deprecated,
@@ -261,6 +284,14 @@ public struct ActionExtractor {
 
         blockAttribute = SyntaxUtils.extractAttribute(for: NativeActionEventType, from: attributes)
         guard blockAttribute != nil else { return nil }
+
+        if attributes.count > 1 {
+            diagnostic.append(
+                Diagnostic(
+                    node: blockAttribute!,
+                    message: DiagnosticType.multiAttributes))
+        }
+
         description = SyntaxUtils.extractDescription(from: blockAttribute!) ?? ""
         dataBinding = SyntaxUtils.extractDataBinding(from: blockAttribute!) ?? []
         then = SyntaxUtils.extractThen(from: blockAttribute!)
@@ -309,6 +340,32 @@ public struct ActionExtractor {
                         block: blockAttribute,
                         variable: binding
                     ) : nil
+            }, diagnostic
+        )
+    }
+
+    private static func extractExtraParam(from varDecl: VariableDeclSyntax, startPosition: Int) -> ([ExtraParamMeta], [Diagnostic])? {
+        var position = startPosition
+        let diagnostic: [Diagnostic] = []
+
+        return (
+            varDecl.bindings.compactMap { binding in
+                position += 1
+                let key = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text ?? ""
+
+                var type = binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(IdentifierTypeSyntax.self)?.name.text ?? ""
+                if type.isEmpty {
+                    type =
+                        binding.typeAnnotation?.as(TypeAnnotationSyntax.self)?.type.as(OptionalTypeSyntax.self)?.wrappedType.as(
+                            IdentifierTypeSyntax.self)?.name.text ?? ""
+                }
+
+                return !key.isEmpty && !type.isEmpty
+                    ? ExtraParamMeta(
+                        position: position,
+                        key: key,
+                        type: type,
+                        variable: binding) : nil
             }, diagnostic
         )
     }

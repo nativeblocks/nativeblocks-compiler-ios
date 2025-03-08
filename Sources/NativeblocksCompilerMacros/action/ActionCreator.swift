@@ -8,7 +8,8 @@ enum ActionCreator {
         actionInfo: ActionMeta?,
         metaData: [DataMeta],
         metaProp: [PropertyMeta],
-        metaEvent: [EventMeta]
+        metaEvent: [EventMeta],
+        metaExtraParams: [ExtraParamMeta]
     ) throws -> ClassDeclSyntax {
         return try ClassDeclSyntax("public class \(raw: structName)Action: INativeAction") {
             """
@@ -46,6 +47,11 @@ enum ActionCreator {
                     let \(raw: data.key)Data = actionProps.variables?[data["\(raw: data.key)"]?.value ?? ""]
                     """
                 }
+                for data in metaData {
+                    """
+                    let \(raw: data.key)DataValue = \(raw: dataTypeMapper(dataItem: data) ?? "")
+                    """
+                }
                 """
                 //Action trigger properties
                 """
@@ -59,7 +65,7 @@ enum ActionCreator {
                     (
                         $0.position,
                         """
-                        \($0.key): \(dataTypeMapper(dataItem: $0) ?? "")
+                        \($0.key): \($0.key)DataValue
                         """
                     )
                 }
@@ -115,7 +121,16 @@ enum ActionCreator {
                     )
                 }
 
-                let arguments = (dataArguments + propArguments + eventArguments)
+                let extraParamArguments = metaExtraParams.map {
+                    (
+                        $0.position,
+                        """
+                        \($0.key): \($0.key)
+                        """
+                    )
+                }
+
+                let arguments = (dataArguments + propArguments + eventArguments + extraParamArguments)
                     .sorted { $0.0 < $1.0 }
                     .map { $0.1 }
                     .joined(separator: ",\n")
@@ -146,27 +161,29 @@ enum ActionCreator {
         case "STRING":
             return
                 """
-                \(dataItem.key)Data?.value ?? ""
+                actionHandleVariableValue(actionProps: actionProps, variable: \(dataItem.key)Data) ?? "\(dataItem.value)"
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
             "FLOAT", "FLOAT80", "FLOAT64",
             "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
-                \(dataItem.type)(\(dataItem.key)Data?.value ?? "") ?? 0
+                \(dataItem.type)(actionHandleVariableValue(actionProps: actionProps, variable: \(dataItem.key)Data) ?? "") ?? \(dataItem.value.isEmpty ? "0" : dataItem.value)
                 """
         case "CGFLOAT":
             return
                 """
-                (\(dataItem.key)Data?.value ?? "").toCGFloat() ?? 0.0
+                (actionHandleVariableValue(actionProps: actionProps, variable: \(dataItem.key)Data).toCGFloat() ?? \(dataItem.value.isEmpty ? "0.0" : dataItem.value)
                 """
         case "BOOL":
             return
                 """
-                \(dataItem.key)Data?.value.lowercased() == "true"
+                Bool(actionHandleVariableValue(actionProps: actionProps, variable: \(dataItem.key)Data) ?? \(dataItem.value.isEmpty ? "false" : dataItem.value)
                 """
         default:
-            return nil
+            return
+                """
+                """
         }
     }
 
@@ -175,7 +192,7 @@ enum ActionCreator {
         case "STRING":
             return
                 """
-                properties["\(item.key)"]?.value ?? \(item.value.isEmpty ? "\"\"" : "\"\(item.value)\"")
+                properties["\(item.key)"]?.value ?? "\(item.value)"
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
             "FLOAT", "FLOAT80", "FLOAT64",
@@ -195,7 +212,10 @@ enum ActionCreator {
                 Bool(properties["\(item.key)"]?.value ?? "") ??  \(item.value.isEmpty ? "false" : item.value)
                 """
         default:
-            return nil
+            return
+                """
+                NativeblocksManager.getInstance().getTypeConverter(\(item.type).self).fromString(properties["\(item.key)"]?.value ?? "\(item.value)")
+                """
         }
     }
 }

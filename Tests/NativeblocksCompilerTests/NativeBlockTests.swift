@@ -25,8 +25,12 @@ final class NativeBlockTests: XCTestCase {
                 struct MyText: View {
                     @NativeBlockData(description: "desc text")
                     var text: String
-                    @NativeBlockProp(description: "desc number")
-                    var number: Int
+                    @NativeBlockProp(description: "desc number",defaultValue: "1")
+                    var number: Int = 1
+                    @NativeBlockProp(description: "desc number",defaultValue: "{\\\"name\\\":\\\"Name2\\\"}")
+                    var user: User = User(name:"Name")
+                    @NativeBlockProp(description: "Weight",defaultValue: "regular")
+                    var fontWeight: Font.Weight.Big = .regular
                     var body: some View {
                         return Text(text+number)
                     }
@@ -36,7 +40,9 @@ final class NativeBlockTests: XCTestCase {
                     """
                     struct MyText: View {
                         var text: String
-                        var number: Int
+                        var number: Int = 1
+                        var user: User = User(name:"Name")
+                        var fontWeight: Font.Weight.Big = .regular
                         var body: some View {
                             return Text(text+number)
                         }
@@ -59,10 +65,15 @@ final class NativeBlockTests: XCTestCase {
                                 let data = blockProps.block?.data ?? [:]
                                 let properties = blockProps.block?.properties ?? [:]
                                 let textData = blockProps.variables? [data["text"]?.value ?? ""]
-                                let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 0
+                                let textDataValue = blockHandleVariableValue(blockProps: blockProps, variable: textData) ?? ""
+                                let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 1
+                                let userProp = NativeblocksManager.getInstance().getTypeConverter(User.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["user"]) ?? "{\\\"name\\\":\\\"Name2\\\"}")
+                                let fontWeightProp = NativeblocksManager.getInstance().getTypeConverter(Font.Weight.Big.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["fontWeight"]) ?? "regular")
                                 return MyText(
-                                    text: textData?.value ?? "",
-                                    number: numberProp
+                                    text: textDataValue,
+                                    number: numberProp,
+                                    user: userProp,
+                                    fontWeight: fontWeightProp
                                 )
                             }
                         }
@@ -87,13 +98,13 @@ final class NativeBlockTests: XCTestCase {
                     description: "My text description"
                 )
                 struct MyText: View {
-                    @NativeBlockProp()
+                    @NativeBlockProp(defaultValue: "true")
                     var visiable: Bool = true
-                    @NativeBlockProp()
+                    @NativeBlockProp(defaultValue: "12")
                     var number: Int = 12
-                    @NativeBlockProp()
+                    @NativeBlockProp(defaultValue: "")
                     var price: Float
-                    @NativeBlockProp()
+                    @NativeBlockProp(defaultValue: "desc")
                     var description: String = "desc"
 
                     var body: some View {
@@ -166,6 +177,8 @@ final class NativeBlockTests: XCTestCase {
                     var text: String
                     @NativeBlockData(description: "desc")
                     var number: Int
+                    @NativeBlockData(description: "desc")
+                    var percent: CGFloat
                     @NativeBlockProp(description: "desc")
                     var visiable: Bool
                     @NativeBlockEvent(
@@ -173,8 +186,14 @@ final class NativeBlockTests: XCTestCase {
                         dataBinding: ["text", "number"]
                     )
                     var onChange: (String, Int) -> Void
+                    @NativeBlockEvent(
+                        description: "desc",
+                        dataBinding: ["text", "number"]
+                    )
+                    var onChange2: ((String, Int) -> Void)?
                     @NativeBlockEvent(description: "desc")
                     var onClick: () -> Void
+                    var blockProps: BlockProps? = nil
                     var body: some View {
                         return Text("\\(text)")
                     }
@@ -185,9 +204,12 @@ final class NativeBlockTests: XCTestCase {
                     struct MyText: View {
                         var text: String
                         var number: Int
+                        var percent: CGFloat
                         var visiable: Bool
                         var onChange: (String, Int) -> Void
+                        var onChange2: ((String, Int) -> Void)?
                         var onClick: () -> Void
+                        var blockProps: BlockProps? = nil
                         var body: some View {
                             return Text("\\(text)")
                         }
@@ -212,12 +234,18 @@ final class NativeBlockTests: XCTestCase {
                                 let action = blockProps.actions? [blockProps.block?.key ?? ""] ?? []
                                 let textData = blockProps.variables? [data["text"]?.value ?? ""]
                                 let numberData = blockProps.variables? [data["number"]?.value ?? ""]
+                                let percentData = blockProps.variables? [data["percent"]?.value ?? ""]
+                                let textDataValue = blockHandleVariableValue(blockProps: blockProps, variable: textData) ?? ""
+                                let numberDataValue = Int(blockHandleVariableValue(blockProps: blockProps, variable: numberData) ?? "") ?? 0
+                                let percentDataValue = (blockHandleVariableValue(blockProps: blockProps, variable: percentData) ?? "").toCGFloat() ?? 0.0
                                 let visiableProp = Bool(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["visiable"]) ?? "") ??  false
                                 let onChangeEvent = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onChange")
+                                let onChange2Event = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onChange2")
                                 let onClickEvent = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onClick")
                                 return MyText(
-                                    text: textData?.value ?? "",
-                                    number: Int(numberData?.value ?? "") ?? 0,
+                                    text: textDataValue,
+                                    number: numberDataValue,
+                                    percent: percentDataValue,
                                     visiable: visiableProp,
                                     onChange: { textParam, numberParam in
                                         if var textUpdated = textData {
@@ -230,10 +258,22 @@ final class NativeBlockTests: XCTestCase {
                                         }
                                         onChangeEvent?()
                                     },
+                                    onChange2: onChange2Event == nil ? nil : { textParam, numberParam in
+                                        if var textUpdated = textData {
+                                            textUpdated.value = String(describing: textParam)
+                                            blockProps.onVariableChange?(textUpdated)
+                                        }
+                                        if var numberUpdated = numberData {
+                                            numberUpdated.value = String(describing: numberParam)
+                                            blockProps.onVariableChange?(numberUpdated)
+                                        }
+                                        onChange2Event?()
+                                    },
                                     onClick: {
 
                                         onClickEvent?()
-                                    }
+                                    },
+                                    blockProps: blockProps
                                 )
                             }
                         }
@@ -259,7 +299,11 @@ final class NativeBlockTests: XCTestCase {
                 )
                 struct MyColumn<Content>: View where Content: View {
                     @NativeBlockSlot(description: "content description")
-                    var content: (BlockIndex) -> Content
+                    var content: (BlockIndex) -> Content?
+                    @NativeBlockSlot(description: "content description")
+                    var content2: (BlockIndex) -> Content
+                    @NativeBlockSlot(description: "content description")
+                    var content3: (() -> Content)?
                     var body: some View {
                         return VStack {
                             content(-1)
@@ -270,7 +314,9 @@ final class NativeBlockTests: XCTestCase {
                 expandedSource:
                     """
                     struct MyColumn<Content>: View where Content: View {
-                        var content: (BlockIndex) -> Content
+                        var content: (BlockIndex) -> Content?
+                        var content2: (BlockIndex) -> Content
+                        var content3: (() -> Content)?
                         var body: some View {
                             return VStack {
                                 content(-1)
@@ -293,12 +339,22 @@ final class NativeBlockTests: XCTestCase {
                             @Environment(\\.horizontalSizeClass) var horizontalSizeClass
                             var body: some View {
                                 let slots = blockProps.block?.slots ?? [:]
-                                let contentSlot = slots["content"]
+                                let contentSlot = blockProvideSlot(blockProps: blockProps, slots: slots, slotType: "content")
+                                let content2Slot = blockProvideSlot(blockProps: blockProps, slots: slots, slotType: "content2")
+                                let content3Slot = blockProvideSlot(blockProps: blockProps, slots: slots, slotType: "content3")
                                 return MyColumn(
                                     content: contentSlot == nil ? { index in
                                         AnyView(EmptyView())
                                     } : { index in
                                         (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], contentSlot!, index)) ?? AnyView(EmptyView())
+                                    },
+                                    content2: content2Slot == nil ? { index in
+                                        AnyView(EmptyView())
+                                    } : { index in
+                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], content2Slot!, index)) ?? AnyView(EmptyView())
+                                    },
+                                    content3: content3Slot == nil ? nil : {
+                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], content3Slot!, -1)) ?? AnyView(EmptyView())
                                     }
                                 )
                             }
