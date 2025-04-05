@@ -146,6 +146,7 @@ public enum NativeActionValuePicker {
     case DROPDOWN  // Dropdown menu
     case COMBOBOX_INPUT  // Combobox input
     case COLOR_PICKER  // Color picker tool
+    case SCRIPT_AREA_INPUT  // Multi-line native script area
 }
 
 // Enumeration of possible outcomes for events.

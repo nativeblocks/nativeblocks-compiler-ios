@@ -49,6 +49,8 @@ enum TypeUtils {
             return "color-picker"
         case "COMBOBOX_INPUT":
             return "combobox-input"
+        case "SCRIPT_AREA_INPUT":
+            return "script-area-input"
         default:
             return nil
         }
