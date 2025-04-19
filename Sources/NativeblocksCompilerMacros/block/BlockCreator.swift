@@ -39,6 +39,14 @@ struct BlockCreator {
                     """
                 )
 
+                for data in metaData {
+                    try VariableDeclSyntax(
+                        """
+                        @State private var  \(raw: data.key)DataValue = \(raw: dataDefaultMapper(dataItem: data))
+                        """
+                    )
+                }
+
                 try VariableDeclSyntax(
                     """
                     var body: some View
@@ -72,11 +80,7 @@ struct BlockCreator {
                         let \(raw: data.key)Data = blockProps.variables?[data["\(raw: data.key)"]?.value ?? ""]
                         """
                     }
-                    for data in metaData {
-                        """
-                        let \(raw: data.key)DataValue = \(raw: dataTypeMapper(dataItem: data))
-                        """
-                    }
+
                     """
                     //Block Properties
                     """
@@ -168,6 +172,13 @@ struct BlockCreator {
                     """
                     return \(raw: structName)(\n\(raw: arguments)\n)
                     """
+                    for data in metaData {
+                        """
+                        .task(id: \(raw: data.key)Data) {
+                        \(raw: data.key)DataValue = \(raw: dataTypeMapper(dataItem: data))
+                        }
+                        """
+                    }
                 }
             }
         }
@@ -204,6 +215,36 @@ struct BlockCreator {
         }
     }
 
+    private static func dataDefaultMapper(dataItem: DataMeta) -> String {
+        switch dataItem.type.uppercased() {
+        case "STRING":
+            return
+                """
+                "\(dataItem.value)"
+                """
+        case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
+            "FLOAT", "FLOAT80", "FLOAT64",
+            "FLOAT32", "FLOAT16", "DOUBLE":
+            return
+                """
+                \(dataItem.value.isEmpty ? "0" : dataItem.value)
+                """
+        case "CGFLOAT":
+            return
+                """
+                \(dataItem.value.isEmpty ? "0.0" : dataItem.value)
+                """
+        case "BOOL":
+            return
+                """
+                \(dataItem.value.isEmpty ? "false" : dataItem.value)
+                """
+        default:
+            return
+                """
+                """
+        }
+    }
     private static func propTypeMapper(item: PropertyMeta) -> String? {
         switch item.type.uppercased() {
         case "STRING":

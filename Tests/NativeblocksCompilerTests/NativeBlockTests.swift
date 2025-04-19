@@ -61,11 +61,11 @@ final class NativeBlockTests: XCTestCase {
                             var blockProps: BlockProps
                             @Environment(\\.verticalSizeClass) var verticalSizeClass
                             @Environment(\\.horizontalSizeClass) var horizontalSizeClass
+                            @State private var  textDataValue = ""
                             var body: some View {
                                 let data = blockProps.block?.data ?? [:]
                                 let properties = blockProps.block?.properties ?? [:]
                                 let textData = blockProps.variables? [data["text"]?.value ?? ""]
-                                let textDataValue = blockHandleVariableValue(blockProps: blockProps, variable: textData) ?? ""
                                 let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 1
                                 let userProp = NativeblocksManager.getInstance().getTypeConverter(User.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["user"]) ?? "{\\\"name\\\":\\\"Name2\\\"}")
                                 let fontWeightProp = NativeblocksManager.getInstance().getTypeConverter(Font.Weight.Big.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["fontWeight"]) ?? "regular")
@@ -75,6 +75,9 @@ final class NativeBlockTests: XCTestCase {
                                     user: userProp,
                                     fontWeight: fontWeightProp
                                 )
+                                .task(id: textData) {
+                                    textDataValue = blockHandleVariableValue(blockProps: blockProps, variable: textData) ?? ""
+                                }
                             }
                         }
                     }
@@ -228,6 +231,9 @@ final class NativeBlockTests: XCTestCase {
                             var blockProps: BlockProps
                             @Environment(\\.verticalSizeClass) var verticalSizeClass
                             @Environment(\\.horizontalSizeClass) var horizontalSizeClass
+                            @State private var  textDataValue = ""
+                            @State private var  numberDataValue = 0
+                            @State private var  percentDataValue = 0.0
                             var body: some View {
                                 let data = blockProps.block?.data ?? [:]
                                 let properties = blockProps.block?.properties ?? [:]
@@ -235,9 +241,6 @@ final class NativeBlockTests: XCTestCase {
                                 let textData = blockProps.variables? [data["text"]?.value ?? ""]
                                 let numberData = blockProps.variables? [data["number"]?.value ?? ""]
                                 let percentData = blockProps.variables? [data["percent"]?.value ?? ""]
-                                let textDataValue = blockHandleVariableValue(blockProps: blockProps, variable: textData) ?? ""
-                                let numberDataValue = Int(blockHandleVariableValue(blockProps: blockProps, variable: numberData) ?? "") ?? 0
-                                let percentDataValue = (blockHandleVariableValue(blockProps: blockProps, variable: percentData) ?? "").toCGFloat() ?? 0.0
                                 let visiableProp = Bool(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["visiable"]) ?? "") ??  false
                                 let onChangeEvent = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onChange")
                                 let onChange2Event = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onChange2")
@@ -275,6 +278,15 @@ final class NativeBlockTests: XCTestCase {
                                     },
                                     blockProps: blockProps
                                 )
+                                .task(id: textData) {
+                                    textDataValue = blockHandleVariableValue(blockProps: blockProps, variable: textData) ?? ""
+                                }
+                                .task(id: numberData) {
+                                    numberDataValue = Int(blockHandleVariableValue(blockProps: blockProps, variable: numberData) ?? "") ?? 0
+                                }
+                                .task(id: percentData) {
+                                    percentDataValue = (blockHandleVariableValue(blockProps: blockProps, variable: percentData) ?? "").toCGFloat() ?? 0.0
+                                }
                             }
                         }
                     }
