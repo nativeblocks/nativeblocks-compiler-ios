@@ -6,6 +6,7 @@ public macro NativeBlock(
     keyType: String,  // Unique identifier for the block
     description: String,  // A description of the block's purpose
     version: Int = 1,  // Version number (default: 1)
+    versionName: String = "",  // Version name (default: empty string)
     deprecated: Bool = false,  // Indicates if the block is deprecated
     deprecatedReason: String = ""  // Reason for deprecation if applicable
 ) =
@@ -89,6 +90,7 @@ public macro NativeAction(
     keyType: String,  // Unique identifier for the action
     description: String,  // A description of the action's purpose
     version: Int = 1,  // Version number (default: 1)
+    versionName: String = "",  // Version name (default: empty string)
     deprecated: Bool = false,  // Indicates if the action is deprecated
     deprecatedReason: String = ""  // Reason for deprecation if applicable
 ) =
