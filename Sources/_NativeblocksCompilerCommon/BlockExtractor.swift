@@ -317,14 +317,26 @@ public enum BlockExtractor {
                     diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.functionTypeError))
                 }
 
-                if parameters.count > 1 {
-                    diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.blockIndexParamLimit))
-                } else if parameters.count == 1 {
-                    if let type = parameters.first?.as(TupleTypeElementSyntax.self)?.type.as(
-                        IdentifierTypeSyntax.self)?.name.text
-                    {
-                        if type != "BlockIndex" {
-                            diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.blockIndexParamLimit))
+                var hasBlockIndex = false
+                var hasBlockScope = false
+
+                if parameters.count > 2 {
+                    diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.blockSlotParamLimit))
+                } else if !parameters.isEmpty {
+                    for (index, parameter) in parameters.enumerated() {
+
+                        if let type = parameter.as(TupleTypeElementSyntax.self)?.type.as(
+                            IdentifierTypeSyntax.self)?.name.text
+                        {
+                            if type == "BlockIndex" && index == 0 {
+                                hasBlockIndex = true
+                            } else if type == "Any" {
+                                hasBlockScope = true
+                            } else {
+                                diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.blockSlotParamLimit))
+                            }
+                        } else {
+                            diagnostic.append(Diagnostic(node: binding, message: DiagnosticType.blockSlotParamLimit))
                         }
                     }
                 }
@@ -336,7 +348,8 @@ public enum BlockExtractor {
                         description: description,
                         deprecated: deprecated,
                         deprecatedReason: deprecatedReason ?? "",
-                        hasBlockIndex: parameters.count == 1,
+                        hasBlockIndex: hasBlockIndex,
+                        hasBlockScope: hasBlockScope,
                         isOptinalFunction: isOptinalFunction,
                         block: blockAttribute,
                         variable: binding) : nil

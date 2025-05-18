@@ -148,8 +148,8 @@ struct BlockCreator {
                         (
                             slot.position,
                             """
-                            \(slot.slot): \(slot.slot)Slot == nil ? \(slot.isOptinalFunction ? "nil" : "{ \(slot.hasBlockIndex ? "index in" : "") AnyView(EmptyView())}") : { \(slot.hasBlockIndex ? "index in" : "")
-                                (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], \(slot.slot)Slot!, \(slot.hasBlockIndex ?"index": "-1"))) ?? AnyView(EmptyView())
+                            \(slot.slot): \(slot.slot)Slot == nil ? \(slot.isOptinalFunction ? "nil" : "{ \(slot.hasBlockIndex ? "index" : "")\(slot.hasBlockIndex && slot.hasBlockScope ? ", ":"")\(slot.hasBlockScope ? "scope" : "")\((slot.hasBlockIndex || slot.hasBlockScope) ? " in" : "") AnyView(EmptyView())}") : { \(slot.hasBlockIndex ? "index" : "")\(slot.hasBlockIndex && slot.hasBlockScope ? ", ":"")\(slot.hasBlockScope ? "scope" : "")\((slot.hasBlockIndex || slot.hasBlockScope) ? " in" : "")
+                                (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], \(slot.slot)Slot!, \(slot.hasBlockIndex ?"index": "-1"), \(slot.hasBlockScope ?"scope": "nil"))) ?? AnyView(EmptyView())
                             }
                             """
                         )

@@ -313,7 +313,9 @@ final class NativeBlockTests: XCTestCase {
                     @NativeBlockSlot(description: "content description")
                     var content: (BlockIndex) -> Content?
                     @NativeBlockSlot(description: "content description")
-                    var content2: (BlockIndex) -> Content
+                    var content1: (BlockIndex,Any) -> Content?
+                    @NativeBlockSlot(description: "content description")
+                    var content2: (Any) -> Content
                     @NativeBlockSlot(description: "content description")
                     var content3: (() -> Content)?
                     var body: some View {
@@ -327,7 +329,8 @@ final class NativeBlockTests: XCTestCase {
                     """
                     struct MyColumn<Content>: View where Content: View {
                         var content: (BlockIndex) -> Content?
-                        var content2: (BlockIndex) -> Content
+                        var content1: (BlockIndex,Any) -> Content?
+                        var content2: (Any) -> Content
                         var content3: (() -> Content)?
                         var body: some View {
                             return VStack {
@@ -352,21 +355,27 @@ final class NativeBlockTests: XCTestCase {
                             var body: some View {
                                 let slots = blockProps.block?.slots ?? [:]
                                 let contentSlot = blockProvideSlot(blockProps: blockProps, slots: slots, slotType: "content")
+                                let content1Slot = blockProvideSlot(blockProps: blockProps, slots: slots, slotType: "content1")
                                 let content2Slot = blockProvideSlot(blockProps: blockProps, slots: slots, slotType: "content2")
                                 let content3Slot = blockProvideSlot(blockProps: blockProps, slots: slots, slotType: "content3")
                                 return MyColumn(
                                     content: contentSlot == nil ? { index in
                                         AnyView(EmptyView())
                                     } : { index in
-                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], contentSlot!, index)) ?? AnyView(EmptyView())
+                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], contentSlot!, index, nil)) ?? AnyView(EmptyView())
                                     },
-                                    content2: content2Slot == nil ? { index in
+                                    content1: content1Slot == nil ? { index, scope in
                                         AnyView(EmptyView())
-                                    } : { index in
-                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], content2Slot!, index)) ?? AnyView(EmptyView())
+                                    } : { index, scope in
+                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], content1Slot!, index, scope)) ?? AnyView(EmptyView())
+                                    },
+                                    content2: content2Slot == nil ? { scope in
+                                        AnyView(EmptyView())
+                                    } : { scope in
+                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], content2Slot!, -1, scope)) ?? AnyView(EmptyView())
                                     },
                                     content3: content3Slot == nil ? nil : {
-                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], content3Slot!, -1)) ?? AnyView(EmptyView())
+                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], content3Slot!, -1, nil)) ?? AnyView(EmptyView())
                                     }
                                 )
                             }

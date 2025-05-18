@@ -4,7 +4,7 @@ public enum DiagnosticType: String, DiagnosticMessage {
     case notAStruct
     case notAClass
     case singleVariableLimit
-    case blockIndexParamLimit
+    case blockSlotParamLimit
     case functionTypeError
     case eventTypeMisMachParamCount
     case premitiveTypeSupported
@@ -25,8 +25,8 @@ public enum DiagnosticType: String, DiagnosticMessage {
             return "Only classes are supported."
         case .singleVariableLimit:
             return "Wrap a single variable only."
-        case .blockIndexParamLimit:
-            return "Must have one 'BlockIndex' parameter."
+        case .blockSlotParamLimit:
+            return "Must have zero param or 'BlockIndex' or 'Any' or both parameter as order."
         case .functionTypeError:
             return "Expected a function."
         case .eventTypeMisMachParamCount:
