@@ -2,13 +2,33 @@ import NativeblocksTool
 import XCTest
 
 final class GenerateJsonTest: XCTestCase {
+
+    func testJsonMetaTypeFileName() throws {
+        for metaType in JsonMetaType.allCases {
+            switch metaType {
+            case .integration:
+                XCTAssertEqual(metaType.fileName, "integration.json")
+            case .data:
+                XCTAssertEqual(metaType.fileName, "data.json")
+            case .event:
+                XCTAssertEqual(metaType.fileName, "events.json")
+            case .properties:
+                XCTAssertEqual(metaType.fileName, "properties.json")
+            case .slot:
+                XCTAssertEqual(metaType.fileName, "slots.json")
+            }
+        }
+    }
+
     func testActionJsonGenerator() throws {
         let sources = [
             """
             @NativeAction(
                 name: "Alert",
                 keyType: "ALERT",
-                description: "Nativeblocks alert action"
+                description: "Nativeblocks alert action",
+                version: 2,
+                versionName: "0.0.2"
             )
             public class NativeAlert {
                 var alertController: UIAlertController
@@ -45,50 +65,85 @@ final class GenerateJsonTest: XCTestCase {
 
         let actionJsons = provider.actionsJson.first?.value
 
-        print("-------------------------")
-        for source in sources {
-            print(source)
+        do {
+            if let integrationObject = try JSONSerialization.jsonObject(with: actionJsons![JsonMetaType.integration]!) as? [String: Any] {
+                XCTAssertEqual(integrationObject.count, 14)
+                XCTAssertEqual(integrationObject["documentation"] as! String, "")
+                XCTAssertEqual(integrationObject["description"] as! String, "Nativeblocks alert action")
+                XCTAssertEqual(integrationObject["imageIcon"] as! String, "")
+                XCTAssertEqual(integrationObject["version"] as! Int, 2)
+                XCTAssertEqual(integrationObject["versionName"] as! String, "0.0.2")
+                XCTAssertEqual(integrationObject["deprecatedReason"] as! String, "")
+                XCTAssertEqual(integrationObject["platformSupport"] as! String, "IOS")
+                XCTAssertEqual(integrationObject["deprecated"] as! Bool, false)
+                XCTAssertEqual(integrationObject["price"] as! Int, 0)
+                XCTAssertEqual(integrationObject["keyType"] as! String, "ALERT")
+                XCTAssertEqual(integrationObject["kind"] as! String, "ACTION")
+                XCTAssertEqual(integrationObject["organizationId"] as! String, "")
+                XCTAssertEqual(integrationObject["name"] as! String, "Alert")
+                XCTAssertEqual(integrationObject["public"] as! Bool, false)
+            } else {
+                XCTFail("Failed to parse integration JSON object")
+            }
+        } catch {
+            XCTFail("JSON parsing error: \(error)")
         }
-        print("+++++++++++++++++++++++++")
-        print("HELLO \(JsonMetaType.integration)")
 
-        print("\(JsonMetaType.integration.fileName)=>")
-        print(actionJsons![JsonMetaType.integration]!.toString()!)
+        do {
+            if let array = try JSONSerialization.jsonObject(with: actionJsons![JsonMetaType.data]!) as? [[String: Any]],
+                let object = array.first
+            {
+                XCTAssertEqual(object.count, 5)
+                XCTAssertEqual(object["deprecatedReason"] as! String, "reasion")
+                XCTAssertEqual(object["key"] as! String, "message")
+                XCTAssertEqual(object["type"] as! String, "STRING")
+                XCTAssertEqual(object["description"] as! String, "")
+                XCTAssertEqual(object["deprecated"] as! Bool, true)
+            } else {
+                XCTFail("Failed to parse JSON as array of dictionaries")
+            }
+        } catch {
+            XCTFail("JSON parsing error: \(error)")
+        }
 
-        print("\(JsonMetaType.data.fileName)=>")
-        print(actionJsons![JsonMetaType.data]!.toString()!)
+        do {
+            if let array = try JSONSerialization.jsonObject(with: actionJsons![JsonMetaType.event]!) as? [[String: Any]],
+                let object = array.first
+            {
+                XCTAssertEqual(object.count, 4)
+                XCTAssertEqual(object["deprecatedReason"] as! String, "reasion")
+                XCTAssertEqual(object["event"] as! String, "END")
+                XCTAssertEqual(object["description"] as! String, "")
+                XCTAssertEqual(object["deprecated"] as! Bool, true)
+            } else {
+                XCTFail("Failed to parse JSON as array of dictionaries")
+            }
+        } catch {
+            XCTFail("JSON parsing error: \(error)")
+        }
 
-        print("\(JsonMetaType.event.fileName)=>")
-        print(actionJsons![JsonMetaType.event]!.toString()!)
+        do {
+            if let array = try JSONSerialization.jsonObject(with: actionJsons![JsonMetaType.properties]!) as? [[String: Any]],
+                let object = array.first
+            {
+                XCTAssertEqual(object.count, 9)
+                XCTAssertEqual(object["deprecatedReason"] as! String, "reasion")
+                XCTAssertEqual(object["valuePicker"] as! String, "text-input")
+                XCTAssertEqual(object["valuePickerGroup"] as! String, "General")
+                XCTAssertEqual(object["valuePickerOptions"] as! String, "[]")
+                XCTAssertEqual(object["value"] as! String, "false")
+                XCTAssertEqual(object["key"] as! String, "animated")
+                XCTAssertEqual(object["type"] as! String, "BOOLEAN")
+                XCTAssertEqual(object["description"] as! String, "")
+                XCTAssertEqual(object["deprecated"] as! Bool, true)
 
-        print("\(JsonMetaType.properties.fileName)=>")
-        print(actionJsons![JsonMetaType.properties]!.toString()!)
-        print("=========================")
+            } else {
+                XCTFail("Failed to parse JSON as array of dictionaries")
+            }
+        } catch {
+            XCTFail("JSON parsing error: \(error)")
+        }
 
-        XCTAssertEqual(
-            String(actionJsons![JsonMetaType.integration]!.toString()!),
-            """
-            {"documentation":"","description":"Nativeblocks alert action","imageIcon":"","version":1,"deprecatedReason":"","platformSupport":"IOS","deprecated":false,"price":0,"keyType":"ALERT","kind":"ACTION","organizationId":"","name":"Alert","public":false}
-            """
-        )
-        XCTAssertEqual(
-            String(actionJsons![JsonMetaType.data]!.toString()!),
-            """
-            [{"deprecatedReason":"reasion","key":"message","type":"STRING","description":"","deprecated":true}]
-            """
-        )
-        XCTAssertEqual(
-            String(actionJsons![JsonMetaType.event]!.toString()!),
-            """
-            [{"deprecatedReason":"reasion","event":"END","description":"","deprecated":true}]
-            """
-        )
-        XCTAssertEqual(
-            String(actionJsons![JsonMetaType.properties]!.toString()!),
-            """
-            [{"deprecatedReason":"reasion","valuePicker":"text-input","valuePickerGroup":"General","valuePickerOptions":"[]","value":"false","key":"animated","type":"BOOLEAN","description":"","deprecated":true}]
-            """
-        )
     }
 
     func testBlockJsonGenerator() throws {
@@ -99,6 +154,7 @@ final class GenerateJsonTest: XCTestCase {
                 keyType: "XBUTTON",
                 description: "This is a button",
                 version: 2,
+                versionName: "0.0.2",
                 deprecated: true,
                 deprecatedReason: "reasion"
             )
@@ -176,57 +232,84 @@ final class GenerateJsonTest: XCTestCase {
 
         let jsons = provider.blocksJson.first?.value
 
-        print("-------------------------")
-        for source in sources {
-            print(source)
+        do {
+            if let object = try JSONSerialization.jsonObject(with: jsons![JsonMetaType.integration]!) as? [String: Any] {
+                XCTAssertEqual(object.count, 14)
+                XCTAssertEqual(object["documentation"] as! String, "")
+                XCTAssertEqual(object["description"] as! String, "This is a button")
+                XCTAssertEqual(object["imageIcon"] as! String, "")
+                XCTAssertEqual(object["version"] as! Int, 2)
+                XCTAssertEqual(object["versionName"] as! String, "0.0.2")
+                XCTAssertEqual(object["deprecatedReason"] as! String, "reasion")
+                XCTAssertEqual(object["platformSupport"] as! String, "IOS")
+                XCTAssertEqual(object["deprecated"] as! Bool, true)
+                XCTAssertEqual(object["price"] as! Int, 0)
+                XCTAssertEqual(object["keyType"] as! String, "XBUTTON")
+                XCTAssertEqual(object["kind"] as! String, "BLOCK")
+                XCTAssertEqual(object["organizationId"] as! String, "")
+                XCTAssertEqual(object["name"] as! String, "X button")
+                XCTAssertEqual(object["public"] as! Bool, false)
+            } else {
+                XCTFail("Failed to parse integration JSON object")
+            }
+        } catch {
+            XCTFail("JSON parsing error: \(error)")
         }
-        print("+++++++++++++++++++++++++")
 
-        print("\(JsonMetaType.integration.fileName)=>")
-        print(jsons![JsonMetaType.integration]!.toString()!)
+        do {
+            if let array = try JSONSerialization.jsonObject(with: jsons![JsonMetaType.data]!) as? [[String: Any]],
+                let object = array.first
+            {
+                XCTAssertEqual(object.count, 5)
+                XCTAssertEqual(object["deprecatedReason"] as! String, "")
+                XCTAssertEqual(object["key"] as! String, "text")
+                XCTAssertEqual(object["type"] as! String, "STRING")
+                XCTAssertEqual(object["description"] as! String, "Button text")
+                XCTAssertEqual(object["deprecated"] as! Bool, false)
+            } else {
+                XCTFail("Failed to parse JSON as array of dictionaries")
+            }
+        } catch {
+            XCTFail("JSON parsing error: \(error)")
+        }
 
-        print("\(JsonMetaType.data.fileName)=>")
-        print(jsons![JsonMetaType.data]!.toString()!)
+        do {
+            if let array = try JSONSerialization.jsonObject(with: jsons![JsonMetaType.event]!) as? [[String: Any]],
+                let object = array.first
+            {
+                XCTAssertEqual(object.count, 4)
+                XCTAssertEqual(object["deprecatedReason"] as! String, "reasion")
+                XCTAssertEqual(object["event"] as! String, "onClick")
+                XCTAssertEqual(object["description"] as! String, "Button on click")
+                XCTAssertEqual(object["deprecated"] as! Bool, true)
+            } else {
+                XCTFail("Failed to parse JSON as array of dictionaries")
+            }
+        } catch {
+            XCTFail("JSON parsing error: \(error)")
+        }
 
-        print("\(JsonMetaType.event.fileName)=>")
-        print(jsons![JsonMetaType.event]!.toString()!)
+        do {
+            if let array = try JSONSerialization.jsonObject(with: jsons![JsonMetaType.properties]!) as? [[String: Any]],
+                let object = array.first
+            {
+                XCTAssertEqual(object.count, 9)
+                XCTAssertEqual(object["deprecatedReason"] as! String, "")
+                XCTAssertEqual(object["valuePicker"] as! String, "color-picker")
+                XCTAssertEqual(object["valuePickerGroup"] as! String, "General")
+                XCTAssertEqual(object["valuePickerOptions"] as! String, "[]")
+                XCTAssertEqual(object["value"] as! String, "#ffffffff")
+                XCTAssertEqual(object["key"] as! String, "background")
+                XCTAssertEqual(object["type"] as! String, "STRING")
+                XCTAssertEqual(object["description"] as! String, "")
+                XCTAssertEqual(object["deprecated"] as! Bool, false)
 
-        print("\(JsonMetaType.properties.fileName)=>")
-        print(jsons![JsonMetaType.properties]!.toString()!)
+            } else {
+                XCTFail("Failed to parse JSON as array of dictionaries")
+            }
+        } catch {
+            XCTFail("JSON parsing error: \(error)")
+        }
 
-        print("\(JsonMetaType.slot.fileName)=>")
-        print(jsons![JsonMetaType.slot]!.toString()!)
-        print("=========================")
-
-        XCTAssertEqual(
-            jsons![JsonMetaType.integration]!.toString()!,
-            """
-            {"documentation":"","description":"This is a button","imageIcon":"","version":2,"deprecatedReason":"reasion","platformSupport":"IOS","deprecated":true,"price":0,"keyType":"XBUTTON","kind":"BLOCK","organizationId":"","name":"X button","public":false}
-            """
-        )
-        XCTAssertEqual(
-            jsons![JsonMetaType.data]!.toString()!,
-            """
-            [{"deprecatedReason":"","key":"text","type":"STRING","description":"Button text","deprecated":false}]
-            """
-        )
-        XCTAssertEqual(
-            jsons![JsonMetaType.event]!.toString()!,
-            """
-            [{"deprecatedReason":"reasion","event":"onClick","description":"Button on click","deprecated":true}]
-            """
-        )
-        XCTAssertEqual(
-            jsons![JsonMetaType.properties]!.toString()!,
-            """
-            [{"deprecatedReason":"","valuePicker":"color-picker","valuePickerGroup":"General","valuePickerOptions":"[]","value":"#ffffffff","key":"background","type":"STRING","description":"","deprecated":false},{"deprecatedReason":"reasion","valuePicker":"dropdown","valuePickerGroup":"Size","valuePickerOptions":"[{\\\"id\\\":\\\"S\\\",\\\"text\\\":\\\"Small\\\"},{\\\"id\\\":\\\"M\",\\\"text\\\":\\\"Medium\\\"},{\\\"id\\\":\\\"L\\\",\\\"text\\\":\\\"Large\\\"}]","value":"S","key":"size","type":"STRING","description":"Button size","deprecated":true}]
-            """
-        )
-        XCTAssertEqual(
-            jsons![JsonMetaType.slot]!.toString()!,
-            """
-            [{"slot":"onLeadingIcon","deprecatedReason":"reasion","description":"Button leading icon","deprecated":true},{"slot":"onTrailingIcon","deprecatedReason":"reasion","description":"Button trailing icon","deprecated":true}]
-            """
-        )
     }
 }

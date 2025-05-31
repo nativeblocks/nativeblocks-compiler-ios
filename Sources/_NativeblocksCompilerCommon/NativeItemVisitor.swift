@@ -25,6 +25,7 @@ public class NativeItemVisitor: SyntaxVisitor {
             let name = getStringValue(name: "name", from: attribute)
             let description = getStringValue(name: "description", from: attribute)
             let version = getIntValue(name: "version", from: attribute)
+            let versionName = getStringValue(name: "versionName", from: attribute)
             let deprecated = getBoolValue(name: "deprecated", from: attribute)
             let deprecatedReason = getStringValue(name: "deprecatedReason", from: attribute)
             nativeItems.append(
@@ -34,6 +35,7 @@ public class NativeItemVisitor: SyntaxVisitor {
                     keyType: keyType!,
                     description: description!,
                     version: version ?? 1,
+                    versionName: versionName ?? "",
                     deprecated: deprecated,
                     deprecatedReason: deprecatedReason ?? "",
                     syntaxStruct: node,
@@ -53,6 +55,7 @@ public class NativeItemVisitor: SyntaxVisitor {
             let name = getStringValue(name: "name", from: attribute)
             let description = getStringValue(name: "description", from: attribute)
             let version = getIntValue(name: "version", from: attribute)
+            let versionName = getStringValue(name: "versionName", from: attribute)
             let deprecated = getBoolValue(name: "deprecated", from: attribute)
             let deprecatedReason = getStringValue(name: "deprecatedReason", from: attribute)
             nativeItems.append(
@@ -62,6 +65,7 @@ public class NativeItemVisitor: SyntaxVisitor {
                     keyType: keyType!,
                     description: description!,
                     version: version ?? 1,
+                    versionName: versionName ?? "",
                     deprecated: deprecated,
                     deprecatedReason: deprecatedReason ?? "",
                     syntaxClass: node,
