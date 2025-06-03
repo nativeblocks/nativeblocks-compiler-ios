@@ -182,6 +182,7 @@ public struct SlotMeta: NativeMeta {
     public var deprecated: Bool
     public var deprecatedReason: String
     public var hasBlockIndex: Bool
+    public var hasBlockScope: Bool
     public var isOptinalFunction: Bool
     public var block: AttributeSyntax?
     public var variable: PatternBindingSyntax?
@@ -193,6 +194,7 @@ public struct SlotMeta: NativeMeta {
         deprecated: Bool,
         deprecatedReason: String,
         hasBlockIndex: Bool,
+        hasBlockScope: Bool,
         isOptinalFunction: Bool,
         block: AttributeSyntax? = nil,
         variable: PatternBindingSyntax? = nil
@@ -201,6 +203,7 @@ public struct SlotMeta: NativeMeta {
         self.slot = slot
         self.description = description
         self.hasBlockIndex = hasBlockIndex
+        self.hasBlockScope = hasBlockScope
         self.isOptinalFunction = isOptinalFunction
         self.block = block
         self.variable = variable

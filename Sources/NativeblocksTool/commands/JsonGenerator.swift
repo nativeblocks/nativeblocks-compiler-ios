@@ -119,7 +119,7 @@ public class JsonGenerator {
     }
 }
 
-public enum JsonMetaType {
+public enum JsonMetaType: CaseIterable {
     case integration
     case data
     case event
