@@ -90,7 +90,7 @@ final class NativeActionTests: XCTestCase {
                         public func handle(actionProps: ActionProps) {
                             let data = actionProps.trigger?.data ?? [:]
                             let properties = actionProps.trigger?.properties ?? [:]
-                            let messageData = actionProps.variables? [data["message"]?.value ?? ""]
+                            let messageData = actionProps.variables[data["message"]?.value ?? ""]
                             let messageDataValue = actionHandleVariableValue(actionProps: actionProps, variable: messageData) ?? ""
                             let animatedProp = Bool(properties["animated"]?.value ?? "") ??  false
                             let param = NativeAlert.Parameter(
@@ -99,7 +99,7 @@ final class NativeActionTests: XCTestCase {
                                 completion: {
 
                                     if actionProps.trigger != nil {
-                                        actionProps.onHandleSuccessNextTrigger?(actionProps.trigger!)
+                                        actionProps.onHandleSuccessNextTrigger(actionProps.trigger!)
                                     }
                                 },
                                 actionProps: actionProps)
@@ -192,7 +192,7 @@ final class NativeActionTests: XCTestCase {
                             Task {
                             let data = actionProps.trigger?.data ?? [:]
                             let properties = actionProps.trigger?.properties ?? [:]
-                            let messageData = actionProps.variables? [data["message"]?.value ?? ""]
+                            let messageData = actionProps.variables[data["message"]?.value ?? ""]
                             let messageDataValue = actionHandleVariableValue(actionProps: actionProps, variable: messageData) ?? ""
                             let animatedProp = Bool(properties["animated"]?.value ?? "") ??  false
                             let param = NativeAlert.Parameter(
@@ -201,7 +201,7 @@ final class NativeActionTests: XCTestCase {
                                 completion: {
 
                                     if actionProps.trigger != nil {
-                                        actionProps.onHandleSuccessNextTrigger?(actionProps.trigger!)
+                                        actionProps.onHandleSuccessNextTrigger(actionProps.trigger!)
                                     }
                                 })
                             await action.callAsFunction(param: param)}

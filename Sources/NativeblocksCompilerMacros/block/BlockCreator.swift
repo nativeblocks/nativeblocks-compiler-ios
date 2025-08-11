@@ -15,7 +15,7 @@ struct BlockCreator {
             try FunctionDeclSyntax("public func blockView(blockProps: BlockProps) -> any View") {
                 """
                 if let visibilityKey = blockProps.block?.visibility,
-                       let visibility = blockProps.variables?[visibilityKey]?.value,
+                       let visibility = blockProps.variables[visibilityKey]?.value,
                        visibility == "false" {
                         return EmptyView()
                     }
@@ -69,7 +69,7 @@ struct BlockCreator {
                     }
                     if !metaEvent.isEmpty {
                         """
-                        let action = blockProps.actions? [blockProps.block?.key ?? ""] ?? []
+                        let action = blockProps.actions[blockProps.block?.key ?? ""] ?? []
                         """
                     }
                     """
@@ -77,7 +77,7 @@ struct BlockCreator {
                     """
                     for data in metaData {
                         """
-                        let \(raw: data.key)Data = blockProps.variables?[data["\(raw: data.key)"]?.value ?? ""]
+                        let \(raw: data.key)Data = blockProps.variables[data["\(raw: data.key)"]?.value ?? ""]
                         """
                     }
 
@@ -135,7 +135,7 @@ struct BlockCreator {
                                 """
                                 if var \(param)Updated = \(param)Data {
                                     \(param)Updated.value = String(describing: \(param)Param)
-                                    blockProps.onVariableChange?(\(param)Updated)
+                                    blockProps.onVariableChange(\(param)Updated)
                                 }
                                 """
                             }.joined())
@@ -149,7 +149,7 @@ struct BlockCreator {
                             slot.position,
                             """
                             \(slot.slot): \(slot.slot)Slot == nil ? \(slot.isOptinalFunction ? "nil" : "{ \(slot.hasBlockIndex ? "index" : "")\(slot.hasBlockIndex && slot.hasBlockScope ? ", ":"")\(slot.hasBlockScope ? "scope" : "")\((slot.hasBlockIndex || slot.hasBlockScope) ? " in" : "") AnyView(EmptyView())}") : { \(slot.hasBlockIndex ? "index" : "")\(slot.hasBlockIndex && slot.hasBlockScope ? ", ":"")\(slot.hasBlockScope ? "scope" : "")\((slot.hasBlockIndex || slot.hasBlockScope) ? " in" : "")
-                                (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], \(slot.slot)Slot!, \(slot.hasBlockIndex ?"index": "-1"), \(slot.hasBlockScope ?"scope": "nil"))) ?? AnyView(EmptyView())
+                                (blockProps.onSubBlock(blockProps.block?.subBlocks ?? [:], \(slot.slot)Slot!, \(slot.hasBlockIndex ?"index": "-1"), \(slot.hasBlockScope ?"scope": "nil")))
                             }
                             """
                         )
@@ -272,7 +272,7 @@ struct BlockCreator {
         default:
             return
                 """
-                NativeblocksManager.getInstance().getTypeConverter(\(item.type).self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass,properties["\(item.key)"]) ?? "\(item.value)")
+                blockHandleTypeConverter(blockProps: blockProps, type:\(item.type).self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass,properties["\(item.key)"]) ?? "\(item.value)")
                 """
         }
     }
