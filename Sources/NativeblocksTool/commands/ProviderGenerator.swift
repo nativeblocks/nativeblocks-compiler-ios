@@ -70,10 +70,10 @@ public class ProviderGenerator {
             import Nativeblocks
             """
             try ClassDeclSyntax("public class \(raw: prefix)BlockProvider") {
-                try FunctionDeclSyntax("public static func provideBlocks()") {
+                try FunctionDeclSyntax("public static func provideBlocks(name: String = \"default\")") {
                     for block in blocks {
                         """
-                        NativeblocksManager.getInstance().provideBlock(blockKeyType: "\(raw: block.keyType)", block: \(raw: block.declName)Block())
+                        NativeblocksManager.getInstance(name: name).provideBlock(blockKeyType: "\(raw: block.keyType)", block: \(raw: block.declName)Block())
                         """
                     }
                 }
@@ -93,10 +93,10 @@ public class ProviderGenerator {
                     """
                 }.joined(separator: " ,")
 
-                try FunctionDeclSyntax("public static func provideActions(\(raw: arguments))") {
+                try FunctionDeclSyntax("public static func provideActions(name: String = \"default\" ,\(raw: arguments))") {
                     for action in actions {
                         """
-                        NativeblocksManager.getInstance().provideAction(actionKeyType: "\(raw: action.keyType)", action: \(raw: action.declName)Action(action: \(raw: refinActionArgumentName(name: action.declName))))
+                        NativeblocksManager.getInstance(name: name).provideAction(actionKeyType: "\(raw: action.keyType)", action: \(raw: action.declName)Action(action: \(raw: refinActionArgumentName(name: action.declName))))
                         """
                     }
                 }

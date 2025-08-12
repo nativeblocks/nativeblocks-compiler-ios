@@ -56,8 +56,8 @@ final class GenerateProviderTest: XCTestCase {
             """
             import Nativeblocks
             public class DefaultActionProvider {
-                public static func provideActions(nativeAlert : NativeAlert) {
-                    NativeblocksManager.getInstance().provideAction(actionKeyType: "ALERT", action: NativeAlertAction(action: nativeAlert))
+                public static func provideActions(name: String = "default" , nativeAlert : NativeAlert) {
+                    NativeblocksManager.getInstance(name: name).provideAction(actionKeyType: "ALERT", action: NativeAlertAction(action: nativeAlert))
                 }
             }
             """
@@ -100,9 +100,9 @@ final class GenerateProviderTest: XCTestCase {
             """
             import Nativeblocks
             public class DefaultBlockProvider {
-                public static func provideBlocks() {
-                    NativeblocksManager.getInstance().provideBlock(blockKeyType: "MYText", block: MyTextBlock())
-                    NativeblocksManager.getInstance().provideBlock(blockKeyType: "MYText2", block: MyText2Block())
+                public static func provideBlocks(name: String = "default") {
+                    NativeblocksManager.getInstance(name: name).provideBlock(blockKeyType: "MYText", block: MyTextBlock())
+                    NativeblocksManager.getInstance(name: name).provideBlock(blockKeyType: "MYText2", block: MyText2Block())
                 }
             }
             """

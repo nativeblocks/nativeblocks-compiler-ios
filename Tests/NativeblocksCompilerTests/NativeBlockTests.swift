@@ -51,7 +51,7 @@ final class NativeBlockTests: XCTestCase {
                     public struct MyTextBlock: INativeBlock {
                         public func blockView(blockProps: BlockProps) -> any View {
                             if let visibilityKey = blockProps.block?.visibility,
-                                   let visibility = blockProps.variables? [visibilityKey]?.value,
+                                   let visibility = blockProps.variables[visibilityKey]?.value,
                                    visibility == "false" {
                                     return EmptyView()
                                 }
@@ -65,10 +65,10 @@ final class NativeBlockTests: XCTestCase {
                             var body: some View {
                                 let data = blockProps.block?.data ?? [:]
                                 let properties = blockProps.block?.properties ?? [:]
-                                let textData = blockProps.variables? [data["text"]?.value ?? ""]
+                                let textData = blockProps.variables[data["text"]?.value ?? ""]
                                 let numberProp = Int(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["number"]) ?? "") ?? 1
-                                let userProp = NativeblocksManager.getInstance().getTypeConverter(User.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["user"]) ?? "{\\\"name\\\":\\\"Name2\\\"}")
-                                let fontWeightProp = NativeblocksManager.getInstance().getTypeConverter(Font.Weight.Big.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["fontWeight"]) ?? "regular")
+                                let userProp = blockHandleTypeConverter(blockProps: blockProps, type: User.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["user"]) ?? "{\\\"name\\\":\\\"Name2\\\"}")
+                                let fontWeightProp = blockHandleTypeConverter(blockProps: blockProps, type: Font.Weight.Big.self).fromString(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["fontWeight"]) ?? "regular")
                                 return MyText(
                                     text: textDataValue,
                                     number: numberProp,
@@ -131,7 +131,7 @@ final class NativeBlockTests: XCTestCase {
                     public struct MyTextBlock: INativeBlock {
                         public func blockView(blockProps: BlockProps) -> any View {
                             if let visibilityKey = blockProps.block?.visibility,
-                                   let visibility = blockProps.variables? [visibilityKey]?.value,
+                                   let visibility = blockProps.variables[visibilityKey]?.value,
                                    visibility == "false" {
                                     return EmptyView()
                                 }
@@ -221,7 +221,7 @@ final class NativeBlockTests: XCTestCase {
                     public struct MyTextBlock: INativeBlock {
                         public func blockView(blockProps: BlockProps) -> any View {
                             if let visibilityKey = blockProps.block?.visibility,
-                                   let visibility = blockProps.variables? [visibilityKey]?.value,
+                                   let visibility = blockProps.variables[visibilityKey]?.value,
                                    visibility == "false" {
                                     return EmptyView()
                                 }
@@ -237,10 +237,10 @@ final class NativeBlockTests: XCTestCase {
                             var body: some View {
                                 let data = blockProps.block?.data ?? [:]
                                 let properties = blockProps.block?.properties ?? [:]
-                                let action = blockProps.actions? [blockProps.block?.key ?? ""] ?? []
-                                let textData = blockProps.variables? [data["text"]?.value ?? ""]
-                                let numberData = blockProps.variables? [data["number"]?.value ?? ""]
-                                let percentData = blockProps.variables? [data["percent"]?.value ?? ""]
+                                let action = blockProps.actions[blockProps.block?.key ?? ""] ?? []
+                                let textData = blockProps.variables[data["text"]?.value ?? ""]
+                                let numberData = blockProps.variables[data["number"]?.value ?? ""]
+                                let percentData = blockProps.variables[data["percent"]?.value ?? ""]
                                 let visiableProp = Bool(findWindowSizeClass(verticalSizeClass, horizontalSizeClass, properties["visiable"]) ?? "") ??  false
                                 let onChangeEvent = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onChange")
                                 let onChange2Event = blockProvideEvent(blockProps: blockProps, action: action, eventType: "onChange2")
@@ -253,22 +253,22 @@ final class NativeBlockTests: XCTestCase {
                                     onChange: { textParam, numberParam in
                                         if var textUpdated = textData {
                                             textUpdated.value = String(describing: textParam)
-                                            blockProps.onVariableChange?(textUpdated)
+                                            blockProps.onVariableChange(textUpdated)
                                         }
                                         if var numberUpdated = numberData {
                                             numberUpdated.value = String(describing: numberParam)
-                                            blockProps.onVariableChange?(numberUpdated)
+                                            blockProps.onVariableChange(numberUpdated)
                                         }
                                         onChangeEvent?()
                                     },
                                     onChange2: onChange2Event == nil ? nil : { textParam, numberParam in
                                         if var textUpdated = textData {
                                             textUpdated.value = String(describing: textParam)
-                                            blockProps.onVariableChange?(textUpdated)
+                                            blockProps.onVariableChange(textUpdated)
                                         }
                                         if var numberUpdated = numberData {
                                             numberUpdated.value = String(describing: numberParam)
-                                            blockProps.onVariableChange?(numberUpdated)
+                                            blockProps.onVariableChange(numberUpdated)
                                         }
                                         onChange2Event?()
                                     },
@@ -342,7 +342,7 @@ final class NativeBlockTests: XCTestCase {
                     public struct MyColumnBlock: INativeBlock {
                         public func blockView(blockProps: BlockProps) -> any View {
                             if let visibilityKey = blockProps.block?.visibility,
-                                   let visibility = blockProps.variables? [visibilityKey]?.value,
+                                   let visibility = blockProps.variables[visibilityKey]?.value,
                                    visibility == "false" {
                                     return EmptyView()
                                 }
@@ -362,20 +362,20 @@ final class NativeBlockTests: XCTestCase {
                                     content: contentSlot == nil ? { index in
                                         AnyView(EmptyView())
                                     } : { index in
-                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], contentSlot!, index, nil)) ?? AnyView(EmptyView())
+                                        (blockProps.onSubBlock(blockProps.block?.subBlocks ?? [:], contentSlot!, index, nil))
                                     },
                                     content1: content1Slot == nil ? { index, scope in
                                         AnyView(EmptyView())
                                     } : { index, scope in
-                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], content1Slot!, index, scope)) ?? AnyView(EmptyView())
+                                        (blockProps.onSubBlock(blockProps.block?.subBlocks ?? [:], content1Slot!, index, scope))
                                     },
                                     content2: content2Slot == nil ? { scope in
                                         AnyView(EmptyView())
                                     } : { scope in
-                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], content2Slot!, -1, scope)) ?? AnyView(EmptyView())
+                                        (blockProps.onSubBlock(blockProps.block?.subBlocks ?? [:], content2Slot!, -1, scope))
                                     },
                                     content3: content3Slot == nil ? nil : {
-                                        (blockProps.onSubBlock?(blockProps.block?.subBlocks ?? [:], content3Slot!, -1, nil)) ?? AnyView(EmptyView())
+                                        (blockProps.onSubBlock(blockProps.block?.subBlocks ?? [:], content3Slot!, -1, nil))
                                     }
                                 )
                             }
