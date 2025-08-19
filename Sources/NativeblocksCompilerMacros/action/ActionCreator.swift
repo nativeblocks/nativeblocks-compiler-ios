@@ -44,7 +44,7 @@ enum ActionCreator {
                 """
                 for data in metaData {
                     """
-                    let \(raw: data.key)Data = actionProps.variables[data["\(raw: data.key)"]?.value ?? ""]
+                    let \(raw: data.key)Data = actionProps.onFindVariable(data["\(raw: data.key)"]?.value ?? "")
                     """
                 }
                 for data in metaData {

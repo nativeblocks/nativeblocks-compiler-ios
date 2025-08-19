@@ -15,7 +15,7 @@ struct BlockCreator {
             try FunctionDeclSyntax("public func blockView(blockProps: BlockProps) -> any View") {
                 """
                 if let visibilityKey = blockProps.block?.visibility,
-                       let visibility = blockProps.variables[visibilityKey]?.value,
+                       let visibility = blockProps.onFindVariable(visibilityKey)?.value,
                        visibility == "false" {
                         return EmptyView()
                     }
@@ -62,22 +62,12 @@ struct BlockCreator {
                         let properties = blockProps.block?.properties ?? [:]
                         """
                     }
-                    if !metaSlot.isEmpty {
-                        """
-                        let slots = blockProps.block?.slots ?? [:]
-                        """
-                    }
-                    if !metaEvent.isEmpty {
-                        """
-                        let action = blockProps.actions[blockProps.block?.key ?? ""] ?? []
-                        """
-                    }
                     """
                     //Block Data
                     """
                     for data in metaData {
                         """
-                        let \(raw: data.key)Data = blockProps.variables[data["\(raw: data.key)"]?.value ?? ""]
+                        let \(raw: data.key)Data = blockProps.onFindVariable(data["\(raw: data.key)"]?.value ?? "")
                         """
                     }
 
@@ -95,7 +85,7 @@ struct BlockCreator {
                     """
                     for event in metaEvent {
                         """
-                        let \(raw: event.event)Event = blockProvideEvent(blockProps: blockProps, action: action, eventType: "\(raw: event.event)")
+                        let \(raw: event.event)Event = blockProvideEvent(blockProps: blockProps, eventType: "\(raw: event.event)")
                         """
                     }
 
@@ -104,7 +94,7 @@ struct BlockCreator {
                     """
                     for slot in metaSlot {
                         """
-                        let \(raw: slot.slot)Slot = blockProvideSlot(blockProps: blockProps, slots: slots, slotType: "\(raw: slot.slot)")
+                        let \(raw: slot.slot)Slot = blockProvideSlot(blockProps: blockProps, slotType: "\(raw: slot.slot)")
                         """
                     }
 
