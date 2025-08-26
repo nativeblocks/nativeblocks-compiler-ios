@@ -11,170 +11,163 @@ struct BlockCreator {
         metaSlot: [SlotMeta],
         metaExtraParams: [ExtraParamMeta]
     ) throws -> StructDeclSyntax {
-        return try StructDeclSyntax("public struct \(raw: structName)Block: INativeBlock") {
-            try FunctionDeclSyntax("public func blockView(blockProps: BlockProps) -> any View") {
+        return try StructDeclSyntax("public struct \(raw: structName)Block: View") {
+            try VariableDeclSyntax("var blockProps: BlockProps")
+            try VariableDeclSyntax("@State private var resolved: ResolvedProperties")
+            try VariableDeclSyntax(
                 """
-                return InternalRootView(blockProps: blockProps)
+                @Environment(\\.verticalSizeClass) var verticalSizeClass
+                """
+            )
+            try VariableDeclSyntax(
+                """
+                @Environment(\\.horizontalSizeClass) var horizontalSizeClass
+                """
+            )
+
+            try InitializerDeclSyntax("init(blockProps: BlockProps)") {
+                """
+                self.blockProps = blockProps
+                """
+                """
+                resolved = ResolvedProperties.make(
+                    blockProps: blockProps,
+                    verticalSizeClass: nil,
+                    horizontalSizeClass: nil
+                )
                 """
             }
-            try StructDeclSyntax("private struct InternalRootView: View") {
-                try VariableDeclSyntax("var blockProps: BlockProps")
-                try VariableDeclSyntax("@State private var resolved: ResolvedProperties")
-                try VariableDeclSyntax(
-                    """
-                    @Environment(\\.verticalSizeClass) var verticalSizeClass
-                    """
-                )
-                try VariableDeclSyntax(
-                    """
-                    @Environment(\\.horizontalSizeClass) var horizontalSizeClass
-                    """
-                )
 
-                try InitializerDeclSyntax("init(blockProps: BlockProps)") {
+            for data in metaData {
+                try VariableDeclSyntax(
                     """
-                    self.blockProps = blockProps
+                    @State private var  \(raw: data.key)DataValue = \(raw: dataDefaultMapper(dataItem: data))
                     """
+                )
+                try VariableDeclSyntax(
                     """
+                    private var  \(raw: data.key)Data :  NativeVariableModel? {
+                        blockProps.onFindVariable(blockProps.block?.data?["\(raw: data.key)"]?.value ?? "")
+                    }
+                    """
+                )
+            }
+
+            try VariableDeclSyntax(
+                """
+                @State private var visibility: Bool = true
+                """
+            )
+            try VariableDeclSyntax(
+                """
+                private var visibilityVariable: NativeVariableModel? {
+                    blockProps.onFindVariable(blockProps.block?.visibility ?? "")
+                }
+                """
+            )
+
+            try VariableDeclSyntax(
+                """
+                public var body: some View
+                """
+            ) {
+                let dataArguments = metaData.map {
+                    (
+                        $0.position,
+                        """
+                        \($0.key): \($0.key)DataValue
+                        """
+                    )
+                }
+
+                let propArguments = metaProp.map {
+                    (
+                        $0.position,
+                        """
+                        \($0.key): resolved.\($0.key)Prop
+                        """
+                    )
+                }
+
+                let eventArguments = metaEvent.map { event in
+                    (
+                        event.position,
+                        """
+                        \(event.event):\(event.isOptinalFunction ? "resolved.\(event.event)Event == nil ? nil :" : "") { \(event.dataBinding.map { "\($0)Param" }.joined(separator: ",")) \(event.dataBinding.isEmpty ? "" : "in")
+                        \(event.dataBinding.map { param in
+                            """
+                            if var \(param)Updated = \(param)Data {
+                                \(param)Updated.value = String(describing: \(param)Param)
+                                blockProps.onVariableChange(\(param)Updated)
+                            }
+                            """
+                        }.joined())
+                         resolved.\(event.event)Event?()
+                        }
+                        """
+                    )
+                }
+                let slotArguments = metaSlot.map { slot in
+                    (
+                        slot.position,
+                        """
+                        \(slot.slot): resolved.\(slot.slot)Slot == nil ? \(slot.isOptinalFunction ? "nil" : "{ \(slot.hasBlockIndex ? "index" : "")\(slot.hasBlockIndex && slot.hasBlockScope ? ", ":"")\(slot.hasBlockScope ? "scope" : "")\((slot.hasBlockIndex || slot.hasBlockScope) ? " in" : "") AnyView(EmptyView())}") : { \(slot.hasBlockIndex ? "index" : "")\(slot.hasBlockIndex && slot.hasBlockScope ? ", ":"")\(slot.hasBlockScope ? "scope" : "")\((slot.hasBlockIndex || slot.hasBlockScope) ? " in" : "")
+                            (blockProps.onSubBlock(blockProps.block?.subBlocks ?? [:], resolved.\(slot.slot)Slot!, \(slot.hasBlockIndex ?"index": "-1"), \(slot.hasBlockScope ?"scope": "nil")))
+                        }
+                        """
+                    )
+                }
+
+                let extraParamArguments = metaExtraParams.map {
+                    (
+                        $0.position,
+                        """
+                        \($0.key): \($0.key)
+                        """
+                    )
+                }
+
+                let arguments = (dataArguments + propArguments + eventArguments + slotArguments + extraParamArguments)
+                    .sorted { $0.0 < $1.0 }
+                    .map { $0.1 }
+                    .joined(separator: ",\n")
+
+                """
+                Group {
+                    if visibility {
+                """
+                """
+                        \(raw: structName)(\n\(raw: arguments)\n)
+                """
+                """
+                    } else {
+                        EmptyView()
+                    }
+                }
+                """
+                for data in metaData {
+                    """
+                    .task(id: \(raw: data.key)Data?.value ?? "") {
+                    \(raw: data.key)DataValue = \(raw: dataTypeMapper(dataItem: data))
+                    }
+                    """
+                }
+                """
+                .task(id: visibilityVariable?.value ?? "") {
+                    let rawValue = blockHandleVariableValue(blockProps: blockProps, variable: visibilityVariable) ?? "true"
+                    visibility = rawValue != "false"
+                }
+                """
+                """
+                .onChange(of: blockProps.block?.properties?.hash() ?? 0) { _ in
                     resolved = ResolvedProperties.make(
                         blockProps: blockProps,
-                        verticalSizeClass: nil,
-                        horizontalSizeClass: nil
-                    )
-                    """
-                }
-
-                for data in metaData {
-                    try VariableDeclSyntax(
-                        """
-                        @State private var  \(raw: data.key)DataValue = \(raw: dataDefaultMapper(dataItem: data))
-                        """
-                    )
-                    try VariableDeclSyntax(
-                        """
-                        private var  \(raw: data.key)Data :  NativeVariableModel? {
-                            blockProps.onFindVariable(blockProps.block?.data?["\(raw: data.key)"]?.value ?? "")
-                        }
-                        """
+                        verticalSizeClass: verticalSizeClass,
+                        horizontalSizeClass: horizontalSizeClass
                     )
                 }
+                """
 
-                try VariableDeclSyntax(
-                    """
-                    @State private var visibility: Bool = true
-                    """
-                )
-                try VariableDeclSyntax(
-                    """
-                    private var visibilityVariable: NativeVariableModel? {
-                        blockProps.onFindVariable(blockProps.block?.visibility ?? "")
-                    }
-                    """
-                )
-
-                try VariableDeclSyntax(
-                    """
-                    var body: some View
-                    """
-                ) {
-                    let dataArguments = metaData.map {
-                        (
-                            $0.position,
-                            """
-                            \($0.key): \($0.key)DataValue
-                            """
-                        )
-                    }
-
-                    let propArguments = metaProp.map {
-                        (
-                            $0.position,
-                            """
-                            \($0.key): resolved.\($0.key)Prop
-                            """
-                        )
-                    }
-
-                    let eventArguments = metaEvent.map { event in
-                        (
-                            event.position,
-                            """
-                            \(event.event):\(event.isOptinalFunction ? "resolved.\(event.event)Event == nil ? nil :" : "") { \(event.dataBinding.map { "\($0)Param" }.joined(separator: ",")) \(event.dataBinding.isEmpty ? "" : "in")
-                            \(event.dataBinding.map { param in
-                                """
-                                if var \(param)Updated = \(param)Data {
-                                    \(param)Updated.value = String(describing: \(param)Param)
-                                    blockProps.onVariableChange(\(param)Updated)
-                                }
-                                """
-                            }.joined())
-                             resolved.\(event.event)Event?()
-                            }
-                            """
-                        )
-                    }
-                    let slotArguments = metaSlot.map { slot in
-                        (
-                            slot.position,
-                            """
-                            \(slot.slot): resolved.\(slot.slot)Slot == nil ? \(slot.isOptinalFunction ? "nil" : "{ \(slot.hasBlockIndex ? "index" : "")\(slot.hasBlockIndex && slot.hasBlockScope ? ", ":"")\(slot.hasBlockScope ? "scope" : "")\((slot.hasBlockIndex || slot.hasBlockScope) ? " in" : "") AnyView(EmptyView())}") : { \(slot.hasBlockIndex ? "index" : "")\(slot.hasBlockIndex && slot.hasBlockScope ? ", ":"")\(slot.hasBlockScope ? "scope" : "")\((slot.hasBlockIndex || slot.hasBlockScope) ? " in" : "")
-                                (blockProps.onSubBlock(blockProps.block?.subBlocks ?? [:], resolved.\(slot.slot)Slot!, \(slot.hasBlockIndex ?"index": "-1"), \(slot.hasBlockScope ?"scope": "nil")))
-                            }
-                            """
-                        )
-                    }
-
-                    let extraParamArguments = metaExtraParams.map {
-                        (
-                            $0.position,
-                            """
-                            \($0.key): \($0.key)
-                            """
-                        )
-                    }
-
-                    let arguments = (dataArguments + propArguments + eventArguments + slotArguments + extraParamArguments)
-                        .sorted { $0.0 < $1.0 }
-                        .map { $0.1 }
-                        .joined(separator: ",\n")
-
-                    """
-                    Group {
-                        if visibility {
-                    """
-                    """
-                            \(raw: structName)(\n\(raw: arguments)\n)
-                    """
-                    """
-                        } else {
-                            EmptyView()
-                        }
-                    }
-                    """
-                    for data in metaData {
-                        """
-                        .task(id: \(raw: data.key)Data?.value ?? "") {
-                        \(raw: data.key)DataValue = \(raw: dataTypeMapper(dataItem: data))
-                        }
-                        """
-                    }
-                    """
-                    .task(id: visibilityVariable?.value ?? "") {
-                        let rawValue = blockHandleVariableValue(blockProps: blockProps, variable: visibilityVariable) ?? "true"
-                        visibility = rawValue != "false"
-                    }
-                    """
-                    """
-                    .onChange(of: blockProps.block?.properties?.hash() ?? 0) { _ in
-                        resolved = ResolvedProperties.make(
-                            blockProps: blockProps,
-                            verticalSizeClass: verticalSizeClass,
-                            horizontalSizeClass: horizontalSizeClass
-                        )
-                    }
-                    """
-
-                }
             }
             try StructDeclSyntax("private struct ResolvedProperties") {
                 for prop in metaProp {
