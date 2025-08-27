@@ -13,210 +13,168 @@ struct BlockCreator {
     ) throws -> StructDeclSyntax {
         return try StructDeclSyntax("public struct \(raw: structName)Block: View") {
             try VariableDeclSyntax("var blockProps: BlockProps")
-            try VariableDeclSyntax("@State private var resolved: ResolvedProperties")
             try VariableDeclSyntax(
-                """
-                @Environment(\\.verticalSizeClass) var verticalSizeClass
-                """
-            )
-            try VariableDeclSyntax(
-                """
-                @Environment(\\.horizontalSizeClass) var horizontalSizeClass
-                """
-            )
-
-            try InitializerDeclSyntax("init(blockProps: BlockProps)") {
-                """
-                self.blockProps = blockProps
-                """
-                """
-                resolved = ResolvedProperties.make(
-                    blockProps: blockProps,
-                    verticalSizeClass: nil,
-                    horizontalSizeClass: nil
-                )
-                """
-            }
-
-            for data in metaData {
-                try VariableDeclSyntax(
-                    """
-                    @State private var  \(raw: data.key)DataValue = \(raw: dataDefaultMapper(dataItem: data))
-                    """
-                )
-                try VariableDeclSyntax(
-                    """
-                    private var  \(raw: data.key)Data :  NativeVariableModel? {
-                        blockProps.onFindVariable(blockProps.block?.data?["\(raw: data.key)"]?.value ?? "")
-                    }
-                    """
-                )
-            }
-
-            try VariableDeclSyntax(
-                """
-                @State private var visibility: Bool = true
-                """
-            )
-            try VariableDeclSyntax(
-                """
-                private var visibilityVariable: NativeVariableModel? {
-                    blockProps.onFindVariable(blockProps.block?.visibility ?? "")
-                }
-                """
-            )
-
-            try VariableDeclSyntax(
-                """
-                public var body: some View
-                """
+                  """
+                  public var body: some View
+                  """
             ) {
-                let dataArguments = metaData.map {
-                    (
-                        $0.position,
-                        """
-                        \($0.key): \($0.key)DataValue
-                        """
-                    )
-                }
-
-                let propArguments = metaProp.map {
-                    (
-                        $0.position,
-                        """
-                        \($0.key): resolved.\($0.key)Prop
-                        """
-                    )
-                }
-
-                let eventArguments = metaEvent.map { event in
-                    (
-                        event.position,
-                        """
-                        \(event.event):\(event.isOptinalFunction ? "resolved.\(event.event)Event == nil ? nil :" : "") { \(event.dataBinding.map { "\($0)Param" }.joined(separator: ",")) \(event.dataBinding.isEmpty ? "" : "in")
-                        \(event.dataBinding.map { param in
-                            """
-                            if var \(param)Updated = \(param)Data {
-                                \(param)Updated.value = String(describing: \(param)Param)
-                                blockProps.onVariableChange(\(param)Updated)
-                            }
-                            """
-                        }.joined())
-                         resolved.\(event.event)Event?()
-                        }
-                        """
-                    )
-                }
-                let slotArguments = metaSlot.map { slot in
-                    (
-                        slot.position,
-                        """
-                        \(slot.slot): resolved.\(slot.slot)Slot == nil ? \(slot.isOptinalFunction ? "nil" : "{ \(slot.hasBlockIndex ? "index" : "")\(slot.hasBlockIndex && slot.hasBlockScope ? ", ":"")\(slot.hasBlockScope ? "scope" : "")\((slot.hasBlockIndex || slot.hasBlockScope) ? " in" : "") AnyView(EmptyView())}") : { \(slot.hasBlockIndex ? "index" : "")\(slot.hasBlockIndex && slot.hasBlockScope ? ", ":"")\(slot.hasBlockScope ? "scope" : "")\((slot.hasBlockIndex || slot.hasBlockScope) ? " in" : "")
-                            (blockProps.onSubBlock(blockProps.block?.subBlocks ?? [:], resolved.\(slot.slot)Slot!, \(slot.hasBlockIndex ?"index": "-1"), \(slot.hasBlockScope ?"scope": "nil")))
-                        }
-                        """
-                    )
-                }
-
-                let extraParamArguments = metaExtraParams.map {
-                    (
-                        $0.position,
-                        """
-                        \($0.key): \($0.key)
-                        """
-                    )
-                }
-
-                let arguments = (dataArguments + propArguments + eventArguments + slotArguments + extraParamArguments)
-                    .sorted { $0.0 < $1.0 }
-                    .map { $0.1 }
-                    .joined(separator: ",\n")
-
                 """
                 Group {
-                    if visibility {
-                """
-                """
-                        \(raw: structName)(\n\(raw: arguments)\n)
-                """
-                """
-                    } else {
+                    if let visibilityKey = blockProps.block?.visibility,
+                       let visibility = blockProps.onFindVariable(visibilityKey)?.value,
+                       visibility == "false" {
                         EmptyView()
+                    } else {
+                        InternalView(blockProps: blockProps)
                     }
                 }
                 """
+            }
+           
+            try StructDeclSyntax("private struct InternalView: View") {
+                try VariableDeclSyntax("var blockProps: BlockProps")
+
+                try VariableDeclSyntax(
+                    """
+                    @Environment(\\.verticalSizeClass) var verticalSizeClass
+                    """
+                )
+                try VariableDeclSyntax(
+                    """
+                    @Environment(\\.horizontalSizeClass) var horizontalSizeClass
+                    """
+                )
+
                 for data in metaData {
-                    """
-                    .task(id: \(raw: data.key)Data?.value ?? "") {
-                    \(raw: data.key)DataValue = \(raw: dataTypeMapper(dataItem: data))
-                    }
-                    """
-                }
-                """
-                .task(id: visibilityVariable?.value ?? "") {
-                    let rawValue = blockHandleVariableValue(blockProps: blockProps, variable: visibilityVariable) ?? "true"
-                    visibility = rawValue != "false"
-                }
-                """
-                """
-                .onChange(of: blockProps.block?.properties?.hash() ?? 0) { _ in
-                    resolved = ResolvedProperties.make(
-                        blockProps: blockProps,
-                        verticalSizeClass: verticalSizeClass,
-                        horizontalSizeClass: horizontalSizeClass
+                    try VariableDeclSyntax(
+                        """
+                        @State private var  \(raw: data.key)DataValue = \(raw: dataDefaultMapper(dataItem: data))
+                        """
                     )
                 }
-                """
 
-            }
-            try StructDeclSyntax("private struct ResolvedProperties") {
-                for prop in metaProp {
+                try VariableDeclSyntax(
                     """
-                    let \(raw: prop.key)Prop : \(raw: prop.type)
+                    var body: some View
                     """
-                }
-
-                for event in metaEvent {
-                    """
-                    let \(raw: event.event)Event : (() -> Void)?
-                    """
-                }
-
-                for slot in metaSlot {
-                    """
-                    let \(raw: slot.slot)Slot : NativeBlockSlotModel?
-                    """
-                }
-
-                try FunctionDeclSyntax(
-                    "static func make(blockProps: BlockProps, verticalSizeClass: UserInterfaceSizeClass?, horizontalSizeClass: UserInterfaceSizeClass?) -> ResolvedProperties"
                 ) {
+                    if !metaData.isEmpty {
+                        """
+                        let data = blockProps.block?.data ?? [:]
+                        """
+                    }
                     if !metaProp.isEmpty {
                         """
                         let properties = blockProps.block?.properties ?? [:]
                         """
                     }
                     """
-                    return ResolvedProperties(\n
+                    //Block Data
+                    """
+                    for data in metaData {
+                        """
+                        let \(raw: data.key)Data = blockProps.onFindVariable(data["\(raw: data.key)"]?.value ?? "")
+                        """
+                    }
+
+                    """
+                    //Block Properties
                     """
                     for prop in metaProp {
                         """
-                        \(raw: prop.key)Prop : \(raw: propTypeMapper(item: prop) ?? ""),
+                        let \(raw: prop.key)Prop = \(raw: propTypeMapper(item: prop) ?? "")
                         """
                     }
+
+                    """
+                    //Block Events
+                    """
                     for event in metaEvent {
                         """
-                        \(raw: event.event)Event : blockProvideEvent(blockProps: blockProps, eventType: "\(raw: event.event)"),
+                        let \(raw: event.event)Event = blockProvideEvent(blockProps: blockProps, eventType: "\(raw: event.event)")
                         """
                     }
+
+                    """
+                    //Block Slots
+                    """
                     for slot in metaSlot {
                         """
-                        \(raw: slot.slot)Slot : blockProvideSlot(blockProps: blockProps, slotType: "\(raw: slot.slot)"),
+                        let \(raw: slot.slot)Slot = blockProvideSlot(blockProps: blockProps, slotType: "\(raw: slot.slot)")
                         """
                     }
+
+                    let dataArguments = metaData.map {
+                        (
+                            $0.position,
+                            """
+                            \($0.key): \($0.key)DataValue
+                            """
+                        )
+                    }
+
+                    let propArguments = metaProp.map {
+                        (
+                            $0.position,
+                            """
+                            \($0.key): \($0.key)Prop
+                            """
+                        )
+                    }
+
+                    let eventArguments = metaEvent.map { event in
+                        (
+                            event.position,
+                            """
+                            \(event.event):\(event.isOptinalFunction ? "\(event.event)Event == nil ? nil :" : "") { \(event.dataBinding.map { "\($0)Param" }.joined(separator: ",")) \(event.dataBinding.isEmpty ? "" : "in")
+                            \(event.dataBinding.map { param in
+                                """
+                                if var \(param)Updated = \(param)Data {
+                                    \(param)Updated.value = String(describing: \(param)Param)
+                                    blockProps.onVariableChange(\(param)Updated)
+                                }
+                                """
+                            }.joined())
+                            \(event.event)Event?()
+                            }
+                            """
+                        )
+                    }
+                    let slotArguments = metaSlot.map { slot in
+                        (
+                            slot.position,
+                            """
+                            \(slot.slot): \(slot.slot)Slot == nil ? \(slot.isOptinalFunction ? "nil" : "{ \(slot.hasBlockIndex ? "index" : "")\(slot.hasBlockIndex && slot.hasBlockScope ? ", ":"")\(slot.hasBlockScope ? "scope" : "")\((slot.hasBlockIndex || slot.hasBlockScope) ? " in" : "") AnyView(EmptyView())}") : { \(slot.hasBlockIndex ? "index" : "")\(slot.hasBlockIndex && slot.hasBlockScope ? ", ":"")\(slot.hasBlockScope ? "scope" : "")\((slot.hasBlockIndex || slot.hasBlockScope) ? " in" : "")
+                                (blockProps.onSubBlock(blockProps.block?.subBlocks ?? [:], \(slot.slot)Slot!, \(slot.hasBlockIndex ?"index": "-1"), \(slot.hasBlockScope ?"scope": "nil")))
+                            }
+                            """
+                        )
+                    }
+
+                    let extraParamArguments = metaExtraParams.map {
+                        (
+                            $0.position,
+                            """
+                            \($0.key): \($0.key)
+                            """
+                        )
+                    }
+
+                    let arguments = (dataArguments + propArguments + eventArguments + slotArguments + extraParamArguments)
+                        .sorted { $0.0 < $1.0 }
+                        .map { $0.1 }
+                        .joined(separator: ",\n")
+
                     """
-                    \n)
+                    return \(raw: structName)(\n\(raw: arguments)\n)
                     """
+                    for data in metaData {
+                        """
+                        .task(id: \(raw: data.key)Data) {
+                        \(raw: data.key)DataValue = \(raw: dataTypeMapper(dataItem: data))
+                        }
+                        """
+                    }
                 }
             }
         }
