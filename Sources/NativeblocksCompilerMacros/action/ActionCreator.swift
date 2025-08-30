@@ -44,7 +44,7 @@ enum ActionCreator {
                 """
                 for data in metaData {
                     """
-                    let \(raw: data.key)Data = actionProps.variables?[data["\(raw: data.key)"]?.value ?? ""]
+                    let \(raw: data.key)Data = actionProps.onFindVariable(data["\(raw: data.key)"]?.value ?? "")
                     """
                 }
                 for data in metaData {
@@ -88,7 +88,7 @@ enum ActionCreator {
                             """
                             if var \(param)Updated = \(param)Data {
                                 \(param)Updated.value = String(describing: \(param)Param)
-                                actionProps.onVariableChange?(\(param)Updated)
+                                actionProps.onVariableChange(\(param)Updated)
                             }
                             """
                         }.joined())
@@ -97,21 +97,21 @@ enum ActionCreator {
                             return
                                 """
                                 if actionProps.trigger != nil {
-                                    actionProps.onHandleSuccessNextTrigger?(actionProps.trigger!)
+                                    actionProps.onHandleSuccessNextTrigger(actionProps.trigger!)
                                 }
                                 """
                         case "FAILURE":
                             return
                                 """
                                 if actionProps.trigger != nil {
-                                    actionProps.onHandleFailureNextTrigger?(actionProps.trigger!)
+                                    actionProps.onHandleFailureNextTrigger(actionProps.trigger!)
                                 }
                                 """
                         case "NEXT":
                             return
                                 """
                                 if actionProps.trigger != nil {
-                                    actionProps.onHandleNextTrigger?(actionProps.trigger!)
+                                    actionProps.onHandleNextTrigger(actionProps.trigger!)
                                 }
                                 """
                         default: return ""
@@ -214,7 +214,7 @@ enum ActionCreator {
         default:
             return
                 """
-                NativeblocksManager.getInstance().getTypeConverter(\(item.type).self).fromString(properties["\(item.key)"]?.value ?? "\(item.value)")
+                actionHandleTypeConverter(actionProps: actionProps, type:\(item.type).self).fromString(properties["\(item.key)"]?.value ?? "\(item.value)")
                 """
         }
     }
