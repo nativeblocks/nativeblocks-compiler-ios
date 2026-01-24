@@ -48,7 +48,12 @@ struct BlockCreator {
                 for data in metaData {
                     try VariableDeclSyntax(
                         """
-                        @State private var  \(raw: data.key)DataValue = \(raw: dataDefaultMapper(dataItem: data))
+                        @State private var \(raw: data.key)DataValue = \(raw: dataDefaultMapper(dataItem: data))
+                        """
+                    )
+                    try VariableDeclSyntax(
+                        """
+                        @State private var \(raw: data.key)DataDependencies: [String] = []
                         """
                     )
                 }
@@ -170,8 +175,10 @@ struct BlockCreator {
                     """
                     for data in metaData {
                         """
-                        .task(id: \(raw: data.key)Data) {
+                        .task(id: \(raw: data.key)DataDependencies + [String(describing: \(raw: data.key)Data)]) {
+                        let result = blockHandleVariableValueWithDeps(blockProps: blockProps, variable: \(raw: data.key)Data)
                         \(raw: data.key)DataValue = \(raw: dataTypeMapper(dataItem: data))
+                        \(raw: data.key)DataDependencies = result.dependencies.map { String(describing: $0) }
                         }
                         """
                     }
@@ -185,24 +192,24 @@ struct BlockCreator {
         case "STRING":
             return
                 """
-                blockHandleVariableValue(blockProps: blockProps, variable: \(dataItem.key)Data) ?? "\(dataItem.value)"
+                result.value ?? "\(dataItem.value)"
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
             "FLOAT", "FLOAT80", "FLOAT64",
             "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
-                \(dataItem.type)(blockHandleVariableValue(blockProps: blockProps, variable: \(dataItem.key)Data) ?? "") ?? \(dataItem.value.isEmpty ? "0" : dataItem.value)
+                \(dataItem.type)(result.value ?? "") ?? \(dataItem.value.isEmpty ? "0" : dataItem.value)
                 """
         case "CGFLOAT":
             return
                 """
-                (blockHandleVariableValue(blockProps: blockProps, variable: \(dataItem.key)Data) ?? "").toCGFloat() ?? \(dataItem.value.isEmpty ? "0.0" : dataItem.value)
+                (result.value ?? "").toCGFloat() ?? \(dataItem.value.isEmpty ? "0.0" : dataItem.value)
                 """
         case "BOOL":
             return
                 """
-                Bool(blockHandleVariableValue(blockProps: blockProps, variable: \(dataItem.key)Data) ?? "") ?? \(dataItem.value.isEmpty ? "false" : dataItem.value)
+                Bool(result.value ?? "") ?? \(dataItem.value.isEmpty ? "false" : dataItem.value)
                 """
         default:
             return
