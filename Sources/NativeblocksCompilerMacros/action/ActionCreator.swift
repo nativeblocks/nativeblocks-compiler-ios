@@ -161,24 +161,24 @@ enum ActionCreator {
         case "STRING":
             return
                 """
-                actionHandleVariableValue(actionProps: actionProps, variable: \(dataItem.key)Data) ?? "\(dataItem.value)"
+                handleVariableValue(\(dataItem.key)Data) ?? "\(dataItem.value)"
                 """
         case "INT", "INT64", "INT32", "INT16", "INT8", "UINT", "UINT64", "UINT32", "UINT16", "UINT8",
             "FLOAT", "FLOAT80", "FLOAT64",
             "FLOAT32", "FLOAT16", "DOUBLE":
             return
                 """
-                \(dataItem.type)(actionHandleVariableValue(actionProps: actionProps, variable: \(dataItem.key)Data) ?? "") ?? \(dataItem.value.isEmpty ? "0" : dataItem.value)
+                \(dataItem.type)(handleVariableValue(\(dataItem.key)Data) ?? "") ?? \(dataItem.value.isEmpty ? "0" : dataItem.value)
                 """
         case "CGFLOAT":
             return
                 """
-                (actionHandleVariableValue(actionProps: actionProps, variable: \(dataItem.key)Data).toCGFloat() ?? \(dataItem.value.isEmpty ? "0.0" : dataItem.value)
+                (handleVariableValue(\(dataItem.key)Data) ?? "").toCGFloat() ?? \(dataItem.value.isEmpty ? "0.0" : dataItem.value)
                 """
         case "BOOL":
             return
                 """
-                Bool(actionHandleVariableValue(actionProps: actionProps, variable: \(dataItem.key)Data) ?? \(dataItem.value.isEmpty ? "false" : dataItem.value)
+                Bool(handleVariableValue(\(dataItem.key)Data) ?? "") ?? \(dataItem.value.isEmpty ? "false" : dataItem.value)
                 """
         default:
             return
